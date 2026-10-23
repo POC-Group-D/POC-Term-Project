@@ -1,0 +1,150 @@
+# Local Online Boutique stack for development (Phase 1 baseline).
+#
+# Every service runs from the upstream prebuilt image except
+# recommendationservice, which is built from ../../online-boutique so that
+# local changes to the component we are replacing are exercised.
+#
+# Usage (from this directory):
+#   docker compose up -d                     # start the shop on http://localhost:8080
+#   docker compose --profile load up -d      # also start the Locust load generator
+#   docker compose down                      # stop and remove containers
+#
+# Service addresses and ports mirror online-boutique/release/kubernetes-manifests.yaml
+# so the same configuration carries over to Azure Container Apps.
+
+name: online-boutique
+
+x-common-env: &common-env
+  DISABLE_PROFILER: "1"
+  ENABLE_PROFILER: "0"
+  ENABLE_TRACING: "0"
+
+services:
+  frontend:
+    image: ${IMAGE_REGISTRY:-us-central1-docker.pkg.dev/online-boutique-ci/microservices-demo}/frontend:${IMAGE_TAG:-v0.10.7}
+    ports:
+      - "${FRONTEND_PORT:-8080}:8080"
+    environment:
+      <<: *common-env
+      PORT: "8080"
+      PRODUCT_CATALOG_SERVICE_ADDR: productcatalogservice:3550
+      CURRENCY_SERVICE_ADDR: currencyservice:7000
+      CART_SERVICE_ADDR: cartservice:7070
+      RECOMMENDATION_SERVICE_ADDR: recommendationservice:8080
+      SHIPPING_SERVICE_ADDR: shippingservice:50051
+      CHECKOUT_SERVICE_ADDR: checkoutservice:5050
+      AD_SERVICE_ADDR: adservice:9555
+      # Required by the frontend even though the assistant is disabled.
+      SHOPPING_ASSISTANT_SERVICE_ADDR: shoppingassistantservice:80
+    depends_on:
+      - productcatalogservice
+      - currencyservice
+      - cartservice
+      - recommendationservice
+      - shippingservice
+      - checkoutservice
+      - adservice
+    restart: unless-stopped
+
+  recommendationservice:
+    build:
+      context: ../../online-boutique/src/recommendationservice
+    image: poc-group-d/recommendationservice:local
+    environment:
+      <<: *common-env
+      PORT: "8080"
+      PRODUCT_CATALOG_SERVICE_ADDR: productcatalogservice:3550
+    depends_on:
+      - productcatalogservice
+    restart: unless-stopped
+
+  productcatalogservice:
+    image: ${IMAGE_REGISTRY:-us-central1-docker.pkg.dev/online-boutique-ci/microservices-demo}/productcatalogservice:${IMAGE_TAG:-v0.10.7}
+    environment:
+      <<: *common-env
+      PORT: "3550"
+    restart: unless-stopped
+
+  cartservice:
+    image: ${IMAGE_REGISTRY:-us-central1-docker.pkg.dev/online-boutique-ci/microservices-demo}/cartservice:${IMAGE_TAG:-v0.10.7}
+    environment:
+      REDIS_ADDR: redis-cart:6379
+    depends_on:
+      - redis-cart
+    restart: unless-stopped
+
+  redis-cart:
+    image: redis:7.4-alpine
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+
+  checkoutservice:
+    image: ${IMAGE_REGISTRY:-us-central1-docker.pkg.dev/online-boutique-ci/microservices-demo}/checkoutservice:${IMAGE_TAG:-v0.10.7}
+    environment:
+      <<: *common-env
+      PORT: "5050"
+      PRODUCT_CATALOG_SERVICE_ADDR: productcatalogservice:3550
+      SHIPPING_SERVICE_ADDR: shippingservice:50051
+      PAYMENT_SERVICE_ADDR: paymentservice:50051
+      EMAIL_SERVICE_ADDR: emailservice:5000
+      CURRENCY_SERVICE_ADDR: currencyservice:7000
+      CART_SERVICE_ADDR: cartservice:7070
+    depends_on:
+      - productcatalogservice
+      - shippingservice
+      - paymentservice
+      - emailservice
+      - currencyservice
+      - cartservice
+    restart: unless-stopped
+
+  currencyservice:
+    image: ${IMAGE_REGISTRY:-us-central1-docker.pkg.dev/online-boutique-ci/microservices-demo}/currencyservice:${IMAGE_TAG:-v0.10.7}
+    environment:
+      <<: *common-env
+      PORT: "7000"
+    restart: unless-stopped
+
+  paymentservice:
+    image: ${IMAGE_REGISTRY:-us-central1-docker.pkg.dev/online-boutique-ci/microservices-demo}/paymentservice:${IMAGE_TAG:-v0.10.7}
+    environment:
+      <<: *common-env
+      PORT: "50051"
+    restart: unless-stopped
+
+  shippingservice:
+    image: ${IMAGE_REGISTRY:-us-central1-docker.pkg.dev/online-boutique-ci/microservices-demo}/shippingservice:${IMAGE_TAG:-v0.10.7}
+    environment:
+      <<: *common-env
+      PORT: "50051"
+    restart: unless-stopped
+
+  emailservice:
+    image: ${IMAGE_REGISTRY:-us-central1-docker.pkg.dev/online-boutique-ci/microservices-demo}/emailservice:${IMAGE_TAG:-v0.10.7}
+    environment:
+      <<: *common-env
+      # Kubernetes maps Service port 5000 to container port 8080; Compose has no
+      # such remapping, so the container listens on 5000 directly.
+      PORT: "5000"
+    restart: unless-stopped
+
+  adservice:
+    image: ${IMAGE_REGISTRY:-us-central1-docker.pkg.dev/online-boutique-ci/microservices-demo}/adservice:${IMAGE_TAG:-v0.10.7}
+    environment:
+      PORT: "9555"
+    restart: unless-stopped
+
+  loadgenerator:
+    image: ${IMAGE_REGISTRY:-us-central1-docker.pkg.dev/online-boutique-ci/microservices-demo}/loadgenerator:${IMAGE_TAG:-v0.10.7}
+    profiles: ["load"]
+    environment:
+      FRONTEND_ADDR: frontend:8080
+      USERS: ${LOAD_USERS:-10}
+      RATE: ${LOAD_RATE:-1}
+    depends_on:
+      - frontend
+    restart: unless-stopped
+
+volumes:
+  redis-data:

@@ -1,0 +1,8 @@
+# Normalise line endings so scripts run inside Linux containers even when
+# checked out on Windows.
+* text=auto
+*.sh text eol=lf
+*.py text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+Dockerfile text eol=lf
