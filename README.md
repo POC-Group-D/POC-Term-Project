@@ -28,6 +28,7 @@ docs/              Roadmap, design docs, AI-usage log
   ai-usage/        Prompts, models and tools used for AI-assisted development
 infra/
   local/           Docker Compose stack for local development
+  azure/           Bicep templates and scripts for Azure Container Apps
 online-boutique/   Upstream Online Boutique (v0.10.7), including v1 and protos/
 ```
 

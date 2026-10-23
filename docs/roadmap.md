@@ -18,9 +18,9 @@ agreement first.
 
 ## Phase 2: Azure foundation
 
-- [ ] 4. **$** Resource group, budget with alerts at 50/80/100%, tag scheme (`project`, `component`, `version`)
-- [ ] 5. **$** Deploy v1 to Azure Container Apps (internal gRPC, public frontend), scripted in `infra/`
-- [ ] 6. **$** NoSQL store: Cosmos DB free tier for agent data (or move cart Redis to managed Redis)
+- [x] 4. Resource group `rg-poc-group-d`, $10/month budget with alerts at 50/80/100%, tag scheme (`project`, `component`, `version`) (Nofil)
+- [ ] 5. **$** Deploy v1 to Azure Container Apps (internal gRPC, public frontend): scripted in `infra/azure`, validated with what-if, not yet deployed
+- [ ] 6. **$** NoSQL store: free-tier Cosmos DB for agent data: scripted in `infra/azure`, not yet deployed
 
 ## Phase 3: v2 AI agent
 
