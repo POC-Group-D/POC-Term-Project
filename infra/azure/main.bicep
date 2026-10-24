@@ -3,11 +3,12 @@
 // Deploys, into the target resource group:
 //   - a Log Analytics workspace with a daily ingestion cap (stays in the 5 GB/month free grant)
 //   - one Container Apps environment (Consumption plan)
-//   - the 11 Online Boutique services; cartservice carries Redis as a sidecar
+//   - the 10 Online Boutique Container Apps (no load generator or shopping
+//     assistant); cartservice carries Redis as a sidecar
 //   - a free-tier Cosmos DB account for the v2 agent
 //
 // Every resource is tagged so costs can be split by component and version.
-// Deploy with ../azure/deploy.sh rather than calling this file directly.
+// Deploy with ./deploy.sh rather than calling this file directly.
 
 targetScope = 'resourceGroup'
 
@@ -25,6 +26,12 @@ param imageTag string = 'v0.10.7'
 
 @description('Image for recommendationservice. v1 is the unmodified upstream image.')
 param recommendationImage string = '${imageRegistry}/recommendationservice:${imageTag}'
+
+@description('Frontend image. Defaults to upstream (9 products); set to the /catalog image once it is in a registry.')
+param frontendImage string = '${imageRegistry}/frontend:${imageTag}'
+
+@description('Product catalog image. Defaults to upstream (9 products); set to the /catalog image once it is in a registry.')
+param productCatalogImage string = '${imageRegistry}/productcatalogservice:${imageTag}'
 
 @description('0 = scale to zero when idle (free-tier friendly). 1 = always on (for demos).')
 @minValue(0)
@@ -74,7 +81,7 @@ var redisSidecar = {
 var services = [
   {
     name: 'frontend'
-    image: '${imageRegistry}/frontend:${imageTag}'
+    image: frontendImage
     port: 8080
     external: true
     transport: 'http'
@@ -112,7 +119,7 @@ var services = [
   }
   {
     name: 'productcatalogservice'
-    image: '${imageRegistry}/productcatalogservice:${imageTag}'
+    image: productCatalogImage
     port: 3550
     external: false
     transport: 'http2'

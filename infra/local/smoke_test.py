@@ -1,7 +1,8 @@
 """End-to-end smoke test for the local Online Boutique stack.
 
-Runs inside the recommendationservice container (see smoke-test.sh), which
-already ships grpcio and the generated demo_pb2 stubs.
+Runs in a container from the v1 recommendationservice image (see
+smoke-test.sh), which already ships grpcio and the generated demo_pb2 stubs.
+Works against v1 or v2.
 
 Checks:
   1. The frontend serves the home page and a product page.
@@ -25,8 +26,11 @@ RECOMMENDATION_ADDR = os.environ.get("RECOMMENDATION_ADDR", "recommendationservi
 CATALOG_ADDR = os.environ.get("CATALOG_ADDR", "productcatalogservice:3550")
 MAX_RECOMMENDATIONS = 5
 RPC_TIMEOUT_SECONDS = 5
-# Product pages wait for recommendations; v2 on a local CPU model takes ~20 s.
-PAGE_TIMEOUT_SECONDS = 60
+# v2 on a local CPU model needs 20-40 s per new decision. A shorter deadline
+# would make v2 fall back (still a valid answer) but leave the abandoned model
+# request running in Ollama, slowing every request after it.
+RECOMMENDATION_TIMEOUT_SECONDS = 90
+PAGE_TIMEOUT_SECONDS = 90
 
 
 def check_http(path):
@@ -47,7 +51,7 @@ def list_recommendations(cart_ids):
     with grpc.insecure_channel(RECOMMENDATION_ADDR) as channel:
         stub = demo_pb2_grpc.RecommendationServiceStub(channel)
         request = demo_pb2.ListRecommendationsRequest(user_id="smoke-test", product_ids=cart_ids)
-        response = stub.ListRecommendations(request, timeout=RPC_TIMEOUT_SECONDS)
+        response = stub.ListRecommendations(request, timeout=RECOMMENDATION_TIMEOUT_SECONDS)
     return list(response.product_ids)
 
 

@@ -38,6 +38,13 @@ Every resource carries `project=poc-group-d`, `course=coen6313`,
 
 Filter Cost Analysis by these tags to separate v1 and v2 costs.
 
+### Product catalog on Azure
+
+`main.bicep` deploys the upstream `frontend` and `productcatalogservice`
+images (9 products) by default. The local stack uses the 200-product images
+built from `/catalog`; to use them on Azure, push them to a registry (Phase 5)
+and pass `frontendImage` and `productCatalogImage` to the deployment.
+
 ## Internal networking
 
 Each service is a Container App whose name matches the upstream service name.

@@ -192,8 +192,9 @@ class RecommendationAgent:
                 raise AgentError("time budget exhausted")
 
             if not turn.tool_calls:
-                # Some models answer in text instead of calling the tool.
-                mentioned = [pid for pid in catalog_ids if pid in turn.content]
+                # Some models answer in text instead of calling the tool; keep
+                # the ids in the order the model wrote them.
+                mentioned = sorted((pid for pid in catalog_ids if pid in turn.content), key=turn.content.index)
                 return self._accept(mentioned, "", catalog_ids, excluded, decision)
 
             messages.append(turn.as_message())
@@ -210,6 +211,8 @@ class RecommendationAgent:
         raise AgentError(f"no recommendation after {self._max_steps} steps")
 
     def _accept(self, proposed, reason, catalog_ids, excluded, decision):
+        if isinstance(proposed, str):  # a single id instead of a list
+            proposed = [proposed]
         chosen = sanitize(proposed, catalog_ids, excluded, self._limit)
         if not chosen:
             raise AgentError(f"model proposed no valid products: {json.dumps(proposed)[:200]}")

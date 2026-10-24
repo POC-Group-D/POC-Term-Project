@@ -83,3 +83,21 @@ Prompts: "Why is it giving tank top as recommendation for mug?" then "Add more p
   22-39 s each, about 690 prompt tokens, $0.
 - The smoke test's page timeout was raised to 60 s because product pages wait
   for v2.
+
+## Follow-up: code review of all phases (2026-10-24)
+
+Prompt: "Remove my other branches. Just keep the all phases one and name it properly this time. Review the code of all phases just to make sure it's accurate and clean."
+
+Fixes from the review:
+- Agent: plain-text answers kept the model's order (was random); a single id
+  string is accepted where a list is expected; malformed tool arguments are
+  reported back to the model instead of failing the request. 25 tests pass.
+- `infra/azure/smoke-test.sh`: `curl -L -X POST` repeated the POST on every
+  redirect (re-adding to cart); now uses `--data` and URL-encodes the
+  checkout form. Verified against the local shop: 5/5, exactly one order.
+- `infra/local/smoke_test.py`: recommendation calls wait 90 s so v2 answers
+  with the model instead of falling back and leaving abandoned work in Ollama.
+- `main.bicep`: `frontendImage` and `productCatalogImage` parameters for the
+  200-product images; corrected comments (10 apps, script path).
+- All work consolidated on `nofil-foundation-and-recommendation-agent`; the
+  earlier `nofil-*` branches were deleted.

@@ -6,8 +6,8 @@
 #   - productcatalogservice and frontend, thin layers over the upstream images
 #     that add the 200-product catalog and its pictures (../../catalog)
 #
-# Usage (from this directory):
-#   docker compose up -d                     # start the shop on http://localhost:8080
+# Usage (from this directory; see README.md for v2):
+#   docker compose up -d --build             # start the shop on http://localhost:8080
 #   docker compose --profile load up -d      # also start the Locust load generator
 #   docker compose down                      # stop and remove containers
 #

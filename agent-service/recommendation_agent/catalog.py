@@ -17,7 +17,7 @@ class Product:
     categories: tuple
 
     def summary(self):
-        """Compact view handed to the model (keeps prompts, and cost, small)."""
+        """Compact view returned by the catalog tools."""
         return {"id": self.id, "name": self.name, "categories": list(self.categories)}
 
     def detail(self):

@@ -45,11 +45,20 @@ echo "Testing $url (the first request may take up to a minute while apps scale f
 check "home page" http_ok "$url/"
 check "product page" http_ok "$url/product/$product_id"
 check "recommendations rendered" has_recommendations
-check "add to cart" http_ok -L -X POST -d "product_id=$product_id&quantity=1" "$url/cart"
-check "checkout" http_ok -L -X POST \
-  -d "email=smoke@example.com&street_address=1455 De Maisonneuve Blvd W&zip_code=94043" \
-  -d "city=Montreal&state=QC&country=Canada&credit_card_number=4432801561520454" \
-  -d "credit_card_expiration_month=1&credit_card_expiration_year=2030&credit_card_cvv=672" \
+# --data makes these POSTs; -L then follows the shop's redirect with a GET.
+# (Adding -X POST would repeat the POST on every redirect.)
+check "add to cart" http_ok -L --data "product_id=$product_id&quantity=1" "$url/cart"
+check "checkout" http_ok -L \
+  --data-urlencode "email=smoke@example.com" \
+  --data-urlencode "street_address=1455 De Maisonneuve Blvd W" \
+  --data-urlencode "zip_code=94043" \
+  --data-urlencode "city=Montreal" \
+  --data-urlencode "state=QC" \
+  --data-urlencode "country=Canada" \
+  --data-urlencode "credit_card_number=4432801561520454" \
+  --data-urlencode "credit_card_expiration_month=1" \
+  --data-urlencode "credit_card_expiration_year=2030" \
+  --data-urlencode "credit_card_cvv=672" \
   "$url/cart/checkout"
 
 echo

@@ -46,10 +46,10 @@ git clone https://github.com/POC-Group-D/POC-Term-Project.git
 cd POC-Term-Project
 ```
 
-The working code is on the `nofil-all-phases` branch until it is merged into `main`:
+The working code is on the `nofil-foundation-and-recommendation-agent` branch until it is merged into `main`:
 
 ```bash
-git checkout nofil-all-phases
+git checkout nofil-foundation-and-recommendation-agent
 ```
 
 All other commands are run from the `infra/local` folder:

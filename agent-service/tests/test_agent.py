@@ -156,11 +156,19 @@ def test_step_limit_without_answer_falls_back(catalog, clock):
 
 
 def test_plain_text_answer_with_ids_is_accepted(catalog, clock):
-    model = ScriptedModel(ModelTurn(content="I suggest 6E92ZMYYFZ and 9SIQT8TOJO."))
+    model = ScriptedModel(ModelTurn(content="I suggest 9SIQT8TOJO, then 6E92ZMYYFZ and L9ECAV7KIM."))
     decision = make_agent(catalog, model, clock).recommend(["LS4PSXUNUM"])
 
     assert decision.outcome == "agent"
-    assert set(decision.product_ids[:2]) == {"6E92ZMYYFZ", "9SIQT8TOJO"}
+    assert decision.product_ids[:3] == ["9SIQT8TOJO", "6E92ZMYYFZ", "L9ECAV7KIM"]
+
+
+def test_single_id_string_is_accepted(catalog, clock):
+    model = ScriptedModel(tool_turn("recommend", product_ids="6E92ZMYYFZ"))
+    decision = make_agent(catalog, model, clock).recommend(["LS4PSXUNUM"])
+
+    assert decision.outcome == "agent"
+    assert decision.product_ids[0] == "6E92ZMYYFZ"
 
 
 def test_no_model_configured_uses_v1(catalog, clock):

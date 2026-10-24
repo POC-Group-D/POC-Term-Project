@@ -3,8 +3,8 @@
 #   docker compose -f docker-compose.yml -f docker-compose.v2.yml up -d --build
 #
 # By default the agent uses a Hugging Face model (Qwen3-4B-Instruct-2507)
-# served locally by Ollama: free and unlimited, but CPU inference takes a few
-# seconds per request. The first start downloads the model (about 2.5 GB).
+# served locally by Ollama: free and unlimited, but on a laptop CPU each new
+# decision takes 20-40 s. The first start downloads the model (about 2.5 GB).
 #
 # Any OpenAI-compatible provider works instead; set in .env, for example:
 #   MODEL_BASE_URL=https://models.github.ai/inference   (GitHub Models)

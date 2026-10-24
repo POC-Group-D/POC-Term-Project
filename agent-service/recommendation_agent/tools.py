@@ -92,11 +92,11 @@ class ToolExecutor:
             return json.dumps({"error": f"unknown tool {name!r}"})
         try:
             return json.dumps(handler(**arguments))
-        except TypeError as exc:  # wrong or missing arguments from the model
+        except (TypeError, AttributeError, ValueError) as exc:  # malformed arguments from the model
             return json.dumps({"error": f"bad arguments for {name}: {exc}"})
 
     def _browse_category(self, category):
-        wanted = category.lower().strip()
+        wanted = str(category).lower().strip()
         matches = [p.summary() for p in self._catalog.all_products().values()
                    if wanted in (c.lower() for c in p.categories)]
         if not matches:
@@ -104,11 +104,13 @@ class ToolExecutor:
         return {"products": matches[:MAX_CATEGORY_RESULTS]}
 
     def _get_products(self, product_ids):
+        if isinstance(product_ids, str):  # a single id instead of a list
+            product_ids = [product_ids]
         found = [self._catalog.get(pid) for pid in product_ids]
         return {"products": [p.detail() for p in found if p is not None]}
 
     def _search_catalog(self, query):
-        results = [p.summary() for p in self._catalog.search(query)]
+        results = [p.summary() for p in self._catalog.search(str(query))]
         if not results:
             return {"products": [], "hint": "No match. Try a single keyword, or browse a category."}
         return {"products": results}

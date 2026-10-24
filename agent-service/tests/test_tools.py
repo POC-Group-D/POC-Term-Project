@@ -34,3 +34,8 @@ def test_empty_search_returns_a_hint(catalog):
 def test_unknown_tool_and_bad_arguments_return_errors(catalog):
     assert "unknown tool" in run(catalog, "list_catalog")["error"]
     assert "bad arguments" in run(catalog, "get_products", wrong="x")["error"]
+
+
+def test_loosely_typed_arguments_still_work(catalog):
+    assert [p["id"] for p in run(catalog, "get_products", product_ids="OLJCESPC7Z")["products"]] == ["OLJCESPC7Z"]
+    assert "Unknown category" in run(catalog, "browse_category", category=None)["hint"]
