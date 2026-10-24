@@ -51,6 +51,12 @@ CPU inference takes several seconds per recommendation; the agent falls back
 to v1 if it runs out of time. To use a hosted API instead, set `MODEL_BASE_URL`,
 `MODEL_API_KEY` and `MODEL_NAME` in `.env`.
 
+Watch the agent's decisions live (one line per recommendation):
+
+```bash
+./watch-agent.sh
+```
+
 Switch back to v1 with `docker compose up -d --build recommendationservice`
 (add `docker compose -f docker-compose.v2.yml stop ollama` to free its memory).
 See [agent-service/README.md](../../agent-service/README.md).
