@@ -2,8 +2,15 @@
 #
 #   docker compose -f docker-compose.yml -f docker-compose.v2.yml up -d --build
 #
-# Put HF_TOKEN (and optionally HF_MODEL, COSMOS_ENDPOINT, COSMOS_KEY) in .env.
-# Without HF_TOKEN the agent still runs but every request uses the v1 fallback.
+# By default the agent uses a Hugging Face model (Qwen3-4B-Instruct-2507)
+# served locally by Ollama: free and unlimited, but CPU inference takes a few
+# seconds per request. The first start downloads the model (about 2.5 GB).
+#
+# Any OpenAI-compatible provider works instead; set in .env, for example:
+#   MODEL_BASE_URL=https://models.github.ai/inference   (GitHub Models)
+#   MODEL_API_KEY=<token>                               (secret: .env only)
+#   MODEL_NAME=openai/gpt-4o-mini
+# The local ollama services still start but are then unused.
 
 services:
   recommendationservice:
@@ -11,10 +18,39 @@ services:
       context: ../../agent-service
     image: poc-group-d/recommendationservice:v2-local
     environment:
-      HF_TOKEN: ${HF_TOKEN:-}
-      HF_MODEL: ${HF_MODEL:-Qwen/Qwen3-4B-Instruct-2507}
-      # Provider list prices (USD per million tokens) for the cost estimate.
-      MODEL_INPUT_PRICE_PER_MTOK: ${MODEL_INPUT_PRICE_PER_MTOK:-0.01}
-      MODEL_OUTPUT_PRICE_PER_MTOK: ${MODEL_OUTPUT_PRICE_PER_MTOK:-0.03}
+      MODEL_BASE_URL: ${MODEL_BASE_URL:-http://ollama:11434/v1}
+      MODEL_API_KEY: ${MODEL_API_KEY:-ollama}
+      MODEL_NAME: ${MODEL_NAME:-${OLLAMA_MODEL:-qwen3:4b-instruct}}
+      # Local inference is free; set provider list prices when using a paid API.
+      MODEL_INPUT_PRICE_PER_MTOK: ${MODEL_INPUT_PRICE_PER_MTOK:-0}
+      MODEL_OUTPUT_PRICE_PER_MTOK: ${MODEL_OUTPUT_PRICE_PER_MTOK:-0}
+      # CPU inference is slow; give the agent more time than on a hosted API.
+      AGENT_TIMEOUT_SECONDS: ${AGENT_TIMEOUT_SECONDS:-45}
       COSMOS_ENDPOINT: ${COSMOS_ENDPOINT:-}
       COSMOS_KEY: ${COSMOS_KEY:-}
+    depends_on:
+      model-init:
+        condition: service_completed_successfully
+
+  ollama:
+    image: ollama/ollama:0.13.5
+    environment:
+      # Keep the model in memory between requests to avoid reload delays.
+      OLLAMA_KEEP_ALIVE: 24h
+      OLLAMA_NUM_PARALLEL: "1"
+    volumes:
+      - ollama-models:/root/.ollama
+    restart: unless-stopped
+
+  # Downloads the model into the shared volume once, then exits.
+  model-init:
+    image: ollama/ollama:0.13.5
+    environment:
+      OLLAMA_HOST: ollama:11434
+    entrypoint: ["ollama", "pull", "${OLLAMA_MODEL:-qwen3:4b-instruct}"]
+    depends_on:
+      - ollama
+    restart: on-failure
+
+volumes:
+  ollama-models:

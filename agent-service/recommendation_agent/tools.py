@@ -1,21 +1,14 @@
 """Tools the model can call, in OpenAI function-calling format.
 
-Three tools read productcatalogservice; the fourth, `recommend`, is how the
-model returns its final answer. Tool results are JSON strings.
+Two tools read productcatalogservice; the third, `recommend`, is how the
+model returns its final answer. Tool results are JSON strings. (The agent
+already gives the model the candidate list, so no "list everything" tool is
+needed; that keeps prompts, latency and cost down.)
 """
 
 import json
 
 RECOMMEND = "recommend"
-
-_LIST_CATALOG = {
-    "type": "function",
-    "function": {
-        "name": "list_catalog",
-        "description": "List every product in the store with its id, name and categories.",
-        "parameters": {"type": "object", "properties": {}},
-    },
-}
 
 _GET_PRODUCTS = {
     "type": "function",
@@ -36,7 +29,7 @@ _SEARCH_CATALOG = {
     "type": "function",
     "function": {
         "name": "search_catalog",
-        "description": "Search product names and descriptions for a keyword, e.g. 'kitchen' or 'summer'.",
+        "description": "Search product names and descriptions for ONE keyword, e.g. 'kitchen' or 'summer'.",
         "parameters": {
             "type": "object",
             "properties": {"query": {"type": "string"}},
@@ -65,7 +58,7 @@ _RECOMMEND = {
     },
 }
 
-ALL_TOOLS = [_LIST_CATALOG, _GET_PRODUCTS, _SEARCH_CATALOG, _RECOMMEND]
+ALL_TOOLS = [_GET_PRODUCTS, _SEARCH_CATALOG, _RECOMMEND]
 FINAL_TOOLS = [_RECOMMEND]
 
 
@@ -77,7 +70,6 @@ class ToolExecutor:
 
     def run(self, name, arguments):
         handler = {
-            "list_catalog": self._list_catalog,
             "get_products": self._get_products,
             "search_catalog": self._search_catalog,
         }.get(name)
@@ -88,12 +80,12 @@ class ToolExecutor:
         except TypeError as exc:  # wrong or missing arguments from the model
             return json.dumps({"error": f"bad arguments for {name}: {exc}"})
 
-    def _list_catalog(self):
-        return {"products": [p.summary() for p in self._catalog.all_products().values()]}
-
     def _get_products(self, product_ids):
         found = [self._catalog.get(pid) for pid in product_ids]
         return {"products": [p.detail() for p in found if p is not None]}
 
     def _search_catalog(self, query):
-        return {"products": [p.summary() for p in self._catalog.search(query)]}
+        results = [p.summary() for p in self._catalog.search(query)]
+        if not results:
+            return {"products": [], "hint": "No match. Try a single keyword, or choose from the candidates."}
+        return {"products": results}

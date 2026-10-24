@@ -44,8 +44,15 @@ returned. These are the same correctness rules v2 must satisfy.
 docker compose -f docker-compose.yml -f docker-compose.v2.yml up -d --build
 ```
 
-Set `HF_TOKEN` in `.env` to enable the model; without it v2 answers with the
-v1 fallback. Switch back with `docker compose up -d --build recommendationservice`.
+This also starts Ollama, which serves the Hugging Face model
+`Qwen/Qwen3-4B-Instruct-2507` (4-bit) locally for free. The first start
+downloads about 2.5 GB, and the stack then needs roughly 6 GB of Docker memory.
+CPU inference takes several seconds per recommendation; the agent falls back
+to v1 if it runs out of time. To use a hosted API instead, set `MODEL_BASE_URL`,
+`MODEL_API_KEY` and `MODEL_NAME` in `.env`.
+
+Switch back to v1 with `docker compose up -d --build recommendationservice`
+(add `docker compose -f docker-compose.v2.yml stop ollama` to free its memory).
 See [agent-service/README.md](../../agent-service/README.md).
 
 ## Generate traffic

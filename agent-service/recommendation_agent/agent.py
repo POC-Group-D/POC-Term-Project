@@ -1,7 +1,8 @@
 """The recommendation agent.
 
-The model decides what to recommend: it looks up the shopper's products and
-the catalog through tools, then calls `recommend`. The agent enforces the v1
+The model decides what to recommend. The agent hands it the shopper's
+products and the candidate products; the model may call catalog tools for more
+detail, then calls `recommend`. The agent enforces the v1
 contract on whatever the model returns and falls back to v1's random choice
 on any failure, so the client always gets a valid answer.
 
@@ -24,12 +25,12 @@ from .tools import ALL_TOOLS, FINAL_TOOLS, RECOMMEND, ToolExecutor
 logger = logging.getLogger(__name__)
 
 SYSTEM_PROMPT = """You are the recommendation engine of an online store.
-The shopper is looking at, or has in their cart, the products listed in the user message.
-Choose up to {limit} OTHER catalog products that the shopper is most likely to want with them:
+The user message lists the shopper's products and the candidate products.
+Choose up to {limit} candidates the shopper is most likely to want next:
 complementary items first, then items from related categories.
-Use the tools to look up the shopper's products and the catalog. Only use product ids returned
-by the tools, never recommend a product the shopper already has, and finish by calling
-`recommend` exactly once."""
+The candidate names and categories are usually enough: then call `recommend` immediately.
+Call get_products or search_catalog only if you cannot decide without more detail.
+Only recommend candidate ids, and finish by calling `recommend` exactly once."""
 
 # Leave this much of the time budget for the fallback path.
 _SAFETY_MARGIN_SECONDS = 0.3
@@ -185,9 +186,14 @@ class RecommendationAgent:
         decision.reason = str(reason)[:300]
 
     def _describe_context(self, context_ids):
-        if not context_ids:
-            return "The shopper has no products yet. Recommend a varied selection of popular items."
-        return "Shopper's products: " + json.dumps(list(context_ids))
+        """Pre-fetch what every decision needs, so the model can usually answer
+        in one call: the shopper's products in detail and the candidates in brief."""
+        products = self._catalog.all_products()
+        owned = [products[pid].detail() for pid in context_ids if pid in products]
+        candidates = [p.summary() for pid, p in products.items() if pid not in context_ids]
+        shopper = (f"Shopper's products (do not recommend these): {json.dumps(owned)}"
+                   if owned else "The shopper has no products yet; recommend a varied selection.")
+        return f"{shopper}\nCandidate products: {json.dumps(candidates)}"
 
     def _top_up(self, decision, catalog_ids, excluded):
         """Fill to the limit with random products so the response size matches v1."""

@@ -10,7 +10,7 @@ from grpc_health.v1 import health, health_pb2, health_pb2_grpc
 from .agent import RecommendationAgent
 from .catalog import CatalogClient
 from .config import Settings
-from .model import HuggingFaceChatModel
+from .model import ChatModel
 from .proto import demo_pb2, demo_pb2_grpc
 from .telemetry import CosmosSink, DecisionLog, build_record, configure_logging, estimate_cost
 
@@ -42,11 +42,11 @@ class RecommendationService(demo_pb2_grpc.RecommendationServiceServicer):
 
 
 def build_model(settings):
-    if not settings.hf_token:
-        logger.warning("HF_TOKEN not set: every request will use the v1 fallback")
+    if not settings.model_base_url:
+        logger.warning("MODEL_BASE_URL not set: every request will use the v1 fallback")
         return None
-    return HuggingFaceChatModel(settings.hf_token, settings.hf_base_url,
-                                settings.hf_model, settings.model_max_tokens)
+    return ChatModel(settings.model_base_url, settings.model_api_key,
+                     settings.model_name, settings.model_max_tokens)
 
 
 def build_sink(settings):

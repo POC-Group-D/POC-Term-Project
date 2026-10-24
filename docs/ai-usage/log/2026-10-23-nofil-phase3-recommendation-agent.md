@@ -46,3 +46,20 @@
   account has no Inference Providers credits. Nothing was charged. Each
   request fell back to v1 in about 65 ms, which confirmed the fallback path
   end to end.
+
+## Follow-up: local model via Ollama
+
+Prompt: "Implement A now [run a Hugging Face model locally with Ollama], then we might change to B [GitHub Models] later."
+
+- Model settings renamed to provider-neutral `MODEL_BASE_URL`, `MODEL_API_KEY`,
+  `MODEL_NAME`, so Ollama, GitHub Models and Hugging Face differ only by config.
+- `docker-compose.v2.yml` now starts Ollama 0.13.5 and pulls `qwen3:4b-instruct`
+  (Hugging Face `Qwen/Qwen3-4B-Instruct-2507`, 4-bit, 2.5 GB).
+- First live run: the model called tools but used multi-word searches that
+  never match and never saw the candidate list, so 0/4 answers were usable
+  (one timeout). Changes: the agent now pre-fetches the shopper's products and
+  the candidate list into the prompt, `list_catalog` was removed, empty searches
+  return a hint, and the prompt asks the model to answer directly when it can.
+- Final run: 4/4 requests decided by the model with sensible reasons,
+  1-2 model calls, 670-1,840 prompt tokens, 15-40 s per request on CPU, $0.
+- Tests: 20 passed.

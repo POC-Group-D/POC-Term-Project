@@ -17,10 +17,11 @@ class Settings:
     port: int
     catalog_addr: str
 
-    # Model (Hugging Face Inference Providers, OpenAI-compatible API).
-    hf_token: str
-    hf_base_url: str
-    hf_model: str
+    # Model: any OpenAI-compatible chat API with tool calling, e.g. a local
+    # Ollama server, Hugging Face Inference Providers or GitHub Models.
+    model_base_url: str
+    model_api_key: str
+    model_name: str
     model_max_tokens: int
     # USD per million tokens, used to estimate cost per request.
     input_price_per_mtok: float
@@ -47,9 +48,9 @@ class Settings:
         return cls(
             port=_int("PORT", 8080),
             catalog_addr=catalog_addr,
-            hf_token=os.environ.get("HF_TOKEN", ""),
-            hf_base_url=os.environ.get("HF_BASE_URL", "https://router.huggingface.co/v1"),
-            hf_model=os.environ.get("HF_MODEL", "Qwen/Qwen3-4B-Instruct-2507"),
+            model_base_url=os.environ.get("MODEL_BASE_URL", ""),
+            model_api_key=os.environ.get("MODEL_API_KEY", ""),
+            model_name=os.environ.get("MODEL_NAME", "qwen3:4b-instruct"),
             model_max_tokens=_int("MODEL_MAX_TOKENS", 300),
             input_price_per_mtok=_float("MODEL_INPUT_PRICE_PER_MTOK", 0.0),
             output_price_per_mtok=_float("MODEL_OUTPUT_PRICE_PER_MTOK", 0.0),

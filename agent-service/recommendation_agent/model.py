@@ -1,8 +1,10 @@
 """Chat model client.
 
-HuggingFaceChatModel talks to Hugging Face Inference Providers through its
-OpenAI-compatible endpoint. Anything with the same `complete` method can be
-used instead, which is how the tests run without network access.
+ChatModel talks to any OpenAI-compatible chat completions API with tool
+calling: a local Ollama server, Hugging Face Inference Providers, GitHub
+Models and others differ only in base URL, key and model name. Anything with
+the same `complete` method can be used instead, which is how the tests run
+without network access.
 """
 
 import json
@@ -48,12 +50,11 @@ def _parse_arguments(raw):
     return parsed if isinstance(parsed, dict) else {}
 
 
-class HuggingFaceChatModel:
-    def __init__(self, token, base_url, model, max_tokens):
-        if not token:
-            raise ValueError("HF_TOKEN is required for the Hugging Face model")
+class ChatModel:
+    def __init__(self, base_url, api_key, model, max_tokens):
         # Retries are disabled: the agent has its own deadline and falls back to v1.
-        self._client = OpenAI(api_key=token, base_url=base_url, max_retries=0)
+        # Local servers such as Ollama ignore the key but the client requires one.
+        self._client = OpenAI(api_key=api_key or "unused", base_url=base_url, max_retries=0)
         self.name = model
         self._max_tokens = max_tokens
 

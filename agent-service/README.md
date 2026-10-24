@@ -18,8 +18,9 @@ ListRecommendations(user_id, product_ids)
   │
   ├─ cache hit for this context? ──────────────────────────► reuse decision ("cached")
   │
-  ├─ model loop (max 4 steps, 8 s budget, capped by the caller's gRPC deadline)
-  │    model ──► list_catalog / get_products / search_catalog ──► productcatalogservice
+  ├─ prompt: shopper's products + candidate products (from productcatalogservice)
+  ├─ model loop (max 4 steps, time budget, capped by the caller's gRPC deadline)
+  │    model ──► get_products / search_catalog (optional) ──► productcatalogservice
   │    model ──► recommend(product_ids, reason)
   │
   ├─ guardrails: keep only real catalog ids, drop the shopper's own products,
@@ -30,13 +31,17 @@ ListRecommendations(user_id, product_ids)
 
 The model must call tools to decide; v2 never just rephrases v1's output.
 
-### Tools
+### Context and tools
+
+Before the first model call the agent reads the catalog
+(`ProductCatalogService.ListProducts`, cached 60 s) and gives the model the
+shopper's products in detail plus every other product as a candidate (id,
+name, categories). The model can then answer in one call, or use tools first:
 
 | Tool | Backend call | Purpose |
 |---|---|---|
-| `list_catalog` | `ProductCatalogService.ListProducts` (cached 60 s) | Every product with id, name, categories |
-| `get_products` | catalog cache | Details of specific products, e.g. the shopper's |
-| `search_catalog` | `ProductCatalogService.SearchProducts` | Keyword search |
+| `get_products` | catalog cache | Descriptions of specific products |
+| `search_catalog` | `ProductCatalogService.SearchProducts` | Keyword search; returns a hint when nothing matches |
 | `recommend` | none | Final answer: product ids and a one-sentence reason |
 
 On the last step only `recommend` is offered, so the model must answer.
@@ -66,17 +71,45 @@ Log Analytics on Azure) and, if configured, written to Cosmos DB
 | `estimatedCostUsd` | number | Tokens × configured prices |
 | `latencyMs` | number | Server-side handling time |
 
+## Model providers
+
+The client speaks the OpenAI chat completions API, so the provider is chosen
+purely by configuration:
+
+| Provider | `MODEL_BASE_URL` | `MODEL_NAME` | Cost |
+|---|---|---|---|
+| Local Ollama (default in `docker-compose.v2.yml`) | `http://ollama:11434/v1` | `qwen3:4b-instruct` (Hugging Face `Qwen/Qwen3-4B-Instruct-2507`, 4-bit) | Free; CPU inference, seconds per request |
+| GitHub Models (free tier, rate limited) | `https://models.github.ai/inference` | e.g. `openai/gpt-4o-mini` | Free within daily limits |
+| Hugging Face Inference Providers | `https://router.huggingface.co/v1` | `Qwen/Qwen3-4B-Instruct-2507` | Pre-paid credits; the free account had none |
+
+### Measured: local Qwen3-4B on CPU (2026-10-23)
+
+Ryzen 7 8840HS, 16 threads, no GPU; 4 requests with different contexts.
+
+| Metric | Result |
+|---|---|
+| Decided by the model | 4 / 4 (2 answered in one call, 2 looked up details first) |
+| Tokens per request | 670-1,840 prompt, 65-160 completion |
+| Latency per request | 15-40 s (about 12-20 s per model call) |
+| Cost | $0 (local) |
+
+Decisions are sensible (e.g. salt & pepper shakers -> bamboo glass jar, mug).
+CPU latency is fine for development but far above v1 (milliseconds), so the
+canary on Azure needs a faster backend (a hosted API, or more CPU for Ollama).
+At the Hugging Face list price for this model ($0.01 / $0.03 per million
+tokens) the same requests would cost about $0.00002 each.
+
 ## Configuration
 
 | Variable | Default | Notes |
 |---|---|---|
 | `PRODUCT_CATALOG_SERVICE_ADDR` | required | e.g. `productcatalogservice:3550` |
 | `PORT` | `8080` | |
-| `HF_TOKEN` | empty | Hugging Face access token. **Secret**: Container Apps secret or local `.env`, never in git. Without it every request uses the fallback. |
-| `HF_MODEL` | `Qwen/Qwen3-4B-Instruct-2507` | Any Inference Providers chat model that supports tool calling |
-| `HF_BASE_URL` | `https://router.huggingface.co/v1` | OpenAI-compatible endpoint |
+| `MODEL_BASE_URL` | empty | OpenAI-compatible endpoint. Without it every request uses the fallback. |
+| `MODEL_API_KEY` | empty | **Secret**: Container Apps secret or local `.env`, never in git. Not needed for Ollama. |
+| `MODEL_NAME` | `qwen3:4b-instruct` | Any chat model with tool calling on that endpoint |
 | `MODEL_MAX_TOKENS` | `300` | Per model call |
-| `MODEL_INPUT_PRICE_PER_MTOK`, `MODEL_OUTPUT_PRICE_PER_MTOK` | `0` | USD per million tokens, for cost per request (set once the provider is chosen) |
+| `MODEL_INPUT_PRICE_PER_MTOK`, `MODEL_OUTPUT_PRICE_PER_MTOK` | `0` | USD per million tokens, for cost per request (0 for local inference) |
 | `MAX_RECOMMENDATIONS` | `5` | Same as v1 |
 | `MAX_AGENT_STEPS` | `4` | |
 | `AGENT_TIMEOUT_SECONDS` | `8` | Overall model budget per request |

@@ -43,6 +43,19 @@ def test_model_choice_is_returned_first_and_topped_up(catalog, clock):
     assert_v1_contract(decision, ["LS4PSXUNUM"])
 
 
+def test_prompt_lists_owned_products_and_only_other_candidates(catalog, clock):
+    model = ScriptedModel(tool_turn("recommend", product_ids=["6E92ZMYYFZ"]))
+    decision = make_agent(catalog, model, clock).recommend(["LS4PSXUNUM"])
+
+    prompt = model.calls[0]["messages"][1]["content"]
+    owned, candidates = prompt.split("\nCandidate products: ")
+    assert "Salt & Pepper Shakers" in owned and "Season your food." in owned
+    assert "LS4PSXUNUM" not in candidates
+    assert all(pid in candidates for pid in PRODUCTS if pid != "LS4PSXUNUM")
+    # One model call is enough when the model answers directly.
+    assert decision.steps == 1
+
+
 def test_tool_results_are_sent_back_to_the_model(catalog, clock):
     model = ScriptedModel(
         tool_turn("search_catalog", query="kitchen"),
@@ -87,7 +100,7 @@ def test_model_error_falls_back_to_v1(catalog, clock):
 
 def test_slow_model_hits_the_time_budget(catalog, clock):
     model = ScriptedModel(
-        tool_turn("list_catalog"),
+        tool_turn("search_catalog", query="kitchen"),
         tool_turn("recommend", product_ids=["6E92ZMYYFZ"]),
         on_call=lambda: clock.advance(5),
     )
@@ -107,7 +120,7 @@ def test_caller_deadline_shortens_the_budget(catalog, clock):
 
 def test_last_step_only_offers_recommend(catalog, clock):
     model = ScriptedModel(
-        tool_turn("list_catalog"),
+        tool_turn("search_catalog", query="kitchen"),
         tool_turn("recommend", product_ids=["L9ECAV7KIM"]),
     )
     decision = make_agent(catalog, model, clock, max_steps=2).recommend(["66VCHSJNUP"])
@@ -117,7 +130,7 @@ def test_last_step_only_offers_recommend(catalog, clock):
 
 
 def test_step_limit_without_answer_falls_back(catalog, clock):
-    model = ScriptedModel(tool_turn("list_catalog"), tool_turn("list_catalog"))
+    model = ScriptedModel(tool_turn("search_catalog", query="kitchen"), tool_turn("search_catalog", query="kitchen"))
     decision = make_agent(catalog, model, clock, max_steps=2).recommend([])
 
     assert decision.outcome == "fallback"
