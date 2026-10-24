@@ -38,6 +38,16 @@ The smoke test checks the frontend pages and the `ListRecommendations`
 contract: at most 5 IDs, every ID exists in the catalog, and no cart item is
 returned. These are the same correctness rules v2 must satisfy.
 
+## Run v2 (the AI agent) instead of v1
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.v2.yml up -d --build
+```
+
+Set `HF_TOKEN` in `.env` to enable the model; without it v2 answers with the
+v1 fallback. Switch back with `docker compose up -d --build recommendationservice`.
+See [agent-service/README.md](../../agent-service/README.md).
+
 ## Generate traffic
 
 ```bash

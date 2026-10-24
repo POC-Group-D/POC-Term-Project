@@ -1,0 +1,5 @@
+azure-cosmos==4.17.1
+grpcio==1.84.1
+grpcio-health-checking==1.84.1
+openai==3.37.0
+protobuf==7.36.2

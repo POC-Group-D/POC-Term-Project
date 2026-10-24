@@ -24,10 +24,10 @@ agreement first.
 
 ## Phase 3: v2 AI agent
 
-- [ ] 7. `agent-service/`: same `ListRecommendations` API, catalog tool call, model selects products, v1 fallback
-- [ ] 8. Choose and test the Hugging Face model; confirm free-tier limits
-- [ ] 9. Per-request telemetry for both versions: version, latency, status, tokens, cost
-- [ ] 10. Correctness checker (valid IDs, no cart items, at most 5, schema)
+- [x] 7. `agent-service/`: same `ListRecommendations` API, catalog tools, model selects products, guardrails, v1 fallback, 19 unit tests (Nofil). Verified in the local stack in fallback mode; live model run pending item 8
+- [ ] 8. Choose and test the Hugging Face model; confirm free-tier limits and prices (needs an HF token)
+- [ ] 9. Per-request telemetry for both versions: done for v2 (JSON log + optional Cosmos DB record with latency, outcome, tokens, cost); v1 still to do
+- [ ] 10. Correctness checker (valid IDs, no cart items, at most 5, schema): rules exist in `infra/local/smoke_test.py` and the agent's guardrails; a canary-time checker is still to do
 
 ## Phase 4: Canary
 

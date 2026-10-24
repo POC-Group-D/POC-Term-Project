@@ -1,0 +1,17 @@
+# Override that replaces recommendationservice v1 with the v2 AI agent.
+#
+#   docker compose -f docker-compose.yml -f docker-compose.v2.yml up -d --build
+#
+# Put HF_TOKEN (and optionally HF_MODEL, COSMOS_ENDPOINT, COSMOS_KEY) in .env.
+# Without HF_TOKEN the agent still runs but every request uses the v1 fallback.
+
+services:
+  recommendationservice:
+    build:
+      context: ../../agent-service
+    image: poc-group-d/recommendationservice:v2-local
+    environment:
+      HF_TOKEN: ${HF_TOKEN:-}
+      HF_MODEL: ${HF_MODEL:-Qwen/Qwen2.5-7B-Instruct}
+      COSMOS_ENDPOINT: ${COSMOS_ENDPOINT:-}
+      COSMOS_KEY: ${COSMOS_KEY:-}
