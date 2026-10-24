@@ -12,6 +12,9 @@ services:
     image: poc-group-d/recommendationservice:v2-local
     environment:
       HF_TOKEN: ${HF_TOKEN:-}
-      HF_MODEL: ${HF_MODEL:-Qwen/Qwen2.5-7B-Instruct}
+      HF_MODEL: ${HF_MODEL:-Qwen/Qwen3-4B-Instruct-2507}
+      # Provider list prices (USD per million tokens) for the cost estimate.
+      MODEL_INPUT_PRICE_PER_MTOK: ${MODEL_INPUT_PRICE_PER_MTOK:-0.01}
+      MODEL_OUTPUT_PRICE_PER_MTOK: ${MODEL_OUTPUT_PRICE_PER_MTOK:-0.03}
       COSMOS_ENDPOINT: ${COSMOS_ENDPOINT:-}
       COSMOS_KEY: ${COSMOS_KEY:-}

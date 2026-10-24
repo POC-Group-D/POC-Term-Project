@@ -73,7 +73,7 @@ Log Analytics on Azure) and, if configured, written to Cosmos DB
 | `PRODUCT_CATALOG_SERVICE_ADDR` | required | e.g. `productcatalogservice:3550` |
 | `PORT` | `8080` | |
 | `HF_TOKEN` | empty | Hugging Face access token. **Secret**: Container Apps secret or local `.env`, never in git. Without it every request uses the fallback. |
-| `HF_MODEL` | `Qwen/Qwen2.5-7B-Instruct` | Any Inference Providers chat model that supports tool calling |
+| `HF_MODEL` | `Qwen/Qwen3-4B-Instruct-2507` | Any Inference Providers chat model that supports tool calling |
 | `HF_BASE_URL` | `https://router.huggingface.co/v1` | OpenAI-compatible endpoint |
 | `MODEL_MAX_TOKENS` | `300` | Per model call |
 | `MODEL_INPUT_PRICE_PER_MTOK`, `MODEL_OUTPUT_PRICE_PER_MTOK` | `0` | USD per million tokens, for cost per request (set once the provider is chosen) |

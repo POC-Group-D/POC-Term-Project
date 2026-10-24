@@ -34,3 +34,15 @@
 ## Human review and changes
 
 <To be completed by the reviewer.>
+
+## Follow-up: first live model attempt
+
+- The member created a fine-grained Hugging Face token (Inference Providers
+  only) and stored it in the git-ignored `infra/local/.env`.
+- `Qwen/Qwen2.5-7B-Instruct` is no longer served by any provider; the
+  default became `Qwen/Qwen3-4B-Instruct-2507` (cheapest tool-capable model
+  listed by the router: $0.01 / $0.03 per million input / output tokens).
+- All 4 live requests returned HTTP 402 "no remaining credits": the free
+  account has no Inference Providers credits. Nothing was charged. Each
+  request fell back to v1 in about 65 ms, which confirmed the fallback path
+  end to end.

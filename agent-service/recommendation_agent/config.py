@@ -49,7 +49,7 @@ class Settings:
             catalog_addr=catalog_addr,
             hf_token=os.environ.get("HF_TOKEN", ""),
             hf_base_url=os.environ.get("HF_BASE_URL", "https://router.huggingface.co/v1"),
-            hf_model=os.environ.get("HF_MODEL", "Qwen/Qwen2.5-7B-Instruct"),
+            hf_model=os.environ.get("HF_MODEL", "Qwen/Qwen3-4B-Instruct-2507"),
             model_max_tokens=_int("MODEL_MAX_TOKENS", 300),
             input_price_per_mtok=_float("MODEL_INPUT_PRICE_PER_MTOK", 0.0),
             output_price_per_mtok=_float("MODEL_OUTPUT_PRICE_PER_MTOK", 0.0),
