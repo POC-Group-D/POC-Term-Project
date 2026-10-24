@@ -154,7 +154,7 @@ def test_no_model_configured_uses_v1(catalog, clock):
 
 
 def test_repeat_context_is_served_from_cache(catalog, clock):
-    model = ScriptedModel(tool_turn("recommend", product_ids=["6E92ZMYYFZ", "9SIQT8TOJO"]))
+    model = ScriptedModel(tool_turn("recommend", product_ids=["6E92ZMYYFZ", "9SIQT8TOJO"], reason="Kitchen set."))
     agent = make_agent(catalog, model, clock, cache_ttl_seconds=600)
 
     first = agent.recommend(["LS4PSXUNUM"])
@@ -164,6 +164,7 @@ def test_repeat_context_is_served_from_cache(catalog, clock):
     assert first.outcome == "agent"
     assert second.outcome == "cached"
     assert second.product_ids[:2] == ["6E92ZMYYFZ", "9SIQT8TOJO"]
+    assert second.reason == "Kitchen set."
     assert second.prompt_tokens == 0
 
 

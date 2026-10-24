@@ -73,22 +73,23 @@ class _DecisionCache:
         self._entries = {}
 
     def get(self, key):
+        """Return (product_ids, reason) of a fresh decision, or None."""
         if self._ttl <= 0:
             return None
         with self._lock:
             entry = self._entries.get(key)
             if entry and self._clock() - entry[0] < self._ttl:
-                return list(entry[1])
+                return list(entry[1]), entry[2]
             self._entries.pop(key, None)
             return None
 
-    def put(self, key, product_ids):
+    def put(self, key, product_ids, reason):
         if self._ttl <= 0:
             return
         with self._lock:
             if len(self._entries) >= self._max:
                 self._entries.pop(next(iter(self._entries)))
-            self._entries[key] = (self._clock(), list(product_ids))
+            self._entries[key] = (self._clock(), list(product_ids), reason)
 
 
 class RecommendationAgent:
@@ -122,9 +123,10 @@ class RecommendationAgent:
 
         cached = self._cache.get(cache_key)
         if cached is not None:
-            chosen = sanitize(cached, catalog_ids, excluded, self._limit)
+            cached_ids, cached_reason = cached
+            chosen = sanitize(cached_ids, catalog_ids, excluded, self._limit)
             if chosen:
-                decision = Decision(product_ids=chosen, outcome="cached")
+                decision = Decision(product_ids=chosen, outcome="cached", reason=cached_reason)
                 return self._top_up(decision, catalog_ids, excluded)
 
         decision = Decision(product_ids=[], outcome="agent")
@@ -139,7 +141,7 @@ class RecommendationAgent:
             decision.product_ids = random_recommendations(catalog_ids, excluded, self._limit, self._rng)
             return decision
 
-        self._cache.put(cache_key, decision.product_ids)
+        self._cache.put(cache_key, decision.product_ids, decision.reason)
         return self._top_up(decision, catalog_ids, excluded)
 
     def _run(self, context_ids, catalog_ids, excluded, deadline, decision):
