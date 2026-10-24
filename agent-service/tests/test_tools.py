@@ -7,6 +7,12 @@ def run(catalog, name, **arguments):
     return json.loads(ToolExecutor(catalog).run(name, arguments))
 
 
+def test_browse_category_lists_matching_products(catalog):
+    products = run(catalog, "browse_category", category="Kitchen")["products"]
+    assert {p["name"] for p in products} == {"Salt & Pepper Shakers", "Bamboo Glass Jar", "Mug"}
+    assert "Unknown category" in run(catalog, "browse_category", category="garden")["hint"]
+
+
 def test_get_products_skips_unknown_ids(catalog):
     products = run(catalog, "get_products", product_ids=["OLJCESPC7Z", "MISSING"])["products"]
     assert [p["id"] for p in products] == ["OLJCESPC7Z"]

@@ -1,8 +1,10 @@
 # Local Online Boutique stack for development (Phase 1 baseline).
 #
-# Every service runs from the upstream prebuilt image except
-# recommendationservice, which is built from ../../online-boutique so that
-# local changes to the component we are replacing are exercised.
+# Every service runs from the upstream prebuilt image except:
+#   - recommendationservice, built from ../../online-boutique so that local
+#     changes to the component we are replacing are exercised
+#   - productcatalogservice and frontend, thin layers over the upstream images
+#     that add the 200-product catalog and its pictures (../../catalog)
 #
 # Usage (from this directory):
 #   docker compose up -d                     # start the shop on http://localhost:8080
@@ -21,7 +23,12 @@ x-common-env: &common-env
 
 services:
   frontend:
-    image: ${IMAGE_REGISTRY:-us-central1-docker.pkg.dev/online-boutique-ci/microservices-demo}/frontend:${IMAGE_TAG:-v0.10.7}
+    # Upstream frontend plus pictures for the extended catalog (see /catalog).
+    build:
+      context: ../../catalog/frontend
+      args:
+        BASE_IMAGE: ${IMAGE_REGISTRY:-us-central1-docker.pkg.dev/online-boutique-ci/microservices-demo}/frontend:${IMAGE_TAG:-v0.10.7}
+    image: poc-group-d/frontend:local
     ports:
       - "${FRONTEND_PORT:-8080}:8080"
     environment:
@@ -59,7 +66,12 @@ services:
     restart: unless-stopped
 
   productcatalogservice:
-    image: ${IMAGE_REGISTRY:-us-central1-docker.pkg.dev/online-boutique-ci/microservices-demo}/productcatalogservice:${IMAGE_TAG:-v0.10.7}
+    # Upstream service serving the extended 200-product catalog (see /catalog).
+    build:
+      context: ../../catalog/productcatalogservice
+      args:
+        BASE_IMAGE: ${IMAGE_REGISTRY:-us-central1-docker.pkg.dev/online-boutique-ci/microservices-demo}/productcatalogservice:${IMAGE_TAG:-v0.10.7}
+    image: poc-group-d/productcatalogservice:local
     environment:
       <<: *common-env
       PORT: "3550"

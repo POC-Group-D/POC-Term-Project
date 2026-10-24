@@ -24,8 +24,13 @@ services:
       # Local inference is free; set provider list prices when using a paid API.
       MODEL_INPUT_PRICE_PER_MTOK: ${MODEL_INPUT_PRICE_PER_MTOK:-0}
       MODEL_OUTPUT_PRICE_PER_MTOK: ${MODEL_OUTPUT_PRICE_PER_MTOK:-0}
-      # CPU inference is slow; give the agent more time than on a hosted API.
-      AGENT_TIMEOUT_SECONDS: ${AGENT_TIMEOUT_SECONDS:-45}
+      # Laptop CPU inference runs at roughly 30 prompt tokens/s, so one model
+      # call takes 20-35 s. Locally the model therefore decides in a single
+      # call from a smaller shortlist; hosted APIs use the full multi-step loop
+      # (override these three in .env when MODEL_BASE_URL points elsewhere).
+      AGENT_TIMEOUT_SECONDS: ${AGENT_TIMEOUT_SECONDS:-60}
+      MAX_AGENT_STEPS: ${MAX_AGENT_STEPS:-1}
+      SHORTLIST_SIZE: ${SHORTLIST_SIZE:-12}
       COSMOS_ENDPOINT: ${COSMOS_ENDPOINT:-}
       COSMOS_KEY: ${COSMOS_KEY:-}
     depends_on:

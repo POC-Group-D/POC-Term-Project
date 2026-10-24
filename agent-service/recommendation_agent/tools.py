@@ -1,14 +1,28 @@
 """Tools the model can call, in OpenAI function-calling format.
 
-Two tools read productcatalogservice; the third, `recommend`, is how the
-model returns its final answer. Tool results are JSON strings. (The agent
-already gives the model the candidate list, so no "list everything" tool is
-needed; that keeps prompts, latency and cost down.)
+Three tools read productcatalogservice; the fourth, `recommend`, is how the
+model returns its final answer. Tool results are JSON strings. The agent's
+prompt already carries a shortlist, so these tools are for when the model
+wants more options or more detail.
 """
 
 import json
 
 RECOMMEND = "recommend"
+MAX_CATEGORY_RESULTS = 40
+
+_BROWSE_CATEGORY = {
+    "type": "function",
+    "function": {
+        "name": "browse_category",
+        "description": "List the products in one store category, e.g. 'kitchen' or 'footwear'.",
+        "parameters": {
+            "type": "object",
+            "properties": {"category": {"type": "string"}},
+            "required": ["category"],
+        },
+    },
+}
 
 _GET_PRODUCTS = {
     "type": "function",
@@ -58,7 +72,7 @@ _RECOMMEND = {
     },
 }
 
-ALL_TOOLS = [_GET_PRODUCTS, _SEARCH_CATALOG, _RECOMMEND]
+ALL_TOOLS = [_BROWSE_CATEGORY, _GET_PRODUCTS, _SEARCH_CATALOG, _RECOMMEND]
 FINAL_TOOLS = [_RECOMMEND]
 
 
@@ -70,6 +84,7 @@ class ToolExecutor:
 
     def run(self, name, arguments):
         handler = {
+            "browse_category": self._browse_category,
             "get_products": self._get_products,
             "search_catalog": self._search_catalog,
         }.get(name)
@@ -80,6 +95,14 @@ class ToolExecutor:
         except TypeError as exc:  # wrong or missing arguments from the model
             return json.dumps({"error": f"bad arguments for {name}: {exc}"})
 
+    def _browse_category(self, category):
+        wanted = category.lower().strip()
+        matches = [p.summary() for p in self._catalog.all_products().values()
+                   if wanted in (c.lower() for c in p.categories)]
+        if not matches:
+            return {"products": [], "hint": "Unknown category. Use one from the store category list."}
+        return {"products": matches[:MAX_CATEGORY_RESULTS]}
+
     def _get_products(self, product_ids):
         found = [self._catalog.get(pid) for pid in product_ids]
         return {"products": [p.detail() for p in found if p is not None]}
@@ -87,5 +110,5 @@ class ToolExecutor:
     def _search_catalog(self, query):
         results = [p.summary() for p in self._catalog.search(query)]
         if not results:
-            return {"products": [], "hint": "No match. Try a single keyword, or choose from the candidates."}
+            return {"products": [], "hint": "No match. Try a single keyword, or browse a category."}
         return {"products": results}

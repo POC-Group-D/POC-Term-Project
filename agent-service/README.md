@@ -34,12 +34,22 @@ The model must call tools to decide; v2 never just rephrases v1's output.
 ### Context and tools
 
 Before the first model call the agent reads the catalog
-(`ProductCatalogService.ListProducts`, cached 60 s) and gives the model the
-shopper's products in detail plus every other product as a candidate (id,
-name, categories). The model can then answer in one call, or use tools first:
+(`ProductCatalogService.ListProducts`, cached 60 s) and builds a bounded
+prompt, whatever the catalog size (200 products, see `/catalog`):
+
+- the shopper's products with descriptions
+- the store's categories with product counts
+- a shortlist (`SHORTLIST_SIZE`, default 20) of products sharing the most
+  categories with the shopper's products, topped up with a category-balanced
+  sample
+
+Products are written as compact `- id: name (categories)` lines, about half
+the tokens of JSON. The model can answer from the shortlist in one call, or use
+tools first:
 
 | Tool | Backend call | Purpose |
 |---|---|---|
+| `browse_category` | catalog cache | All products in one category (up to 40) |
 | `get_products` | catalog cache | Descriptions of specific products |
 | `search_catalog` | `ProductCatalogService.SearchProducts` | Keyword search; returns a hint when nothing matches |
 | `recommend` | none | Final answer: product ids and a one-sentence reason |
@@ -82,22 +92,37 @@ purely by configuration:
 | GitHub Models (free tier, rate limited) | `https://models.github.ai/inference` | e.g. `openai/gpt-4o-mini` | Free within daily limits |
 | Hugging Face Inference Providers | `https://router.huggingface.co/v1` | `Qwen/Qwen3-4B-Instruct-2507` | Pre-paid credits; the free account had none |
 
-### Measured: local Qwen3-4B on CPU (2026-10-23)
+### Measured: local Qwen3-4B on CPU (2026-10-24, 200-product catalog)
 
-Ryzen 7 8840HS, 16 threads, no GPU; 4 requests with different contexts.
+Ryzen 7 8840HS, 16 threads, no GPU; settings from `docker-compose.v2.yml`
+(`MAX_AGENT_STEPS=1`, `SHORTLIST_SIZE=12`); one request at a time.
+
+| Shopper has | v2 recommended |
+|---|---|
+| Mug | Nonstick Frying Pan, Travel Coffee Mug, Kitchen Scale, Gooseneck Kettle, Silicone Spatula |
+| French Press | Espresso Cups, Travel Coffee Mug, Whole Bean Coffee, Coffee Canister, Ceramic Teapot |
+| Yoga Mat | Adjustable Dumbbells, Kettlebell, Foam Roller, Fitness Tracker Band, Resistance Bands |
+| Rain Jacket | Trench Coat, Windbreaker, Denim Jacket, Quilted Vest, Wool Overcoat |
 
 | Metric | Result |
 |---|---|
-| Decided by the model | 4 / 4 (2 answered in one call, 2 looked up details first) |
-| Tokens per request | 670-1,840 prompt, 65-160 completion |
-| Latency per request | 15-40 s (about 12-20 s per model call) |
+| Decided by the model | 4 / 4, no random top-ups |
+| Prompt tokens | about 690 per request |
+| Latency | 22-39 s per request (one model call) |
 | Cost | $0 (local) |
 
-Decisions are sensible (e.g. salt & pepper shakers -> bamboo glass jar, mug).
-CPU latency is fine for development but far above v1 (milliseconds), so the
-canary on Azure needs a faster backend (a hosted API, or more CPU for Ollama).
-At the Hugging Face list price for this model ($0.01 / $0.03 per million
-tokens) the same requests would cost about $0.00002 each.
+Lessons from tuning on CPU (about 30 prompt tokens/s):
+
+- With 4 steps and a 20-item JSON shortlist (about 1,300 prompt tokens), every
+  request timed out: one call took about 35 s and the model usually wanted a
+  second one.
+- Ollama keeps working on a request after the caller gives up, so timed-out
+  requests queue up and slow everything behind them. Avoid overlapping
+  requests when running locally.
+- A hosted API runs the same prompts in about 1-2 s per call, so the full
+  multi-step loop (browse, search, then recommend) is the configuration for
+  the Azure canary. At Hugging Face list prices for this model ($0.01 / $0.03
+  per million tokens) a request would cost about $0.00001.
 
 ## Configuration
 
@@ -111,7 +136,8 @@ tokens) the same requests would cost about $0.00002 each.
 | `MODEL_MAX_TOKENS` | `300` | Per model call |
 | `MODEL_INPUT_PRICE_PER_MTOK`, `MODEL_OUTPUT_PRICE_PER_MTOK` | `0` | USD per million tokens, for cost per request (0 for local inference) |
 | `MAX_RECOMMENDATIONS` | `5` | Same as v1 |
-| `MAX_AGENT_STEPS` | `4` | |
+| `MAX_AGENT_STEPS` | `4` | `1` = decide in one call from the shortlist (used for local CPU inference) |
+| `SHORTLIST_SIZE` | `20` | Candidates in the prompt; the rest are reachable through tools |
 | `AGENT_TIMEOUT_SECONDS` | `8` | Overall model budget per request |
 | `CACHE_TTL_SECONDS` | `600` | Reuse a decision for the same context; `0` disables (use `0` when measuring model cost per request) |
 | `COSMOS_ENDPOINT`, `COSMOS_KEY` | empty | Enables the Cosmos DB sink. `COSMOS_KEY` is a secret. |

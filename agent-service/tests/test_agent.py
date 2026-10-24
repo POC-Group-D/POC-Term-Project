@@ -2,7 +2,7 @@ import random
 
 import pytest
 
-from recommendation_agent.agent import RecommendationAgent, sanitize
+from recommendation_agent.agent import RecommendationAgent, build_shortlist, sanitize
 from recommendation_agent.model import ModelTurn
 from recommendation_agent.tools import FINAL_TOOLS
 
@@ -43,17 +43,35 @@ def test_model_choice_is_returned_first_and_topped_up(catalog, clock):
     assert_v1_contract(decision, ["LS4PSXUNUM"])
 
 
-def test_prompt_lists_owned_products_and_only_other_candidates(catalog, clock):
+def test_prompt_has_owned_products_categories_and_shortlist(catalog, clock):
     model = ScriptedModel(tool_turn("recommend", product_ids=["6E92ZMYYFZ"]))
     decision = make_agent(catalog, model, clock).recommend(["LS4PSXUNUM"])
 
     prompt = model.calls[0]["messages"][1]["content"]
-    owned, candidates = prompt.split("\nCandidate products: ")
-    assert "Salt & Pepper Shakers" in owned and "Season your food." in owned
-    assert "LS4PSXUNUM" not in candidates
-    assert all(pid in candidates for pid in PRODUCTS if pid != "LS4PSXUNUM")
+    owned, rest = prompt.split("\nStore categories: ")
+    categories, shortlist = rest.split("\nShortlist:\n")
+    assert "- LS4PSXUNUM: Salt & Pepper Shakers (kitchen). Season your food." in owned
+    assert "kitchen (3)" in categories
+    assert "LS4PSXUNUM" not in shortlist
+    assert "- 6E92ZMYYFZ: Mug (kitchen)" in shortlist.splitlines()
     # One model call is enough when the model answers directly.
     assert decision.steps == 1
+
+
+def test_shortlist_puts_related_products_first_and_stays_bounded():
+    products = dict(PRODUCTS)
+    shortlist = build_shortlist(products, ["LS4PSXUNUM"], size=4, rng=random.Random(3))
+
+    assert len(shortlist) == 4
+    assert {p.id for p in shortlist[:2]} == {"9SIQT8TOJO", "6E92ZMYYFZ"}  # the other kitchen items
+    assert "LS4PSXUNUM" not in {p.id for p in shortlist}
+
+
+def test_shortlist_without_context_samples_across_categories():
+    shortlist = build_shortlist(dict(PRODUCTS), [], size=5, rng=random.Random(3))
+
+    assert len(shortlist) == 5
+    assert len({p.categories[0] for p in shortlist}) == 5
 
 
 def test_tool_results_are_sent_back_to_the_model(catalog, clock):

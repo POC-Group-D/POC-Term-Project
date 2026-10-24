@@ -25,11 +25,13 @@ RECOMMENDATION_ADDR = os.environ.get("RECOMMENDATION_ADDR", "recommendationservi
 CATALOG_ADDR = os.environ.get("CATALOG_ADDR", "productcatalogservice:3550")
 MAX_RECOMMENDATIONS = 5
 RPC_TIMEOUT_SECONDS = 5
+# Product pages wait for recommendations; v2 on a local CPU model takes ~20 s.
+PAGE_TIMEOUT_SECONDS = 60
 
 
 def check_http(path):
     url = FRONTEND_URL + path
-    with urllib.request.urlopen(url, timeout=RPC_TIMEOUT_SECONDS) as response:
+    with urllib.request.urlopen(url, timeout=PAGE_TIMEOUT_SECONDS) as response:
         if response.status != 200:
             raise AssertionError(f"GET {url} returned {response.status}")
 

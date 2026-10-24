@@ -1,8 +1,9 @@
 """The recommendation agent.
 
 The model decides what to recommend. The agent hands it the shopper's
-products and the candidate products; the model may call catalog tools for more
-detail, then calls `recommend`. The agent enforces the v1
+products, the store's categories and a shortlist of related candidates; the
+model may browse or search the catalog for more, then calls `recommend`.
+The agent enforces the v1
 contract on whatever the model returns and falls back to v1's random choice
 on any failure, so the client always gets a valid answer.
 
@@ -25,12 +26,16 @@ from .tools import ALL_TOOLS, FINAL_TOOLS, RECOMMEND, ToolExecutor
 logger = logging.getLogger(__name__)
 
 SYSTEM_PROMPT = """You are the recommendation engine of an online store.
-The user message lists the shopper's products and the candidate products.
-Choose up to {limit} candidates the shopper is most likely to want next:
+The user message lists the shopper's products, the store's categories and a shortlist of candidates.
+Choose up to {limit} products the shopper is most likely to want next:
 complementary items first, then items from related categories.
-The candidate names and categories are usually enough: then call `recommend` immediately.
-Call get_products or search_catalog only if you cannot decide without more detail.
-Only recommend candidate ids, and finish by calling `recommend` exactly once."""
+The shortlist is usually enough: then call `recommend` immediately.
+Call browse_category, search_catalog or get_products only if you need more options or detail.
+Only recommend ids you have seen in this conversation, never the shopper's own products,
+and finish by calling `recommend` exactly once."""
+
+# Candidates included in the prompt; the rest of the catalog is reachable via tools.
+DEFAULT_SHORTLIST_SIZE = 20
 
 # Leave this much of the time budget for the fallback path.
 _SAFETY_MARGIN_SECONDS = 0.3
@@ -51,6 +56,29 @@ class Decision:
     topped_up: int = 0
     prompt_tokens: int = 0
     completion_tokens: int = 0
+
+
+def build_shortlist(products, context_ids, size, rng):
+    """Candidates for the prompt: products sharing the most categories with the
+    shopper's products first (shuffled within ties, for variety), then a
+    category-balanced sample so an empty or unusual context still gets choices."""
+    owned_categories = {c for pid in context_ids if pid in products for c in products[pid].categories}
+    others = [p for pid, p in products.items() if pid not in context_ids]
+    rng.shuffle(others)
+
+    related = [p for p in others if owned_categories & set(p.categories)]
+    related.sort(key=lambda p: -len(owned_categories & set(p.categories)))  # stable: keeps the shuffle within ties
+    shortlist = related[:size]
+
+    by_category = {}
+    for p in others:
+        if p not in shortlist:
+            by_category.setdefault(p.categories[0] if p.categories else "", []).append(p)
+    while len(shortlist) < size and any(by_category.values()):
+        for bucket in by_category.values():
+            if bucket and len(shortlist) < size:
+                shortlist.append(bucket.pop())
+    return shortlist
 
 
 def sanitize(product_ids, catalog_ids, excluded, limit):
@@ -93,12 +121,13 @@ class _DecisionCache:
 
 
 class RecommendationAgent:
-    def __init__(self, catalog, model, max_recommendations=5, max_steps=4,
-                 timeout_seconds=8.0, cache_ttl_seconds=600, clock=time.monotonic, rng=random):
+    def __init__(self, catalog, model, max_recommendations=5, max_steps=4, timeout_seconds=8.0,
+                 cache_ttl_seconds=600, shortlist_size=DEFAULT_SHORTLIST_SIZE, clock=time.monotonic, rng=random):
         self._catalog = catalog
         self._model = model
         self._tools = ToolExecutor(catalog)
         self._limit = max_recommendations
+        self._shortlist_size = shortlist_size
         self._max_steps = max_steps
         self._timeout = timeout_seconds
         self._cache = _DecisionCache(cache_ttl_seconds, clock=clock)
@@ -188,14 +217,32 @@ class RecommendationAgent:
         decision.reason = str(reason)[:300]
 
     def _describe_context(self, context_ids):
-        """Pre-fetch what every decision needs, so the model can usually answer
-        in one call: the shopper's products in detail and the candidates in brief."""
+        """Pre-fetch what most decisions need, so the model can usually answer in
+        one call: the shopper's products in detail, the store's categories and a
+        shortlist of related candidates. Prompt size stays bounded however large
+        the catalog is."""
         products = self._catalog.all_products()
-        owned = [products[pid].detail() for pid in context_ids if pid in products]
-        candidates = [p.summary() for pid, p in products.items() if pid not in context_ids]
-        shopper = (f"Shopper's products (do not recommend these): {json.dumps(owned)}"
-                   if owned else "The shopper has no products yet; recommend a varied selection.")
-        return f"{shopper}\nCandidate products: {json.dumps(candidates)}"
+        owned = [products[pid] for pid in context_ids if pid in products]
+        counts = {}
+        for p in products.values():
+            for c in p.categories:
+                counts[c] = counts.get(c, 0) + 1
+        categories = ", ".join(f"{c} ({n})" for c, n in sorted(counts.items()))
+        shortlist = build_shortlist(products, context_ids, self._shortlist_size, self._rng)
+
+        # Plain "id: name (categories)" lines use about half the tokens of JSON,
+        # which matters for prompt-processing time and per-token cost.
+        def line(p, with_description=False):
+            text = f"- {p.id}: {p.name} ({', '.join(p.categories)})"
+            return f"{text}. {p.description}" if with_description else text
+
+        if owned:
+            shopper = "Shopper's products (do not recommend these):\n" + "\n".join(line(p, True) for p in owned)
+        else:
+            shopper = "The shopper has no products yet; recommend a varied selection."
+        return (f"{shopper}\n"
+                f"Store categories: {categories}\n"
+                "Shortlist:\n" + "\n".join(line(p) for p in shortlist))
 
     def _top_up(self, decision, catalog_ids, excluded):
         """Fill to the limit with random products so the response size matches v1."""

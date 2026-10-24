@@ -33,6 +33,8 @@ class Settings:
     agent_timeout_seconds: float
     # Reuse a model decision for the same context for this long (0 disables).
     cache_ttl_seconds: int
+    # Related candidates put in the prompt; the rest are reachable via tools.
+    shortlist_size: int
 
     # Optional Cosmos DB sink for per-request decision records.
     cosmos_endpoint: str
@@ -58,6 +60,7 @@ class Settings:
             max_agent_steps=_int("MAX_AGENT_STEPS", 4),
             agent_timeout_seconds=_float("AGENT_TIMEOUT_SECONDS", 8.0),
             cache_ttl_seconds=_int("CACHE_TTL_SECONDS", 600),
+            shortlist_size=_int("SHORTLIST_SIZE", 20),
             cosmos_endpoint=os.environ.get("COSMOS_ENDPOINT", ""),
             cosmos_key=os.environ.get("COSMOS_KEY", ""),
             cosmos_database=os.environ.get("COSMOS_DATABASE", "recommendations"),

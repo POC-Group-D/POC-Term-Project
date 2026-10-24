@@ -67,6 +67,7 @@ def serve():
         max_steps=settings.max_agent_steps,
         timeout_seconds=settings.agent_timeout_seconds,
         cache_ttl_seconds=settings.cache_ttl_seconds,
+        shortlist_size=settings.shortlist_size,
     )
 
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))

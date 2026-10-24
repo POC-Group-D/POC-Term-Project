@@ -29,6 +29,7 @@ docs/              Roadmap, design docs, AI-usage log
 infra/
   local/           Docker Compose stack for local development
   azure/           Bicep templates and scripts for Azure Container Apps
+catalog/           Extended 200-product catalog and pictures (thin layers over upstream images)
 online-boutique/   Upstream Online Boutique (v0.10.7), including v1 and protos/
 ```
 

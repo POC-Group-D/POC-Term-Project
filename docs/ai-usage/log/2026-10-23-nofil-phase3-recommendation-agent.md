@@ -63,3 +63,23 @@ Prompt: "Implement A now [run a Hugging Face model locally with Ollama], then we
 - Final run: 4/4 requests decided by the model with sensible reasons,
   1-2 model calls, 670-1,840 prompt tokens, 15-40 s per request on CPU, $0.
 - Tests: 20 passed.
+
+## Follow-up: 200-product catalog
+
+Prompts: "Why is it giving tank top as recommendation for mug?" then "Add more products to the store. Let's do 200."
+
+- `catalog/generate_catalog.py` keeps the 9 upstream products and adds 191
+  hand-written products in 17 groups with generated SVG pictures. Thin
+  Dockerfiles layer `products.json` and the pictures onto the upstream
+  `productcatalogservice` and `frontend` images; no upstream code changed.
+- Agent: the prompt now carries the shopper's products, the category list and
+  a bounded shortlist of related products (compact text lines, not JSON); new
+  `browse_category` tool. 23 tests pass.
+- CPU tuning: 4 steps with a 20-item JSON shortlist timed out on every request
+  (about 35 s per call, and Ollama keeps processing abandoned requests, which
+  queue up). Local defaults are now 1 step, 12-item shortlist, 60 s budget.
+- Result: 4/4 live requests decided by the model with relevant picks (Mug ->
+  kitchen and coffee items, Yoga Mat -> fitness, Rain Jacket -> outerwear),
+  22-39 s each, about 690 prompt tokens, $0.
+- The smoke test's page timeout was raised to 60 s because product pages wait
+  for v2.

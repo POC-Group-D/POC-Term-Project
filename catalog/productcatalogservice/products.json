@@ -1,0 +1,2974 @@
+{
+  "products": [
+    {
+      "id": "OLJCESPC7Z",
+      "name": "Sunglasses",
+      "description": "Add a modern touch to your outfits with these sleek aviator sunglasses.",
+      "picture": "/static/img/products/sunglasses.jpg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 19,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories"
+      ]
+    },
+    {
+      "id": "66VCHSJNUP",
+      "name": "Tank Top",
+      "description": "Perfectly cropped cotton tank, with a scooped neckline.",
+      "picture": "/static/img/products/tank-top.jpg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 18,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "tops"
+      ]
+    },
+    {
+      "id": "1YMWWN1N4O",
+      "name": "Watch",
+      "description": "This gold-tone stainless steel watch will work with most of your outfits.",
+      "picture": "/static/img/products/watch.jpg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 109,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories"
+      ]
+    },
+    {
+      "id": "L9ECAV7KIM",
+      "name": "Loafers",
+      "description": "A neat addition to your summer wardrobe.",
+      "picture": "/static/img/products/loafers.jpg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 89,
+        "nanos": 990000000
+      },
+      "categories": [
+        "footwear"
+      ]
+    },
+    {
+      "id": "2ZYFJ3GM2N",
+      "name": "Hairdryer",
+      "description": "This lightweight hairdryer has 3 heat and speed settings. It's perfect for travel.",
+      "picture": "/static/img/products/hairdryer.jpg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 24,
+        "nanos": 990000000
+      },
+      "categories": [
+        "hair",
+        "beauty"
+      ]
+    },
+    {
+      "id": "0PUK6V6EV0",
+      "name": "Candle Holder",
+      "description": "This small but intricate candle holder is an excellent gift.",
+      "picture": "/static/img/products/candle-holder.jpg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 18,
+        "nanos": 990000000
+      },
+      "categories": [
+        "decor",
+        "home"
+      ]
+    },
+    {
+      "id": "LS4PSXUNUM",
+      "name": "Salt & Pepper Shakers",
+      "description": "Add some flavor to your kitchen.",
+      "picture": "/static/img/products/salt-and-pepper-shakers.jpg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 18,
+        "nanos": 490000000
+      },
+      "categories": [
+        "kitchen"
+      ]
+    },
+    {
+      "id": "9SIQT8TOJO",
+      "name": "Bamboo Glass Jar",
+      "description": "This bamboo glass jar can hold 57 oz (1.7 l) and is perfect for any kitchen.",
+      "picture": "/static/img/products/bamboo-glass-jar.jpg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 5,
+        "nanos": 490000000
+      },
+      "categories": [
+        "kitchen"
+      ]
+    },
+    {
+      "id": "6E92ZMYYFZ",
+      "name": "Mug",
+      "description": "A simple mug with a mustard interior.",
+      "picture": "/static/img/products/mug.jpg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 8,
+        "nanos": 990000000
+      },
+      "categories": [
+        "kitchen"
+      ]
+    },
+    {
+      "id": "9TWTHTJEHY",
+      "name": "Cast Iron Skillet",
+      "description": "Pre-seasoned 10-inch skillet that goes from stovetop to oven.",
+      "picture": "/static/img/products/generated/cast-iron-skillet.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 34,
+        "nanos": 990000000
+      },
+      "categories": [
+        "kitchen",
+        "cookware"
+      ]
+    },
+    {
+      "id": "LEDZUNSZVD",
+      "name": "Chef's Knife",
+      "description": "8-inch stainless steel chef's knife with a balanced handle.",
+      "picture": "/static/img/products/generated/chef-s-knife.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 49,
+        "nanos": 990000000
+      },
+      "categories": [
+        "kitchen",
+        "cookware"
+      ]
+    },
+    {
+      "id": "AT3U0YZ8RJ",
+      "name": "Bamboo Cutting Board",
+      "description": "Large reversible bamboo board with a juice groove.",
+      "picture": "/static/img/products/generated/bamboo-cutting-board.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 24,
+        "nanos": 990000000
+      },
+      "categories": [
+        "kitchen",
+        "cookware"
+      ]
+    },
+    {
+      "id": "R52N97HNQ9",
+      "name": "Nonstick Frying Pan",
+      "description": "Lightweight 11-inch pan with a ceramic nonstick coating.",
+      "picture": "/static/img/products/generated/nonstick-frying-pan.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 29,
+        "nanos": 990000000
+      },
+      "categories": [
+        "kitchen",
+        "cookware"
+      ]
+    },
+    {
+      "id": "6AXO0CUVYU",
+      "name": "Dutch Oven",
+      "description": "Enamelled 5-quart Dutch oven for stews, bread and braises.",
+      "picture": "/static/img/products/generated/dutch-oven.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 79,
+        "nanos": 990000000
+      },
+      "categories": [
+        "kitchen",
+        "cookware"
+      ]
+    },
+    {
+      "id": "DP5232YV47",
+      "name": "Wooden Spoon Set",
+      "description": "Three olive-wood spoons for stirring, tasting and serving.",
+      "picture": "/static/img/products/generated/wooden-spoon-set.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 16,
+        "nanos": 990000000
+      },
+      "categories": [
+        "kitchen",
+        "cookware"
+      ]
+    },
+    {
+      "id": "VZXQLGWXZX",
+      "name": "Mixing Bowl Set",
+      "description": "Nesting stainless steel bowls in three sizes with lids.",
+      "picture": "/static/img/products/generated/mixing-bowl-set.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 27,
+        "nanos": 990000000
+      },
+      "categories": [
+        "kitchen",
+        "cookware"
+      ]
+    },
+    {
+      "id": "NXEZVOD53E",
+      "name": "Silicone Spatula",
+      "description": "Heat-resistant spatula that will not scratch nonstick pans.",
+      "picture": "/static/img/products/generated/silicone-spatula.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 8,
+        "nanos": 990000000
+      },
+      "categories": [
+        "kitchen",
+        "cookware"
+      ]
+    },
+    {
+      "id": "VYYOS81WKX",
+      "name": "Stainless Saucepan",
+      "description": "2-quart saucepan with a glass lid and pour spouts.",
+      "picture": "/static/img/products/generated/stainless-saucepan.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 39,
+        "nanos": 990000000
+      },
+      "categories": [
+        "kitchen",
+        "cookware"
+      ]
+    },
+    {
+      "id": "C9MOE9RSJH",
+      "name": "Kitchen Scale",
+      "description": "Digital scale accurate to one gram, with a tare button.",
+      "picture": "/static/img/products/generated/kitchen-scale.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 19,
+        "nanos": 990000000
+      },
+      "categories": [
+        "kitchen",
+        "cookware"
+      ]
+    },
+    {
+      "id": "X070JDXVLF",
+      "name": "Herb Scissors",
+      "description": "Five-blade scissors that chop fresh herbs in seconds.",
+      "picture": "/static/img/products/generated/herb-scissors.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 11,
+        "nanos": 990000000
+      },
+      "categories": [
+        "kitchen",
+        "cookware"
+      ]
+    },
+    {
+      "id": "CMRBD10Z2P",
+      "name": "Garlic Press",
+      "description": "Heavy-duty press that crushes cloves without peeling.",
+      "picture": "/static/img/products/generated/garlic-press.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 13,
+        "nanos": 990000000
+      },
+      "categories": [
+        "kitchen",
+        "cookware"
+      ]
+    },
+    {
+      "id": "IQM9PU4MNY",
+      "name": "Linen Apron",
+      "description": "Washed linen apron with a front pocket and adjustable strap.",
+      "picture": "/static/img/products/generated/linen-apron.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 26,
+        "nanos": 990000000
+      },
+      "categories": [
+        "kitchen",
+        "cookware"
+      ]
+    },
+    {
+      "id": "9W7P1S17E5",
+      "name": "Ceramic Dinner Plates",
+      "description": "Set of four speckled stoneware dinner plates.",
+      "picture": "/static/img/products/generated/ceramic-dinner-plates.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 44,
+        "nanos": 990000000
+      },
+      "categories": [
+        "kitchen",
+        "cookware"
+      ]
+    },
+    {
+      "id": "LPTERCI6VF",
+      "name": "Pasta Bowls",
+      "description": "Set of four wide, shallow bowls for pasta and salads.",
+      "picture": "/static/img/products/generated/pasta-bowls.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 38,
+        "nanos": 990000000
+      },
+      "categories": [
+        "kitchen",
+        "cookware"
+      ]
+    },
+    {
+      "id": "M781Q5EUUF",
+      "name": "Olive Oil Dispenser",
+      "description": "Glass bottle with a drip-free pour spout for oils.",
+      "picture": "/static/img/products/generated/olive-oil-dispenser.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 15,
+        "nanos": 990000000
+      },
+      "categories": [
+        "kitchen",
+        "cookware"
+      ]
+    },
+    {
+      "id": "RVI46LGB4I",
+      "name": "French Press",
+      "description": "Glass and steel French press that brews four cups.",
+      "picture": "/static/img/products/generated/french-press.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 32,
+        "nanos": 990000000
+      },
+      "categories": [
+        "kitchen",
+        "coffee"
+      ]
+    },
+    {
+      "id": "8Y9DNUN3Q4",
+      "name": "Pour-Over Coffee Dripper",
+      "description": "Ceramic cone dripper for a clean, bright cup.",
+      "picture": "/static/img/products/generated/pour-over-coffee-dripper.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 22,
+        "nanos": 990000000
+      },
+      "categories": [
+        "kitchen",
+        "coffee"
+      ]
+    },
+    {
+      "id": "684WL1019Y",
+      "name": "Burr Coffee Grinder",
+      "description": "Hand grinder with adjustable steel burrs.",
+      "picture": "/static/img/products/generated/burr-coffee-grinder.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 44,
+        "nanos": 990000000
+      },
+      "categories": [
+        "kitchen",
+        "coffee"
+      ]
+    },
+    {
+      "id": "LY74IV7XCL",
+      "name": "Gooseneck Kettle",
+      "description": "Precision-pour kettle for pour-over coffee and tea.",
+      "picture": "/static/img/products/generated/gooseneck-kettle.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 39,
+        "nanos": 990000000
+      },
+      "categories": [
+        "kitchen",
+        "coffee"
+      ]
+    },
+    {
+      "id": "J7CA2AQC4U",
+      "name": "Espresso Cups",
+      "description": "Set of four double-walled glass espresso cups.",
+      "picture": "/static/img/products/generated/espresso-cups.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 21,
+        "nanos": 990000000
+      },
+      "categories": [
+        "kitchen",
+        "coffee"
+      ]
+    },
+    {
+      "id": "SZZ3WA60UF",
+      "name": "Travel Coffee Mug",
+      "description": "Insulated stainless mug that keeps drinks hot for hours.",
+      "picture": "/static/img/products/generated/travel-coffee-mug.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 24,
+        "nanos": 990000000
+      },
+      "categories": [
+        "kitchen",
+        "coffee"
+      ]
+    },
+    {
+      "id": "QL4E2H84XR",
+      "name": "Tea Infuser",
+      "description": "Fine-mesh stainless infuser for loose-leaf tea.",
+      "picture": "/static/img/products/generated/tea-infuser.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 9,
+        "nanos": 990000000
+      },
+      "categories": [
+        "kitchen",
+        "coffee"
+      ]
+    },
+    {
+      "id": "HR7X0O93VV",
+      "name": "Ceramic Teapot",
+      "description": "Hand-glazed teapot with a removable infuser basket.",
+      "picture": "/static/img/products/generated/ceramic-teapot.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 34,
+        "nanos": 990000000
+      },
+      "categories": [
+        "kitchen",
+        "coffee"
+      ]
+    },
+    {
+      "id": "1UVIARBLYI",
+      "name": "Milk Frother",
+      "description": "Battery-powered whisk for foamy lattes at home.",
+      "picture": "/static/img/products/generated/milk-frother.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 14,
+        "nanos": 990000000
+      },
+      "categories": [
+        "kitchen",
+        "coffee"
+      ]
+    },
+    {
+      "id": "WDN34I22DJ",
+      "name": "Coffee Canister",
+      "description": "Airtight canister that keeps beans fresh longer.",
+      "picture": "/static/img/products/generated/coffee-canister.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 19,
+        "nanos": 990000000
+      },
+      "categories": [
+        "kitchen",
+        "coffee"
+      ]
+    },
+    {
+      "id": "RNSZL4GPJR",
+      "name": "Loose Leaf Green Tea",
+      "description": "Tin of organic sencha green tea, 100 g.",
+      "picture": "/static/img/products/generated/loose-leaf-green-tea.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 12,
+        "nanos": 990000000
+      },
+      "categories": [
+        "kitchen",
+        "coffee"
+      ]
+    },
+    {
+      "id": "ERZP8I9OR1",
+      "name": "Whole Bean Coffee",
+      "description": "Medium roast single-origin beans, 340 g bag.",
+      "picture": "/static/img/products/generated/whole-bean-coffee.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 16,
+        "nanos": 990000000
+      },
+      "categories": [
+        "kitchen",
+        "coffee"
+      ]
+    },
+    {
+      "id": "T3EQRCMV37",
+      "name": "Linen Throw Pillow",
+      "description": "Soft washed-linen cushion cover with an insert.",
+      "picture": "/static/img/products/generated/linen-throw-pillow.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 29,
+        "nanos": 990000000
+      },
+      "categories": [
+        "decor",
+        "home"
+      ]
+    },
+    {
+      "id": "B6HC2KJPKG",
+      "name": "Ceramic Vase",
+      "description": "Matte white vase for fresh or dried flowers.",
+      "picture": "/static/img/products/generated/ceramic-vase.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 32,
+        "nanos": 990000000
+      },
+      "categories": [
+        "decor",
+        "home"
+      ]
+    },
+    {
+      "id": "TELWARJVBQ",
+      "name": "Wall Mirror",
+      "description": "Round mirror with a thin brass frame, 60 cm.",
+      "picture": "/static/img/products/generated/wall-mirror.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 89,
+        "nanos": 990000000
+      },
+      "categories": [
+        "decor",
+        "home"
+      ]
+    },
+    {
+      "id": "YELUYBS7VU",
+      "name": "Woven Basket",
+      "description": "Seagrass storage basket with handles.",
+      "picture": "/static/img/products/generated/woven-basket.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 27,
+        "nanos": 990000000
+      },
+      "categories": [
+        "decor",
+        "home"
+      ]
+    },
+    {
+      "id": "LMM1007N8V",
+      "name": "Table Lamp",
+      "description": "Ceramic table lamp with a linen shade.",
+      "picture": "/static/img/products/generated/table-lamp.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 64,
+        "nanos": 990000000
+      },
+      "categories": [
+        "decor",
+        "home"
+      ]
+    },
+    {
+      "id": "U6Z6O0P7HI",
+      "name": "Scented Soy Candle",
+      "description": "Hand-poured candle with notes of cedar and fig.",
+      "picture": "/static/img/products/generated/scented-soy-candle.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 22,
+        "nanos": 990000000
+      },
+      "categories": [
+        "decor",
+        "home"
+      ]
+    },
+    {
+      "id": "EDZRLAV3LH",
+      "name": "Picture Frame Set",
+      "description": "Three black frames for 5x7 and 8x10 photos.",
+      "picture": "/static/img/products/generated/picture-frame-set.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 34,
+        "nanos": 990000000
+      },
+      "categories": [
+        "decor",
+        "home"
+      ]
+    },
+    {
+      "id": "8M68MJ12B6",
+      "name": "Faux Olive Tree",
+      "description": "Realistic potted olive tree, 120 cm tall.",
+      "picture": "/static/img/products/generated/faux-olive-tree.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 119,
+        "nanos": 990000000
+      },
+      "categories": [
+        "decor",
+        "home"
+      ]
+    },
+    {
+      "id": "R9DLK10PJF",
+      "name": "Wool Throw Blanket",
+      "description": "Chunky knit throw blanket for the sofa.",
+      "picture": "/static/img/products/generated/wool-throw-blanket.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 74,
+        "nanos": 990000000
+      },
+      "categories": [
+        "decor",
+        "home"
+      ]
+    },
+    {
+      "id": "ONGXWC4RQS",
+      "name": "Wall Clock",
+      "description": "Minimal wooden wall clock with a silent movement.",
+      "picture": "/static/img/products/generated/wall-clock.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 39,
+        "nanos": 990000000
+      },
+      "categories": [
+        "decor",
+        "home"
+      ]
+    },
+    {
+      "id": "H6UH66JITI",
+      "name": "Bookends",
+      "description": "Pair of heavy marble bookends.",
+      "picture": "/static/img/products/generated/bookends.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 29,
+        "nanos": 990000000
+      },
+      "categories": [
+        "decor",
+        "home"
+      ]
+    },
+    {
+      "id": "G8ZZN4QOBF",
+      "name": "Jute Area Rug",
+      "description": "Hand-woven jute rug, 120 x 180 cm.",
+      "picture": "/static/img/products/generated/jute-area-rug.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 99,
+        "nanos": 990000000
+      },
+      "categories": [
+        "decor",
+        "home"
+      ]
+    },
+    {
+      "id": "2WRW5APE9H",
+      "name": "Brass Candlesticks",
+      "description": "Set of two brass candlesticks for taper candles.",
+      "picture": "/static/img/products/generated/brass-candlesticks.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 26,
+        "nanos": 990000000
+      },
+      "categories": [
+        "decor",
+        "home"
+      ]
+    },
+    {
+      "id": "UAFM3JDJFL",
+      "name": "Terracotta Planter",
+      "description": "Indoor plant pot with a drainage saucer.",
+      "picture": "/static/img/products/generated/terracotta-planter.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 18,
+        "nanos": 990000000
+      },
+      "categories": [
+        "decor",
+        "home"
+      ]
+    },
+    {
+      "id": "7PAKK5H2SR",
+      "name": "Cotton Bath Towels",
+      "description": "Set of two plush Turkish cotton bath towels.",
+      "picture": "/static/img/products/generated/cotton-bath-towels.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 44,
+        "nanos": 990000000
+      },
+      "categories": [
+        "home",
+        "bath"
+      ]
+    },
+    {
+      "id": "QNTVVFP3ZU",
+      "name": "Linen Sheet Set",
+      "description": "Breathable stonewashed linen sheets, queen size.",
+      "picture": "/static/img/products/generated/linen-sheet-set.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 149,
+        "nanos": 990000000
+      },
+      "categories": [
+        "home",
+        "bath"
+      ]
+    },
+    {
+      "id": "ZPJRI8EUM9",
+      "name": "Down Alternative Pillow",
+      "description": "Hypoallergenic pillow with a cotton cover.",
+      "picture": "/static/img/products/generated/down-alternative-pillow.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 39,
+        "nanos": 990000000
+      },
+      "categories": [
+        "home",
+        "bath"
+      ]
+    },
+    {
+      "id": "3FILXZCM3K",
+      "name": "Bath Mat",
+      "description": "Absorbent cotton bath mat with a non-slip back.",
+      "picture": "/static/img/products/generated/bath-mat.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 24,
+        "nanos": 990000000
+      },
+      "categories": [
+        "home",
+        "bath"
+      ]
+    },
+    {
+      "id": "EB9S16BYXK",
+      "name": "Shower Curtain",
+      "description": "Waffle-weave cotton shower curtain.",
+      "picture": "/static/img/products/generated/shower-curtain.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 34,
+        "nanos": 990000000
+      },
+      "categories": [
+        "home",
+        "bath"
+      ]
+    },
+    {
+      "id": "LYJMR1UI3P",
+      "name": "Waffle Bathrobe",
+      "description": "Lightweight waffle cotton robe.",
+      "picture": "/static/img/products/generated/waffle-bathrobe.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 59,
+        "nanos": 990000000
+      },
+      "categories": [
+        "home",
+        "bath"
+      ]
+    },
+    {
+      "id": "IGQZ01Z3HY",
+      "name": "Duvet Cover",
+      "description": "Percale duvet cover with button closure, queen size.",
+      "picture": "/static/img/products/generated/duvet-cover.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 89,
+        "nanos": 990000000
+      },
+      "categories": [
+        "home",
+        "bath"
+      ]
+    },
+    {
+      "id": "P51Q8U76P9",
+      "name": "Soap Dispenser",
+      "description": "Refillable ceramic soap dispenser.",
+      "picture": "/static/img/products/generated/soap-dispenser.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 17,
+        "nanos": 990000000
+      },
+      "categories": [
+        "home",
+        "bath"
+      ]
+    },
+    {
+      "id": "T625TBUKO9",
+      "name": "Weighted Blanket",
+      "description": "7 kg blanket for calmer sleep.",
+      "picture": "/static/img/products/generated/weighted-blanket.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 119,
+        "nanos": 990000000
+      },
+      "categories": [
+        "home",
+        "bath"
+      ]
+    },
+    {
+      "id": "IA6WSKY2ZS",
+      "name": "Laundry Hamper",
+      "description": "Collapsible cotton hamper with leather handles.",
+      "picture": "/static/img/products/generated/laundry-hamper.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 32,
+        "nanos": 990000000
+      },
+      "categories": [
+        "home",
+        "bath"
+      ]
+    },
+    {
+      "id": "Q34BSPENX4",
+      "name": "Bamboo Bath Tray",
+      "description": "Expandable bath caddy for books and drinks.",
+      "picture": "/static/img/products/generated/bamboo-bath-tray.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 36,
+        "nanos": 990000000
+      },
+      "categories": [
+        "home",
+        "bath"
+      ]
+    },
+    {
+      "id": "JJ4I7NHSNJ",
+      "name": "Silk Pillowcase",
+      "description": "Mulberry silk pillowcase that is gentle on hair and skin.",
+      "picture": "/static/img/products/generated/silk-pillowcase.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 39,
+        "nanos": 990000000
+      },
+      "categories": [
+        "home",
+        "bath"
+      ]
+    },
+    {
+      "id": "WTE47CHW17",
+      "name": "Crew Neck T-Shirt",
+      "description": "Everyday organic cotton tee.",
+      "picture": "/static/img/products/generated/crew-neck-t-shirt.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 22,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "tops"
+      ]
+    },
+    {
+      "id": "LXXM4J94B5",
+      "name": "Oxford Shirt",
+      "description": "Button-down cotton Oxford shirt.",
+      "picture": "/static/img/products/generated/oxford-shirt.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 49,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "tops"
+      ]
+    },
+    {
+      "id": "K4ZRDJ1K75",
+      "name": "Linen Shirt",
+      "description": "Relaxed-fit linen shirt for warm days.",
+      "picture": "/static/img/products/generated/linen-shirt.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 54,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "tops"
+      ]
+    },
+    {
+      "id": "0MSRMW5UDX",
+      "name": "Merino Sweater",
+      "description": "Fine-knit merino wool crew neck sweater.",
+      "picture": "/static/img/products/generated/merino-sweater.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 89,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "tops"
+      ]
+    },
+    {
+      "id": "5LWIPRS8IZ",
+      "name": "Hooded Sweatshirt",
+      "description": "Brushed fleece hoodie with a kangaroo pocket.",
+      "picture": "/static/img/products/generated/hooded-sweatshirt.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 54,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "tops"
+      ]
+    },
+    {
+      "id": "PFL7T4500S",
+      "name": "Striped Breton Top",
+      "description": "Classic long-sleeve striped cotton top.",
+      "picture": "/static/img/products/generated/striped-breton-top.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 39,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "tops"
+      ]
+    },
+    {
+      "id": "N968XV15ZS",
+      "name": "Silk Blouse",
+      "description": "Washable silk blouse with a relaxed fit.",
+      "picture": "/static/img/products/generated/silk-blouse.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 79,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "tops"
+      ]
+    },
+    {
+      "id": "JA3SYTS8I8",
+      "name": "Polo Shirt",
+      "description": "Pique cotton polo shirt.",
+      "picture": "/static/img/products/generated/polo-shirt.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 39,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "tops"
+      ]
+    },
+    {
+      "id": "8J0ZCQYRC8",
+      "name": "Cardigan",
+      "description": "Soft cotton cardigan with horn buttons.",
+      "picture": "/static/img/products/generated/cardigan.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 64,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "tops"
+      ]
+    },
+    {
+      "id": "6YO3EI0LBY",
+      "name": "Turtleneck",
+      "description": "Slim ribbed turtleneck.",
+      "picture": "/static/img/products/generated/turtleneck.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 44,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "tops"
+      ]
+    },
+    {
+      "id": "16CMW6EFZX",
+      "name": "Flannel Shirt",
+      "description": "Brushed cotton plaid flannel shirt.",
+      "picture": "/static/img/products/generated/flannel-shirt.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 49,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "tops"
+      ]
+    },
+    {
+      "id": "JSUHYACJMC",
+      "name": "Henley Shirt",
+      "description": "Long-sleeve waffle-knit henley.",
+      "picture": "/static/img/products/generated/henley-shirt.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 34,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "tops"
+      ]
+    },
+    {
+      "id": "JOG6IHMBRP",
+      "name": "Workout Tank",
+      "description": "Moisture-wicking tank top for training.",
+      "picture": "/static/img/products/generated/workout-tank.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 24,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "tops"
+      ]
+    },
+    {
+      "id": "8ZP4XN1RJS",
+      "name": "Denim Shirt",
+      "description": "Washed chambray denim shirt.",
+      "picture": "/static/img/products/generated/denim-shirt.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 54,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "tops"
+      ]
+    },
+    {
+      "id": "C6TMKCWBOZ",
+      "name": "Slim Jeans",
+      "description": "Stretch denim jeans in a dark wash.",
+      "picture": "/static/img/products/generated/slim-jeans.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 69,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "bottoms"
+      ]
+    },
+    {
+      "id": "YB0W112X5O",
+      "name": "Chino Pants",
+      "description": "Garment-dyed cotton chinos.",
+      "picture": "/static/img/products/generated/chino-pants.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 59,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "bottoms"
+      ]
+    },
+    {
+      "id": "HSK6YW327Z",
+      "name": "Linen Trousers",
+      "description": "Drawstring linen trousers.",
+      "picture": "/static/img/products/generated/linen-trousers.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 64,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "bottoms"
+      ]
+    },
+    {
+      "id": "PDDPDAUM8W",
+      "name": "Jogger Pants",
+      "description": "Fleece joggers with a tapered leg.",
+      "picture": "/static/img/products/generated/jogger-pants.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 49,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "bottoms"
+      ]
+    },
+    {
+      "id": "B5UUWKG55T",
+      "name": "Denim Shorts",
+      "description": "Mid-rise denim shorts.",
+      "picture": "/static/img/products/generated/denim-shorts.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 39,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "bottoms"
+      ]
+    },
+    {
+      "id": "C70UIULGC2",
+      "name": "Pleated Skirt",
+      "description": "Midi pleated skirt with an elastic waist.",
+      "picture": "/static/img/products/generated/pleated-skirt.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 54,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "bottoms"
+      ]
+    },
+    {
+      "id": "E617Y6J9P0",
+      "name": "Yoga Leggings",
+      "description": "High-waisted leggings with pockets.",
+      "picture": "/static/img/products/generated/yoga-leggings.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 44,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "bottoms"
+      ]
+    },
+    {
+      "id": "UHMLWR75HI",
+      "name": "Cargo Pants",
+      "description": "Utility cargo pants in ripstop cotton.",
+      "picture": "/static/img/products/generated/cargo-pants.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 64,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "bottoms"
+      ]
+    },
+    {
+      "id": "RCP4YUNB3Z",
+      "name": "Wool Trousers",
+      "description": "Tailored wool-blend trousers.",
+      "picture": "/static/img/products/generated/wool-trousers.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 89,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "bottoms"
+      ]
+    },
+    {
+      "id": "01HKM0I8BB",
+      "name": "Swim Trunks",
+      "description": "Quick-dry swim trunks with a mesh lining.",
+      "picture": "/static/img/products/generated/swim-trunks.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 34,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "bottoms"
+      ]
+    },
+    {
+      "id": "NFL466VOHD",
+      "name": "Rain Jacket",
+      "description": "Waterproof, breathable shell with a packable hood.",
+      "picture": "/static/img/products/generated/rain-jacket.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 99,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "outerwear"
+      ]
+    },
+    {
+      "id": "4CKIHNHQIN",
+      "name": "Denim Jacket",
+      "description": "Classic trucker jacket in a medium wash.",
+      "picture": "/static/img/products/generated/denim-jacket.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 79,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "outerwear"
+      ]
+    },
+    {
+      "id": "MF5SMAT6GM",
+      "name": "Puffer Jacket",
+      "description": "Lightweight insulated puffer jacket.",
+      "picture": "/static/img/products/generated/puffer-jacket.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 129,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "outerwear"
+      ]
+    },
+    {
+      "id": "TVGOS19F1V",
+      "name": "Wool Overcoat",
+      "description": "Single-breasted wool-blend overcoat.",
+      "picture": "/static/img/products/generated/wool-overcoat.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 199,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "outerwear"
+      ]
+    },
+    {
+      "id": "0IC3PN033B",
+      "name": "Fleece Jacket",
+      "description": "Recycled polyester fleece full-zip.",
+      "picture": "/static/img/products/generated/fleece-jacket.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 59,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "outerwear"
+      ]
+    },
+    {
+      "id": "EFLGSZ8CT4",
+      "name": "Trench Coat",
+      "description": "Water-resistant cotton trench coat.",
+      "picture": "/static/img/products/generated/trench-coat.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 169,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "outerwear"
+      ]
+    },
+    {
+      "id": "W4DI1IZVMK",
+      "name": "Bomber Jacket",
+      "description": "Nylon bomber jacket with ribbed cuffs.",
+      "picture": "/static/img/products/generated/bomber-jacket.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 89,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "outerwear"
+      ]
+    },
+    {
+      "id": "J58YBCC9UO",
+      "name": "Quilted Vest",
+      "description": "Lightweight quilted vest for layering.",
+      "picture": "/static/img/products/generated/quilted-vest.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 64,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "outerwear"
+      ]
+    },
+    {
+      "id": "FSUDNUJ6RM",
+      "name": "Leather Jacket",
+      "description": "Lambskin leather moto jacket.",
+      "picture": "/static/img/products/generated/leather-jacket.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 249,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "outerwear"
+      ]
+    },
+    {
+      "id": "9A8DX9J8N4",
+      "name": "Windbreaker",
+      "description": "Packable windbreaker for running and travel.",
+      "picture": "/static/img/products/generated/windbreaker.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 54,
+        "nanos": 990000000
+      },
+      "categories": [
+        "clothing",
+        "outerwear"
+      ]
+    },
+    {
+      "id": "8T9PHN8KH1",
+      "name": "White Sneakers",
+      "description": "Minimal leather sneakers that go with everything.",
+      "picture": "/static/img/products/generated/white-sneakers.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 89,
+        "nanos": 990000000
+      },
+      "categories": [
+        "footwear"
+      ]
+    },
+    {
+      "id": "2BOSCZDAS9",
+      "name": "Running Shoes",
+      "description": "Cushioned running shoes with a breathable mesh upper.",
+      "picture": "/static/img/products/generated/running-shoes.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 119,
+        "nanos": 990000000
+      },
+      "categories": [
+        "footwear"
+      ]
+    },
+    {
+      "id": "FJ34GARE57",
+      "name": "Chelsea Boots",
+      "description": "Suede Chelsea boots with elastic sides.",
+      "picture": "/static/img/products/generated/chelsea-boots.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 139,
+        "nanos": 990000000
+      },
+      "categories": [
+        "footwear"
+      ]
+    },
+    {
+      "id": "770OK6BXED",
+      "name": "Canvas Slip-Ons",
+      "description": "Easy canvas slip-on shoes.",
+      "picture": "/static/img/products/generated/canvas-slip-ons.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 44,
+        "nanos": 990000000
+      },
+      "categories": [
+        "footwear"
+      ]
+    },
+    {
+      "id": "6PRG7XQBCV",
+      "name": "Hiking Boots",
+      "description": "Waterproof boots with a grippy outsole.",
+      "picture": "/static/img/products/generated/hiking-boots.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 149,
+        "nanos": 990000000
+      },
+      "categories": [
+        "footwear"
+      ]
+    },
+    {
+      "id": "YS8AVHS3HR",
+      "name": "Leather Sandals",
+      "description": "Slide sandals with a contoured footbed.",
+      "picture": "/static/img/products/generated/leather-sandals.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 59,
+        "nanos": 990000000
+      },
+      "categories": [
+        "footwear"
+      ]
+    },
+    {
+      "id": "T5BAPQUH79",
+      "name": "Wool Slippers",
+      "description": "Felted wool slippers for the house.",
+      "picture": "/static/img/products/generated/wool-slippers.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 39,
+        "nanos": 990000000
+      },
+      "categories": [
+        "footwear"
+      ]
+    },
+    {
+      "id": "SWI07RQDH5",
+      "name": "Ankle Boots",
+      "description": "Leather ankle boots with a block heel.",
+      "picture": "/static/img/products/generated/ankle-boots.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 129,
+        "nanos": 990000000
+      },
+      "categories": [
+        "footwear"
+      ]
+    },
+    {
+      "id": "BEQ3RQ09Q2",
+      "name": "Espadrilles",
+      "description": "Canvas espadrilles with jute soles.",
+      "picture": "/static/img/products/generated/espadrilles.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 49,
+        "nanos": 990000000
+      },
+      "categories": [
+        "footwear"
+      ]
+    },
+    {
+      "id": "GXTD6WQSN5",
+      "name": "Rain Boots",
+      "description": "Rubber rain boots with a cotton lining.",
+      "picture": "/static/img/products/generated/rain-boots.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 64,
+        "nanos": 990000000
+      },
+      "categories": [
+        "footwear"
+      ]
+    },
+    {
+      "id": "2X7W15GFC8",
+      "name": "Dress Shoes",
+      "description": "Polished leather Oxford dress shoes.",
+      "picture": "/static/img/products/generated/dress-shoes.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 159,
+        "nanos": 990000000
+      },
+      "categories": [
+        "footwear"
+      ]
+    },
+    {
+      "id": "XM4ON8FP4D",
+      "name": "Wool Socks",
+      "description": "Pack of three cushioned merino wool socks.",
+      "picture": "/static/img/products/generated/wool-socks.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 24,
+        "nanos": 990000000
+      },
+      "categories": [
+        "footwear"
+      ]
+    },
+    {
+      "id": "6FU2XTZNKD",
+      "name": "Wool Beanie",
+      "description": "Ribbed merino wool beanie.",
+      "picture": "/static/img/products/generated/wool-beanie.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 24,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories"
+      ]
+    },
+    {
+      "id": "3YHIXDKP28",
+      "name": "Baseball Cap",
+      "description": "Washed cotton cap with an adjustable strap.",
+      "picture": "/static/img/products/generated/baseball-cap.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 22,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories"
+      ]
+    },
+    {
+      "id": "YQGJAH2999",
+      "name": "Cashmere Scarf",
+      "description": "Soft cashmere scarf in a solid colour.",
+      "picture": "/static/img/products/generated/cashmere-scarf.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 79,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories"
+      ]
+    },
+    {
+      "id": "ZDLNG9WV6Y",
+      "name": "Leather Belt",
+      "description": "Full-grain leather belt with a brass buckle.",
+      "picture": "/static/img/products/generated/leather-belt.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 44,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories"
+      ]
+    },
+    {
+      "id": "QZHAW73FA7",
+      "name": "Leather Gloves",
+      "description": "Touchscreen-compatible leather gloves.",
+      "picture": "/static/img/products/generated/leather-gloves.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 49,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories"
+      ]
+    },
+    {
+      "id": "HFA9471SIS",
+      "name": "Straw Sun Hat",
+      "description": "Wide-brim straw hat for sunny days.",
+      "picture": "/static/img/products/generated/straw-sun-hat.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 34,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories"
+      ]
+    },
+    {
+      "id": "XH3QYOE0EM",
+      "name": "Silk Tie",
+      "description": "Woven silk tie.",
+      "picture": "/static/img/products/generated/silk-tie.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 39,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories"
+      ]
+    },
+    {
+      "id": "TB8EVASPWT",
+      "name": "Compact Umbrella",
+      "description": "Wind-resistant travel umbrella.",
+      "picture": "/static/img/products/generated/compact-umbrella.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 27,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories"
+      ]
+    },
+    {
+      "id": "QA0ZVBJ8D2",
+      "name": "Leather Wallet",
+      "description": "Slim bifold wallet with RFID blocking.",
+      "picture": "/static/img/products/generated/leather-wallet.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 49,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories"
+      ]
+    },
+    {
+      "id": "PRP84R8ZOC",
+      "name": "Card Holder",
+      "description": "Minimal leather card holder.",
+      "picture": "/static/img/products/generated/card-holder.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 29,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories"
+      ]
+    },
+    {
+      "id": "WNC7DYFV9B",
+      "name": "Bandana",
+      "description": "Printed cotton bandana.",
+      "picture": "/static/img/products/generated/bandana.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 12,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories"
+      ]
+    },
+    {
+      "id": "87YOSDO411",
+      "name": "Key Ring",
+      "description": "Brass key ring with a leather loop.",
+      "picture": "/static/img/products/generated/key-ring.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 14,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories"
+      ]
+    },
+    {
+      "id": "481X6CHEMV",
+      "name": "Gold Hoop Earrings",
+      "description": "Lightweight 14k gold-plated hoops.",
+      "picture": "/static/img/products/generated/gold-hoop-earrings.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 39,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories",
+        "jewelry"
+      ]
+    },
+    {
+      "id": "09ZMA3GX2E",
+      "name": "Pearl Necklace",
+      "description": "Freshwater pearl necklace on a gold chain.",
+      "picture": "/static/img/products/generated/pearl-necklace.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 89,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories",
+        "jewelry"
+      ]
+    },
+    {
+      "id": "FUB2NZEEO3",
+      "name": "Silver Ring",
+      "description": "Sterling silver band ring.",
+      "picture": "/static/img/products/generated/silver-ring.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 34,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories",
+        "jewelry"
+      ]
+    },
+    {
+      "id": "1EMXMHNKLA",
+      "name": "Charm Bracelet",
+      "description": "Adjustable bracelet with small gold charms.",
+      "picture": "/static/img/products/generated/charm-bracelet.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 44,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories",
+        "jewelry"
+      ]
+    },
+    {
+      "id": "3OLFVRLXLF",
+      "name": "Stud Earrings",
+      "description": "Cubic zirconia stud earrings.",
+      "picture": "/static/img/products/generated/stud-earrings.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 24,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories",
+        "jewelry"
+      ]
+    },
+    {
+      "id": "WBE3MPIBG1",
+      "name": "Pendant Necklace",
+      "description": "Dainty pendant necklace with a crescent moon.",
+      "picture": "/static/img/products/generated/pendant-necklace.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 49,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories",
+        "jewelry"
+      ]
+    },
+    {
+      "id": "03IYWF9JAF",
+      "name": "Beaded Bracelet",
+      "description": "Stretch bracelet with natural stone beads.",
+      "picture": "/static/img/products/generated/beaded-bracelet.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 19,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories",
+        "jewelry"
+      ]
+    },
+    {
+      "id": "G2FSJV1DE9",
+      "name": "Signet Ring",
+      "description": "Polished signet ring in gold vermeil.",
+      "picture": "/static/img/products/generated/signet-ring.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 69,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories",
+        "jewelry"
+      ]
+    },
+    {
+      "id": "XQDAY0QPGV",
+      "name": "Cufflinks",
+      "description": "Brushed silver cufflinks.",
+      "picture": "/static/img/products/generated/cufflinks.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 49,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories",
+        "jewelry"
+      ]
+    },
+    {
+      "id": "UW226PURTP",
+      "name": "Jewelry Box",
+      "description": "Velvet-lined travel jewelry case.",
+      "picture": "/static/img/products/generated/jewelry-box.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 34,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories",
+        "jewelry"
+      ]
+    },
+    {
+      "id": "7XQT8J859S",
+      "name": "Canvas Tote Bag",
+      "description": "Heavy canvas tote with an inner pocket.",
+      "picture": "/static/img/products/generated/canvas-tote-bag.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 29,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories",
+        "bags"
+      ]
+    },
+    {
+      "id": "VEHL6O0R0I",
+      "name": "Leather Backpack",
+      "description": "Everyday leather backpack with a laptop sleeve.",
+      "picture": "/static/img/products/generated/leather-backpack.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 149,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories",
+        "bags"
+      ]
+    },
+    {
+      "id": "PQCYRR5SB4",
+      "name": "Crossbody Bag",
+      "description": "Compact leather crossbody bag.",
+      "picture": "/static/img/products/generated/crossbody-bag.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 89,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories",
+        "bags"
+      ]
+    },
+    {
+      "id": "JA1OBXVRFE",
+      "name": "Weekender Bag",
+      "description": "Waxed canvas weekender with leather trim.",
+      "picture": "/static/img/products/generated/weekender-bag.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 129,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories",
+        "bags"
+      ]
+    },
+    {
+      "id": "6B52RZQ2H6",
+      "name": "Laptop Sleeve",
+      "description": "Padded felt sleeve for 14-inch laptops.",
+      "picture": "/static/img/products/generated/laptop-sleeve.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 34,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories",
+        "bags"
+      ]
+    },
+    {
+      "id": "5A778WJFJ0",
+      "name": "Belt Bag",
+      "description": "Nylon belt bag for travel essentials.",
+      "picture": "/static/img/products/generated/belt-bag.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 39,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories",
+        "bags"
+      ]
+    },
+    {
+      "id": "44DRJX773I",
+      "name": "Toiletry Bag",
+      "description": "Water-resistant hanging toiletry bag.",
+      "picture": "/static/img/products/generated/toiletry-bag.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 29,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories",
+        "bags"
+      ]
+    },
+    {
+      "id": "DXBKVJ45YW",
+      "name": "Messenger Bag",
+      "description": "Canvas messenger bag with a padded strap.",
+      "picture": "/static/img/products/generated/messenger-bag.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 79,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories",
+        "bags"
+      ]
+    },
+    {
+      "id": "ARX8O4VVBV",
+      "name": "Gym Duffel",
+      "description": "Duffel bag with a separate shoe compartment.",
+      "picture": "/static/img/products/generated/gym-duffel.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 59,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories",
+        "bags"
+      ]
+    },
+    {
+      "id": "GRJ7BW0LQB",
+      "name": "Coin Purse",
+      "description": "Small leather zip coin purse.",
+      "picture": "/static/img/products/generated/coin-purse.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 19,
+        "nanos": 990000000
+      },
+      "categories": [
+        "accessories",
+        "bags"
+      ]
+    },
+    {
+      "id": "0HUMEUXW1J",
+      "name": "Facial Cleanser",
+      "description": "Gentle gel cleanser for all skin types.",
+      "picture": "/static/img/products/generated/facial-cleanser.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 18,
+        "nanos": 990000000
+      },
+      "categories": [
+        "beauty",
+        "skincare"
+      ]
+    },
+    {
+      "id": "DVBI7JAF1A",
+      "name": "Moisturizer",
+      "description": "Lightweight daily moisturizer with hyaluronic acid.",
+      "picture": "/static/img/products/generated/moisturizer.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 29,
+        "nanos": 990000000
+      },
+      "categories": [
+        "beauty",
+        "skincare"
+      ]
+    },
+    {
+      "id": "4U7L0AQ0IG",
+      "name": "Sunscreen SPF 50",
+      "description": "Broad-spectrum mineral sunscreen for the face.",
+      "picture": "/static/img/products/generated/sunscreen-spf-50.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 24,
+        "nanos": 990000000
+      },
+      "categories": [
+        "beauty",
+        "skincare"
+      ]
+    },
+    {
+      "id": "KPTDDJG1A5",
+      "name": "Lip Balm Set",
+      "description": "Three nourishing lip balms.",
+      "picture": "/static/img/products/generated/lip-balm-set.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 12,
+        "nanos": 990000000
+      },
+      "categories": [
+        "beauty",
+        "skincare"
+      ]
+    },
+    {
+      "id": "PQRV77W0A6",
+      "name": "Vitamin C Serum",
+      "description": "Brightening serum with 15% vitamin C.",
+      "picture": "/static/img/products/generated/vitamin-c-serum.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 34,
+        "nanos": 990000000
+      },
+      "categories": [
+        "beauty",
+        "skincare"
+      ]
+    },
+    {
+      "id": "I61GQC6G1G",
+      "name": "Hand Cream",
+      "description": "Rich shea butter hand cream.",
+      "picture": "/static/img/products/generated/hand-cream.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 14,
+        "nanos": 990000000
+      },
+      "categories": [
+        "beauty",
+        "skincare"
+      ]
+    },
+    {
+      "id": "Z6Q53Q8QPX",
+      "name": "Body Lotion",
+      "description": "Unscented body lotion with oat extract.",
+      "picture": "/static/img/products/generated/body-lotion.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 19,
+        "nanos": 990000000
+      },
+      "categories": [
+        "beauty",
+        "skincare"
+      ]
+    },
+    {
+      "id": "QD00PMPF6W",
+      "name": "Face Mask Set",
+      "description": "Five hydrating sheet masks.",
+      "picture": "/static/img/products/generated/face-mask-set.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 16,
+        "nanos": 990000000
+      },
+      "categories": [
+        "beauty",
+        "skincare"
+      ]
+    },
+    {
+      "id": "XSQRX3OA7O",
+      "name": "Makeup Brush Set",
+      "description": "Eight soft synthetic makeup brushes.",
+      "picture": "/static/img/products/generated/makeup-brush-set.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 39,
+        "nanos": 990000000
+      },
+      "categories": [
+        "beauty",
+        "skincare"
+      ]
+    },
+    {
+      "id": "AQHSMNALKQ",
+      "name": "Perfume",
+      "description": "Eau de parfum with notes of bergamot and amber.",
+      "picture": "/static/img/products/generated/perfume.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 89,
+        "nanos": 990000000
+      },
+      "categories": [
+        "beauty",
+        "skincare"
+      ]
+    },
+    {
+      "id": "PWIWQ2980C",
+      "name": "Nail Polish Set",
+      "description": "Four long-wearing nail colours.",
+      "picture": "/static/img/products/generated/nail-polish-set.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 22,
+        "nanos": 990000000
+      },
+      "categories": [
+        "beauty",
+        "skincare"
+      ]
+    },
+    {
+      "id": "OKD6KRVP2Q",
+      "name": "Jade Face Roller",
+      "description": "Cooling jade roller for facial massage.",
+      "picture": "/static/img/products/generated/jade-face-roller.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 24,
+        "nanos": 990000000
+      },
+      "categories": [
+        "beauty",
+        "skincare"
+      ]
+    },
+    {
+      "id": "1THPWV2IF7",
+      "name": "Wide-Tooth Comb",
+      "description": "Handmade cellulose acetate comb.",
+      "picture": "/static/img/products/generated/wide-tooth-comb.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 12,
+        "nanos": 990000000
+      },
+      "categories": [
+        "hair",
+        "beauty"
+      ]
+    },
+    {
+      "id": "WKNFHF4SJY",
+      "name": "Boar Bristle Brush",
+      "description": "Brush that smooths and adds shine.",
+      "picture": "/static/img/products/generated/boar-bristle-brush.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 29,
+        "nanos": 990000000
+      },
+      "categories": [
+        "hair",
+        "beauty"
+      ]
+    },
+    {
+      "id": "U07S4MWSAS",
+      "name": "Hair Straightener",
+      "description": "Ceramic flat iron with adjustable heat.",
+      "picture": "/static/img/products/generated/hair-straightener.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 59,
+        "nanos": 990000000
+      },
+      "categories": [
+        "hair",
+        "beauty"
+      ]
+    },
+    {
+      "id": "UVVMB58EF4",
+      "name": "Curling Iron",
+      "description": "1-inch ceramic curling iron.",
+      "picture": "/static/img/products/generated/curling-iron.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 49,
+        "nanos": 990000000
+      },
+      "categories": [
+        "hair",
+        "beauty"
+      ]
+    },
+    {
+      "id": "FDSGBKDKFS",
+      "name": "Silk Scrunchies",
+      "description": "Set of five silk scrunchies.",
+      "picture": "/static/img/products/generated/silk-scrunchies.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 19,
+        "nanos": 990000000
+      },
+      "categories": [
+        "hair",
+        "beauty"
+      ]
+    },
+    {
+      "id": "ULEFVNP2YG",
+      "name": "Argan Hair Oil",
+      "description": "Nourishing oil for frizz control.",
+      "picture": "/static/img/products/generated/argan-hair-oil.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 24,
+        "nanos": 990000000
+      },
+      "categories": [
+        "hair",
+        "beauty"
+      ]
+    },
+    {
+      "id": "MGQJIT9132",
+      "name": "Dry Shampoo",
+      "description": "Refreshing dry shampoo spray.",
+      "picture": "/static/img/products/generated/dry-shampoo.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 14,
+        "nanos": 990000000
+      },
+      "categories": [
+        "hair",
+        "beauty"
+      ]
+    },
+    {
+      "id": "AQA2CNJ80W",
+      "name": "Hair Clips",
+      "description": "Set of six tortoiseshell claw clips.",
+      "picture": "/static/img/products/generated/hair-clips.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 16,
+        "nanos": 990000000
+      },
+      "categories": [
+        "hair",
+        "beauty"
+      ]
+    },
+    {
+      "id": "LGFY02YZ3M",
+      "name": "Yoga Mat",
+      "description": "Non-slip 6 mm yoga mat with a carry strap.",
+      "picture": "/static/img/products/generated/yoga-mat.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 39,
+        "nanos": 990000000
+      },
+      "categories": [
+        "fitness",
+        "sports"
+      ]
+    },
+    {
+      "id": "2WU4ZRSZR0",
+      "name": "Adjustable Dumbbells",
+      "description": "Pair of dumbbells adjustable from 2 to 12 kg.",
+      "picture": "/static/img/products/generated/adjustable-dumbbells.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 149,
+        "nanos": 990000000
+      },
+      "categories": [
+        "fitness",
+        "sports"
+      ]
+    },
+    {
+      "id": "8COLPAAXUW",
+      "name": "Resistance Bands",
+      "description": "Set of five resistance bands with handles.",
+      "picture": "/static/img/products/generated/resistance-bands.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 24,
+        "nanos": 990000000
+      },
+      "categories": [
+        "fitness",
+        "sports"
+      ]
+    },
+    {
+      "id": "FZRX5LI4WV",
+      "name": "Jump Rope",
+      "description": "Speed jump rope with ball bearings.",
+      "picture": "/static/img/products/generated/jump-rope.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 14,
+        "nanos": 990000000
+      },
+      "categories": [
+        "fitness",
+        "sports"
+      ]
+    },
+    {
+      "id": "LYOZH2AMUN",
+      "name": "Foam Roller",
+      "description": "High-density foam roller for recovery.",
+      "picture": "/static/img/products/generated/foam-roller.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 29,
+        "nanos": 990000000
+      },
+      "categories": [
+        "fitness",
+        "sports"
+      ]
+    },
+    {
+      "id": "UOZDAB24NQ",
+      "name": "Water Bottle",
+      "description": "Insulated 750 ml stainless steel bottle.",
+      "picture": "/static/img/products/generated/water-bottle.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 27,
+        "nanos": 990000000
+      },
+      "categories": [
+        "fitness",
+        "sports"
+      ]
+    },
+    {
+      "id": "63Z8L9CA0X",
+      "name": "Kettlebell",
+      "description": "Cast iron kettlebell, 12 kg.",
+      "picture": "/static/img/products/generated/kettlebell.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 54,
+        "nanos": 990000000
+      },
+      "categories": [
+        "fitness",
+        "sports"
+      ]
+    },
+    {
+      "id": "J0RAIGYTSX",
+      "name": "Yoga Blocks",
+      "description": "Pair of cork yoga blocks.",
+      "picture": "/static/img/products/generated/yoga-blocks.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 24,
+        "nanos": 990000000
+      },
+      "categories": [
+        "fitness",
+        "sports"
+      ]
+    },
+    {
+      "id": "PXCJV7FGCT",
+      "name": "Fitness Tracker Band",
+      "description": "Activity and sleep tracking wristband.",
+      "picture": "/static/img/products/generated/fitness-tracker-band.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 69,
+        "nanos": 990000000
+      },
+      "categories": [
+        "fitness",
+        "sports"
+      ]
+    },
+    {
+      "id": "AOWPB9Z3UD",
+      "name": "Gym Towel",
+      "description": "Quick-dry microfibre gym towel.",
+      "picture": "/static/img/products/generated/gym-towel.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 14,
+        "nanos": 990000000
+      },
+      "categories": [
+        "fitness",
+        "sports"
+      ]
+    },
+    {
+      "id": "65LMJF8AF3",
+      "name": "Camping Tent",
+      "description": "Two-person lightweight backpacking tent.",
+      "picture": "/static/img/products/generated/camping-tent.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 179,
+        "nanos": 990000000
+      },
+      "categories": [
+        "outdoor",
+        "travel"
+      ]
+    },
+    {
+      "id": "M4RHTZ9D0U",
+      "name": "Sleeping Bag",
+      "description": "Three-season sleeping bag rated to -5 C.",
+      "picture": "/static/img/products/generated/sleeping-bag.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 99,
+        "nanos": 990000000
+      },
+      "categories": [
+        "outdoor",
+        "travel"
+      ]
+    },
+    {
+      "id": "RG5HG0CHT6",
+      "name": "Headlamp",
+      "description": "Rechargeable LED headlamp, 400 lumens.",
+      "picture": "/static/img/products/generated/headlamp.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 34,
+        "nanos": 990000000
+      },
+      "categories": [
+        "outdoor",
+        "travel"
+      ]
+    },
+    {
+      "id": "BWVPC9CHFE",
+      "name": "Camping Mug",
+      "description": "Enamel camping mug.",
+      "picture": "/static/img/products/generated/camping-mug.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 14,
+        "nanos": 990000000
+      },
+      "categories": [
+        "outdoor",
+        "travel"
+      ]
+    },
+    {
+      "id": "3O23YMZU14",
+      "name": "Picnic Blanket",
+      "description": "Water-resistant picnic blanket with a carry strap.",
+      "picture": "/static/img/products/generated/picnic-blanket.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 39,
+        "nanos": 990000000
+      },
+      "categories": [
+        "outdoor",
+        "travel"
+      ]
+    },
+    {
+      "id": "HW5GI6LZLR",
+      "name": "Hiking Backpack",
+      "description": "28-litre daypack with a rain cover.",
+      "picture": "/static/img/products/generated/hiking-backpack.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 89,
+        "nanos": 990000000
+      },
+      "categories": [
+        "outdoor",
+        "travel"
+      ]
+    },
+    {
+      "id": "M3AEH28CBR",
+      "name": "Trekking Poles",
+      "description": "Collapsible aluminium trekking poles.",
+      "picture": "/static/img/products/generated/trekking-poles.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 59,
+        "nanos": 990000000
+      },
+      "categories": [
+        "outdoor",
+        "travel"
+      ]
+    },
+    {
+      "id": "81GKQKZ8T2",
+      "name": "Hammock",
+      "description": "Parachute nylon hammock with tree straps.",
+      "picture": "/static/img/products/generated/hammock.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 49,
+        "nanos": 990000000
+      },
+      "categories": [
+        "outdoor",
+        "travel"
+      ]
+    },
+    {
+      "id": "CAPHH9PFWF",
+      "name": "Travel Pillow",
+      "description": "Memory foam neck pillow.",
+      "picture": "/static/img/products/generated/travel-pillow.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 24,
+        "nanos": 990000000
+      },
+      "categories": [
+        "outdoor",
+        "travel"
+      ]
+    },
+    {
+      "id": "1YC88KJ6CE",
+      "name": "Packing Cubes",
+      "description": "Set of four compression packing cubes.",
+      "picture": "/static/img/products/generated/packing-cubes.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 29,
+        "nanos": 990000000
+      },
+      "categories": [
+        "outdoor",
+        "travel"
+      ]
+    },
+    {
+      "id": "U11V2847GO",
+      "name": "Dotted Notebook",
+      "description": "A5 hardcover notebook with dotted pages.",
+      "picture": "/static/img/products/generated/dotted-notebook.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 18,
+        "nanos": 990000000
+      },
+      "categories": [
+        "office",
+        "stationery"
+      ]
+    },
+    {
+      "id": "1MZLNDPVWO",
+      "name": "Fountain Pen",
+      "description": "Steel-nib fountain pen with a converter.",
+      "picture": "/static/img/products/generated/fountain-pen.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 34,
+        "nanos": 990000000
+      },
+      "categories": [
+        "office",
+        "stationery"
+      ]
+    },
+    {
+      "id": "MKPSM2IYFR",
+      "name": "Desk Organizer",
+      "description": "Wooden desk organizer with three compartments.",
+      "picture": "/static/img/products/generated/desk-organizer.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 29,
+        "nanos": 990000000
+      },
+      "categories": [
+        "office",
+        "stationery"
+      ]
+    },
+    {
+      "id": "ZEQPVQEYUM",
+      "name": "Weekly Planner",
+      "description": "Undated weekly planner with a linen cover.",
+      "picture": "/static/img/products/generated/weekly-planner.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 22,
+        "nanos": 990000000
+      },
+      "categories": [
+        "office",
+        "stationery"
+      ]
+    },
+    {
+      "id": "14E47R9XAQ",
+      "name": "Brass Pen",
+      "description": "Solid brass ballpoint pen.",
+      "picture": "/static/img/products/generated/brass-pen.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 39,
+        "nanos": 990000000
+      },
+      "categories": [
+        "office",
+        "stationery"
+      ]
+    },
+    {
+      "id": "4LDZQ7G08U",
+      "name": "Sticky Notes Set",
+      "description": "Colourful sticky notes in six sizes.",
+      "picture": "/static/img/products/generated/sticky-notes-set.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 9,
+        "nanos": 990000000
+      },
+      "categories": [
+        "office",
+        "stationery"
+      ]
+    },
+    {
+      "id": "9NRPAG4HBJ",
+      "name": "Desk Lamp",
+      "description": "Adjustable LED desk lamp with dimming.",
+      "picture": "/static/img/products/generated/desk-lamp.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 49,
+        "nanos": 990000000
+      },
+      "categories": [
+        "office",
+        "stationery"
+      ]
+    },
+    {
+      "id": "LJ14P9K3PI",
+      "name": "Leather Desk Mat",
+      "description": "Large leather desk mat.",
+      "picture": "/static/img/products/generated/leather-desk-mat.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 44,
+        "nanos": 990000000
+      },
+      "categories": [
+        "office",
+        "stationery"
+      ]
+    },
+    {
+      "id": "KVJH95NMGW",
+      "name": "Watercolour Set",
+      "description": "24-colour travel watercolour palette.",
+      "picture": "/static/img/products/generated/watercolour-set.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 29,
+        "nanos": 990000000
+      },
+      "categories": [
+        "office",
+        "stationery"
+      ]
+    },
+    {
+      "id": "I339NOK78D",
+      "name": "Greeting Cards",
+      "description": "Set of ten letterpress greeting cards.",
+      "picture": "/static/img/products/generated/greeting-cards.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 16,
+        "nanos": 990000000
+      },
+      "categories": [
+        "office",
+        "stationery"
+      ]
+    },
+    {
+      "id": "PDT4UAHOK2",
+      "name": "Wireless Earbuds",
+      "description": "Bluetooth earbuds with a charging case.",
+      "picture": "/static/img/products/generated/wireless-earbuds.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 79,
+        "nanos": 990000000
+      },
+      "categories": [
+        "electronics",
+        "accessories"
+      ]
+    },
+    {
+      "id": "Z8WBS4INKF",
+      "name": "Phone Case",
+      "description": "Slim protective phone case.",
+      "picture": "/static/img/products/generated/phone-case.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 24,
+        "nanos": 990000000
+      },
+      "categories": [
+        "electronics",
+        "accessories"
+      ]
+    },
+    {
+      "id": "FT78EDOYLW",
+      "name": "Portable Charger",
+      "description": "10,000 mAh power bank with USB-C.",
+      "picture": "/static/img/products/generated/portable-charger.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 34,
+        "nanos": 990000000
+      },
+      "categories": [
+        "electronics",
+        "accessories"
+      ]
+    },
+    {
+      "id": "F68ON6SLR7",
+      "name": "Bluetooth Speaker",
+      "description": "Water-resistant portable speaker.",
+      "picture": "/static/img/products/generated/bluetooth-speaker.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 59,
+        "nanos": 990000000
+      },
+      "categories": [
+        "electronics",
+        "accessories"
+      ]
+    },
+    {
+      "id": "2OF10VEWNS",
+      "name": "Charging Cable",
+      "description": "Braided USB-C cable, 2 m.",
+      "picture": "/static/img/products/generated/charging-cable.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 14,
+        "nanos": 990000000
+      },
+      "categories": [
+        "electronics",
+        "accessories"
+      ]
+    },
+    {
+      "id": "07FEUB3319",
+      "name": "Laptop Stand",
+      "description": "Aluminium laptop stand for better posture.",
+      "picture": "/static/img/products/generated/laptop-stand.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 39,
+        "nanos": 990000000
+      },
+      "categories": [
+        "electronics",
+        "accessories"
+      ]
+    },
+    {
+      "id": "JFKFLMHPPJ",
+      "name": "Wireless Charger",
+      "description": "Fast wireless charging pad.",
+      "picture": "/static/img/products/generated/wireless-charger.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 29,
+        "nanos": 990000000
+      },
+      "categories": [
+        "electronics",
+        "accessories"
+      ]
+    },
+    {
+      "id": "UI7LDQTBLJ",
+      "name": "Over-Ear Headphones",
+      "description": "Noise-cancelling over-ear headphones.",
+      "picture": "/static/img/products/generated/over-ear-headphones.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 179,
+        "nanos": 990000000
+      },
+      "categories": [
+        "electronics",
+        "accessories"
+      ]
+    },
+    {
+      "id": "XGP6NI0LZA",
+      "name": "Smart Watch Band",
+      "description": "Silicone replacement band for smart watches.",
+      "picture": "/static/img/products/generated/smart-watch-band.svg",
+      "priceUsd": {
+        "currencyCode": "USD",
+        "units": 19,
+        "nanos": 990000000
+      },
+      "categories": [
+        "electronics",
+        "accessories"
+      ]
+    }
+  ]
+}
