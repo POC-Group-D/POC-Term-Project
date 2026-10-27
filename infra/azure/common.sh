@@ -8,6 +8,11 @@ AZ_LOCATION="${AZ_LOCATION:-canadacentral}"
 AZ_NAME_PREFIX="${AZ_NAME_PREFIX:-poc-gd}"
 AZ_BUDGET_AMOUNT="${AZ_BUDGET_AMOUNT:-10}"
 
+# Our images, published by .github/workflows/images.yml. IMAGE_TAG picks the
+# build: "latest" (main), a branch name, or "sha-<commit>".
+GHCR_PREFIX="${GHCR_PREFIX:-ghcr.io/poc-group-d}"
+IMAGE_TAG="${IMAGE_TAG:-latest}"
+
 AZ_TAGS=(project=poc-group-d course=coen6313 environment=dev)
 
 # Container Apps that make up the shop, in the order they should start.

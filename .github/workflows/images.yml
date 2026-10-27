@@ -3,7 +3,7 @@
 #
 # Only the images we change are built:
 #   recommendationservice-v2  the AI agent (agent-service/); its Dockerfile runs the unit tests
-#   productcatalogservice     upstream image + the 200-product catalog (catalog/)
+#   productcatalogservice-200 upstream image + the 200-product catalog (catalog/)
 #   frontend                  upstream image + pictures for the new products (catalog/)
 #
 # Tags: sha-<commit> on every build, the branch name, and "latest" on main.
@@ -39,7 +39,7 @@ jobs:
           - image: recommendationservice-v2
             context: agent-service
             base: ""
-          - image: productcatalogservice
+          - image: productcatalogservice-200
             context: catalog/productcatalogservice
             base: productcatalogservice
           - image: frontend
