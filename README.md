@@ -105,6 +105,14 @@ The cloud shop is kept **off** between demos, so it uses no credit (internet
 bots visit public websites all the time and would otherwise keep it running).
 These commands need the Azure CLI and `az login` with your Concordia account.
 
+**Whose Azure account is used?** The repository contains no Azure credentials.
+Every Azure script acts as whoever ran `az login` on that computer, in that
+person's own "Azure for Students" subscription. The shop at the link above
+belongs to Nofil's subscription: only Nofil can turn it on or off, and only
+Nofil's student credit pays for it. A teammate who runs the scripts with their
+own login works on their own subscription (see
+[infra/azure/README.md](infra/azure/README.md) to deploy a separate copy).
+
 1. **10 minutes before the demo, turn it on.** From the `POC-Term-Project` folder:
 
    ```bash
