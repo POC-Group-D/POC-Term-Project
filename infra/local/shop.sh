@@ -21,13 +21,16 @@ port() {
 
 # Which recommendation service is running: v1 (random) or v2 (AI)?
 running_version() {
-  local image
-  image="$(docker ps --filter name=online-boutique-recommendationservice --format '{{.Image}}' 2>/dev/null)"
-  case "$image" in
-    *v2-local*) echo "v2 (AI recommendations)" ;;
-    "") echo "not running" ;;
-    *) echo "v1 (random recommendations)" ;;
-  esac
+  local id
+  id="$(docker ps -q --filter name=online-boutique-recommendationservice 2>/dev/null)"
+  if [[ -z "$id" ]]; then
+    echo "not running"
+  # Only v2 is configured with an AI model endpoint.
+  elif docker inspect --format '{{range .Config.Env}}{{println .}}{{end}}' "$id" | grep -q '^MODEL_BASE_URL='; then
+    echo "v2 (AI recommendations)"
+  else
+    echo "v1 (random recommendations)"
+  fi
 }
 
 # Stop early if another program already uses the shop's port, so nobody opens
