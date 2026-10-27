@@ -61,11 +61,9 @@ All commands for Demos 1 and 2 are run from this `infra/local` folder.
 
    It ends with: `Ready: http://localhost:8080   Recommendations: v2 (AI recommendations)`
 
-2. Open a **second** Git Bash window, go to the same folder, and start the AI log:
-
-   ```bash
-   cd POC-Term-Project/infra/local
-   ```
+2. Open a **second** Git Bash window in the same `infra/local` folder (in File
+   Explorer, right-click the `infra/local` folder > **Open Git Bash here**), and
+   start the AI log:
 
    ```bash
    ./shop.sh watch

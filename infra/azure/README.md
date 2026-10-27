@@ -5,7 +5,11 @@ tiers of an Azure for Students subscription.
 
 **Live shop (deployed 2026-10-26):**
 https://frontend.blueflower-54b52d82.canadacentral.azurecontainerapps.io
-(apps scale to zero, so the first request after a pause takes up to a minute)
+
+The shop is kept **off** between demos with `./cloud.sh stop`: internet bots
+visit the public address every minute or so, which would otherwise keep apps
+awake and use credit. `./cloud.sh start` turns it on (then allow about 3 minutes
+for the first request), and `./cloud.sh status` shows whether it is on.
 
 ## What gets created
 
