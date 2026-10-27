@@ -19,8 +19,8 @@ agreement first.
 ## Phase 2: Azure foundation
 
 - [x] 4. Resource group `rg-poc-group-d`, $10/month budget with alerts at 50/80/100%, tag scheme (`project`, `component`, `version`) (Nofil)
-- [ ] 5. **$** Deploy v1 to Azure Container Apps (internal gRPC, public frontend): scripted in `infra/azure`, validated with what-if, not yet deployed
-- [ ] 6. **$** NoSQL store: free-tier Cosmos DB for agent data: scripted in `infra/azure`, not yet deployed
+- [x] 5. v1 on Azure Container Apps, live at https://frontend.blueflower-54b52d82.canadacentral.azurecontainerapps.io (10 apps, internal gRPC, public frontend, 200-product catalog; smoke test 5/5) (Nofil)
+- [x] 6. NoSQL store: free-tier Cosmos DB (`recommendations` / `agent-decisions`, West US 2, 1000 RU/s cap) deployed; v2 writes to it once v2 is on Azure (Nofil)
 
 ## Phase 3: v2 AI agent
 
@@ -32,13 +32,13 @@ agreement first.
 ## Phase 4: Canary
 
 - [ ] 11. Criteria table (availability, p95 latency, correctness, cost), fixed before the first canary
-- [ ] 12. Facade: v1 and v2 as revisions of one Container App with weighted traffic
+- [ ] 12. Facade: v1 and v2 as revisions of one Container App with weighted traffic (needs `activeRevisionsMode: Multiple` in `modules/container-app.bicep`)
 - [ ] 13. Canary scripts: 10 -> 25 -> 50 -> 100 with automatic rollback
 - [ ] 14. Azure Monitor dashboard comparing v1 and v2
 
 ## Phase 5: Extra feature
 
-- [ ] 15. GitHub Actions: build and push images to GHCR, optionally deploy a new revision
+- [ ] 15. GitHub Actions: build and push images to GHCR: done (`.github/workflows/images.yml`, 3 public images); deploying a new revision still to do
 
 ## Phase 6: Experiments
 

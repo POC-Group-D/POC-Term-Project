@@ -5,6 +5,9 @@
 AZ_SUBSCRIPTION="${AZ_SUBSCRIPTION:-Azure for Students}"
 AZ_RESOURCE_GROUP="${AZ_RESOURCE_GROUP:-rg-poc-group-d}"
 AZ_LOCATION="${AZ_LOCATION:-canadacentral}"
+# Azure for Students allows only regions on two policy lists: canadacentral and
+# westus2. Cosmos DB had no capacity in Canada Central (Oct 2026), so it uses westus2.
+AZ_COSMOS_LOCATION="${AZ_COSMOS_LOCATION:-westus2}"
 AZ_NAME_PREFIX="${AZ_NAME_PREFIX:-poc-gd}"
 AZ_BUDGET_AMOUNT="${AZ_BUDGET_AMOUNT:-10}"
 

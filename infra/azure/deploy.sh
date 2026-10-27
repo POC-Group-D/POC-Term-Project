@@ -46,6 +46,7 @@ az deployment group "$action" \
       location="$AZ_LOCATION" \
       namePrefix="$AZ_NAME_PREFIX" \
       deployCosmos="$deploy_cosmos" \
+      cosmosLocation="$AZ_COSMOS_LOCATION" \
       frontendImage="$GHCR_PREFIX/frontend:$IMAGE_TAG" \
       productCatalogImage="$GHCR_PREFIX/productcatalogservice-200:$IMAGE_TAG"
 

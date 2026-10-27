@@ -41,6 +41,9 @@ param minReplicas int = 0
 @description('Deploy the Cosmos DB account used by the v2 agent.')
 param deployCosmos bool = true
 
+@description('Region for Cosmos DB. Can differ from the apps: the agent writes to it in the background.')
+param cosmosLocation string = location
+
 @description('Daily Log Analytics ingestion cap in GB. 0.15 GB/day keeps under the 5 GB/month free grant.')
 param logDailyQuotaGb string = '0.15'
 
@@ -255,11 +258,24 @@ resource logs 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
   }
 }
 
-resource environment 'Microsoft.App/managedEnvironments@2024-03-01' = {
+#disable-next-line BCP081 // newer than Bicep's bundled type definitions
+resource environment 'Microsoft.App/managedEnvironments@2026-07-01' = {
   name: '${namePrefix}-env'
   location: location
   tags: union(baseTags, { component: 'platform' })
   properties: {
+    // New environments default to "Express" mode, which supports neither
+    // HTTP/2 (gRPC) ingress nor sidecars. The workload-profiles mode with only
+    // the Consumption profile supports both and has no fixed environment cost.
+    // (The API accepts environmentMode; Bicep's type list does not know it yet.)
+    #disable-next-line BCP037
+    environmentMode: 'WorkloadProfiles'
+    workloadProfiles: [
+      {
+        name: 'Consumption'
+        workloadProfileType: 'Consumption'
+      }
+    ]
     appLogsConfiguration: {
       destination: 'log-analytics'
       logAnalyticsConfiguration: {
@@ -294,7 +310,7 @@ module apps 'modules/container-app.bicep' = [for svc in services: {
 module cosmos 'modules/cosmos.bicep' = if (deployCosmos) {
   name: 'cosmos'
   params: {
-    location: location
+    location: cosmosLocation
     tags: union(baseTags, { component: 'recommendationservice', version: 'v2' })
     accountName: '${namePrefix}-cosmos-${uniqueString(resourceGroup().id)}'
   }
