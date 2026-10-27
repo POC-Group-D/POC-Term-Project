@@ -4,9 +4,13 @@
 #
 # Refuses to run until guardrails.sh has created the budget.
 #
+# The frontend and product catalog use our 200-product images from GHCR
+# (IMAGE_TAG, default "latest"); recommendationservice is upstream v1.
+#
 # Usage:
 #   ./deploy.sh              # deploy / update everything
 #   ./deploy.sh --what-if    # preview the changes without applying them
+#   IMAGE_TAG=sha-1a2b3c4 ./deploy.sh   # deploy a specific build
 set -euo pipefail
 source "$(dirname "$0")/common.sh"
 
@@ -41,7 +45,10 @@ az deployment group "$action" \
   --parameters \
       location="$AZ_LOCATION" \
       namePrefix="$AZ_NAME_PREFIX" \
-      deployCosmos="$deploy_cosmos"
+      deployCosmos="$deploy_cosmos" \
+      cosmosLocation="$AZ_COSMOS_LOCATION" \
+      frontendImage="$GHCR_PREFIX/frontend:$IMAGE_TAG" \
+      productCatalogImage="$GHCR_PREFIX/productcatalogservice-200:$IMAGE_TAG"
 
 if [[ "$action" == "create" ]]; then
   url="$(az deployment group show --resource-group "$AZ_RESOURCE_GROUP" --name online-boutique \

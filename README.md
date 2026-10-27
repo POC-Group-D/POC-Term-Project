@@ -1,194 +1,164 @@
 # Safely Replacing a Microservice with an AI Agent
 
 COEN 424/6313 Programming on Cloud, Fall 2026, Group D (Option B).
+Team: Mustafa Ghouri (40355660), Nofil Siddiqui (40292948), Rahil Shah (40329714)
 
-We run Google's [Online Boutique](https://github.com/GoogleCloudPlatform/microservices-demo)
-and replace its `recommendationservice` with an AI agent behind the same gRPC
-API. A canary release (10% -> 25% -> 50% -> 100%) will move traffic from v1 to
-v2 on Azure and roll back if availability, latency, correctness or cost
-criteria are violated.
+We run Google's Online Boutique, an online shop with 200 products, and replace
+its recommendation service (the "You May Also Like" box under each product)
+with an AI version.
 
-| Version | How it chooses "You May Also Like" products |
-|---|---|
-| v1 (microservice, upstream) | Up to 5 random products the shopper does not already have |
-| v2 (AI agent, `agent-service/`) | A language model picks related products, using catalog tools; falls back to v1 on any failure |
+## The three demos
 
-The store is extended from 9 to 200 products (`catalog/`) so recommendations are meaningful.
-
-## Team
-
-- Mustafa Ghouri (40355660)
-- Nofil Siddiqui (40292948)
-- Rahil Shah (40329714)
+| Demo | Where it runs | "You May Also Like" shows |
+|---|---|---|
+| **Demo 1** | Your computer (Docker) | **v1:** 5 random products that are not in the cart |
+| **Demo 2** | Your computer (Docker) | **v2:** products chosen by an AI model (Qwen3-4B from Hugging Face), running in Docker |
+| **Demo 3** | Azure (cloud) | **v1:** random products, like Demo 1 (connecting the AI on Azure is our next step) |
 
 ---
 
-## Getting started (local, free, about 15 minutes)
+## Before Demos 1 and 2 (once)
 
-Everything below runs on your own computer with Docker. No Azure account,
-API key or payment is needed.
-
-### 1. Install the prerequisites
-
-| Tool | Notes |
-|---|---|
-| [Docker Desktop](https://www.docker.com/products/docker-desktop/) | Start it and wait until it says "Engine running". In Settings > Resources, give it **at least 8 GB of memory** (v1 alone needs about 4 GB). |
-| [Git](https://git-scm.com/downloads) | On Windows this includes **Git Bash**. Use Git Bash for every command below; the `.sh` scripts do not run in PowerShell or cmd. |
-| Disk space | About 6 GB (shop images about 2.5 GB, AI model about 2.5 GB) |
-
-### 2. Get the code
+You need [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+(running, with at least 8 GB of memory in Settings > Resources) and
+[Git](https://git-scm.com/downloads). On Windows, type every command in **Git Bash**.
 
 ```bash
 git clone https://github.com/POC-Group-D/POC-Term-Project.git
 ```
 
 ```bash
-cd POC-Term-Project
+cd POC-Term-Project/infra/local
 ```
 
-The working code is on the `nofil-foundation-and-recommendation-agent` branch until it is merged into `main`:
-
-```bash
-git checkout nofil-foundation-and-recommendation-agent
-```
-
-All other commands are run from the `infra/local` folder:
-
-```bash
-cd infra/local
-```
-
-If you open a new terminal later, `cd` back into `POC-Term-Project/infra/local` first.
-
-### 3. (Optional) Choose a port
-
-The shop opens on port 8080. If something else already uses it, create a
-`.env` file from the example and change `FRONTEND_PORT` (e.g. to 8081):
-
-```bash
-cp .env.example .env
-```
-
-`.env` is git-ignored, so your local settings and any keys never get committed.
-
-### 4. Start the shop with v1 (the original)
-
-```bash
-docker compose up -d --build
-```
-
-The first run downloads the shop images (a few minutes); later runs take seconds.
-Open **http://localhost:8080** (or your `FRONTEND_PORT`). You should see the
-store with 200 products. Open any product: the "You May Also Like" box at the
-bottom shows v1's random picks.
-
-Check that everything works:
-
-```bash
-./smoke-test.sh
-```
-
-Expected last line: `4/4 checks passed`.
-
-### 5. Switch to v2 (the AI agent)
-
-```bash
-docker compose -f docker-compose.yml -f docker-compose.v2.yml up -d --build
-```
-
-This also starts **Ollama**, which runs the Hugging Face model
-`Qwen/Qwen3-4B-Instruct-2507` on your CPU for free. The first run downloads
-the model (about 2.5 GB, a few minutes). `docker compose ps` shows
-`model-init` as *Exited (0)* once the download has finished.
-
-Now open a product in the shop. **The page takes about 20-40 seconds** the
-first time, because the model is thinking on your CPU. The picks should match
-the product (e.g. a Mug gets kitchen and coffee items). Opening the same
-product again within 10 minutes is instant (the decision is cached).
-
-### 6. Watch the agent's decisions
-
-In a second Git Bash window (`cd` into `POC-Term-Project/infra/local` first):
-
-```bash
-./watch-agent.sh
-```
-
-Each recommendation prints one line, for example:
-
-```
-AGENT     17.7 s | tools: ['recommend'] | tokens: 780 | These products complement the shopper's mug...
-CACHED     0.0 s | tools: [] | tokens: 0 | These products complement the shopper's mug...
-FALLBACK   0.1 s | tools: [] | tokens: 0 | APIConnectionError: Connection error.
-```
-
-`AGENT` = the model decided, `CACHED` = a recent decision was reused,
-`FALLBACK` = the model was unavailable or too slow, so v1's random choice was
-returned instead. Press Ctrl+C to stop watching.
-
-To see the fallback, stop the model, open a product you have not opened in the
-last 10 minutes, then start the model again:
-
-```bash
-docker compose -f docker-compose.yml -f docker-compose.v2.yml stop ollama
-```
-
-```bash
-docker compose -f docker-compose.yml -f docker-compose.v2.yml start ollama
-```
-
-### 7. Switch back to v1, or stop everything
-
-Back to v1 (fast, random):
-
-```bash
-docker compose up -d --build recommendationservice
-```
-
-Stop everything and free the memory (the model alone uses about 3 GB):
-
-```bash
-docker compose -f docker-compose.yml -f docker-compose.v2.yml --profile load down
-```
-
-Your downloaded images and model stay on disk, so the next start is quick.
-
-### Troubleshooting
-
-| Problem | Fix |
-|---|---|
-| `no configuration file provided` or `docker-compose.yml: not found` | You are in the wrong folder: `cd` into `POC-Term-Project/infra/local`. |
-| `Cannot connect to the Docker daemon` | Start Docker Desktop and wait for "Engine running". |
-| `port is already allocated` | Another app uses the port: set `FRONTEND_PORT` in `.env` (step 3). |
-| `./smoke-test.sh: No such file or directory` or `'.' is not recognized` | Use Git Bash, not PowerShell or cmd. |
-| Product pages take 20-40 s with v2 | Expected: the model runs on your CPU. |
-| Every line in `watch-agent.sh` says `FALLBACK ... timed out` | The CPU is overloaded: close other heavy apps and other Docker stacks, and do not open many product pages at once (the local model handles one request at a time). |
-| Containers keep restarting or Docker is very slow | Give Docker Desktop more memory (Settings > Resources). |
+All commands for Demos 1 and 2 are run from this `infra/local` folder.
 
 ---
 
-## Repository layout
+## Demo 1: Local shop, random recommendations (v1)
 
+1. Start the shop:
+
+   ```bash
+   ./shop.sh v1
+   ```
+
+   It ends with: `Ready: http://localhost:8080   Recommendations: v1 (random recommendations)`
+
+2. Open the address it printed and click any product, e.g. **Mug**. Scroll to
+   **"You May Also Like"**: the products are random (a Mug can get loafers or a tank top).
+
+---
+
+## Demo 2: Local shop, AI recommendations (v2)
+
+1. Switch the shop to the AI version (the first time, this downloads the AI
+   model, about 2.5 GB, and takes 5-15 minutes):
+
+   ```bash
+   ./shop.sh v2
+   ```
+
+   It ends with: `Ready: http://localhost:8080   Recommendations: v2 (AI recommendations)`
+
+2. Open a **second** Git Bash window in the same `infra/local` folder (in File
+   Explorer, right-click the `infra/local` folder > **Open Git Bash here**), and
+   start the AI log:
+
+   ```bash
+   ./shop.sh watch
+   ```
+
+3. Wait about 30 seconds (the AI service is starting), then in the browser open
+   the same product as in Demo 1, e.g. **Mug**. The page takes **20-60 seconds**
+   (the AI runs on your computer's processor; the first product after starting
+   is the slowest). Now "You May Also Like" shows related products, and the AI
+   log prints its choice and reason, for example:
+
+   ```
+   AGENT     42.4 s | tools: ['recommend'] | tokens: 784 | These kitchen cookware items complement the shopper's existing mug...
+   ```
+
+   (Mug in Demo 1: Polo Shirt, Rain Boots, Travel Pillow, Wool Slippers.
+   Mug in Demo 2: Silicone Spatula, Coffee Canister, Kitchen Scale, Garlic Press.)
+
+   Opening the same product again is instant (`CACHED`: the AI's answer is reused for 10 minutes).
+
+   **Tip:** open 2-3 products before the demo so you can show them instantly,
+   then open one new product live.
+
+When you finish Demos 1 and 2, stop the local shop:
+
+```bash
+./shop.sh stop
 ```
-agent-service/     v2: the AI agent (Python, gRPC); see its README for the design
-catalog/           200-product catalog and pictures (thin layers over upstream images)
-docs/
-  roadmap.md       Project plan and progress tracker
-  ai-usage/        Log of AI-assisted development (required by the course)
-infra/
-  local/           Docker Compose stack used in "Getting started"
-  azure/           Bicep templates and scripts for Azure Container Apps (Phase 2)
-online-boutique/   Upstream Online Boutique v0.10.7, including v1 and protos/
-```
 
-More detail: [infra/local/README.md](infra/local/README.md) (local stack),
-[agent-service/README.md](agent-service/README.md) (how the agent works and
-its settings), [catalog/README.md](catalog/README.md) (product data),
-[infra/azure/README.md](infra/azure/README.md) (Azure, costs money: ask the
-team first).
+---
 
-## Working on this repository
+## Demo 3: Azure (cloud), random recommendations (v1)
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for branch naming, pull requests and the
-rules for secrets and cloud costs. Progress is tracked in
-[docs/roadmap.md](docs/roadmap.md).
+The same shop, with v1, running on Azure Container Apps:
+
+**https://frontend.blueflower-54b52d82.canadacentral.azurecontainerapps.io**
+
+The cloud shop is kept **off** between demos, so it uses no credit (internet
+bots visit public websites all the time and would otherwise keep it running).
+These commands need the Azure CLI and `az login` with your Concordia account.
+
+1. **10 minutes before the demo, turn it on.** From the `POC-Term-Project` folder:
+
+   ```bash
+   cd infra/azure
+   ```
+
+   ```bash
+   ./cloud.sh start
+   ```
+
+2. **Wake it up and check it** (about 3 minutes):
+
+   ```bash
+   ./smoke-test.sh https://frontend.blueflower-54b52d82.canadacentral.azurecontainerapps.io
+   ```
+
+   It ends with `5/5 checks passed` (home page, product page, recommendations,
+   add to cart, checkout). The shop is now fast.
+
+3. Open the link above, click a product: **"You May Also Like"** shows random
+   products, like Demo 1. Add a product to the cart and check out.
+
+4. Show the cloud resources in the Azure portal (sign in with your Concordia account):
+   [resource group rg-poc-group-d](https://portal.azure.com/#resource/subscriptions/30bf2f60-c2e2-40c7-9504-001b63a13a60/resourceGroups/rg-poc-group-d/overview):
+   the 10 shop services (Container Apps), Cosmos DB (database for the AI's decisions) and Log Analytics (logs).
+
+5. **After the demo, turn it off:**
+
+   ```bash
+   ./cloud.sh stop
+   ```
+
+   `./cloud.sh status` shows whether it is on or off (`Stopped` and `0` copies = off, no cost).
+
+---
+
+## If something goes wrong
+
+| Message or problem | Fix |
+|---|---|
+| `Docker is not running` | Start Docker Desktop and wait for "Engine running" |
+| `Port 8080 is already used by another container` | Another shop or program is on port 8080. Run `echo FRONTEND_PORT=8081 >> .env`, start again, and open **http://localhost:8081** |
+| `No such file or directory` | You are not in `POC-Term-Project/infra/local`, or not in Git Bash |
+| Demo 2 shows random products | Check `./shop.sh status`: it must say `v2 (AI recommendations)`. Make sure you opened the address `shop.sh` printed |
+| Demo 2: no "You May Also Like" box | The AI service is still starting: wait 30 seconds and refresh |
+| Demo 2 page waits 20-60 s | Normal: the AI runs on your processor. Open one product at a time |
+| Demo 3 link shows "404" or "not found" | The cloud shop is off: run `./cloud.sh start` in `infra/azure` |
+| `az: command not found` | Close and reopen Git Bash (the Azure CLI was installed after it was opened) |
+| `Not logged in to Azure` | Run `az login` and sign in with your Concordia account |
+
+Other commands: `./shop.sh status` (which version is running, and where),
+`./shop.sh test` (checks the shop, expects `4/4 checks passed`).
+
+More detail: [agent-service](agent-service/README.md) (how the AI works),
+[infra/local](infra/local/README.md) (local setup),
+[infra/azure](infra/azure/README.md) (Azure and costs),
+[roadmap](docs/roadmap.md) (progress).

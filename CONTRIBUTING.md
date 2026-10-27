@@ -18,8 +18,8 @@
 
 - Use the imperative mood: `Add canary rollback script`, not `added script`.
 - One logical change per commit.
-- If an AI assistant wrote or co-wrote the change, add a `Co-Authored-By:`
-  trailer and log the session in [docs/ai-usage](docs/ai-usage/README.md).
+- If an AI assistant helped with the change, log the session in
+  [docs/ai-usage](docs/ai-usage/README.md).
 
 ## Pull requests
 
