@@ -92,6 +92,7 @@ cd infra/azure
 Other commands:
 
 ```bash
+./cloud.sh stop    # turn the shop off between demos (no compute cost); ./cloud.sh start to turn it on
 ./scale.sh up      # keep every app running (demos, canary runs); billed while on
 ./scale.sh down    # back to scale-to-zero
 ./teardown.sh      # delete the whole resource group (asks for confirmation)

@@ -103,13 +103,21 @@ The same shop, with v1, running on Azure Container Apps:
 
 **https://frontend.blueflower-54b52d82.canadacentral.azurecontainerapps.io**
 
-1. **5 minutes before the demo, wake it up.** The cloud apps switch off when
-   nobody uses them (so they cost nothing), and starting again takes about
-   3 minutes. From the `POC-Term-Project` folder:
+The cloud shop is kept **off** between demos, so it uses no credit (internet
+bots visit public websites all the time and would otherwise keep it running).
+These commands need the Azure CLI and `az login` with your Concordia account.
+
+1. **10 minutes before the demo, turn it on.** From the `POC-Term-Project` folder:
 
    ```bash
    cd infra/azure
    ```
+
+   ```bash
+   ./cloud.sh start
+   ```
+
+2. **Wake it up and check it** (about 3 minutes):
 
    ```bash
    ./smoke-test.sh https://frontend.blueflower-54b52d82.canadacentral.azurecontainerapps.io
@@ -118,12 +126,20 @@ The same shop, with v1, running on Azure Container Apps:
    It ends with `5/5 checks passed` (home page, product page, recommendations,
    add to cart, checkout). The shop is now fast.
 
-2. Open the link above, click a product: **"You May Also Like"** shows random
+3. Open the link above, click a product: **"You May Also Like"** shows random
    products, like Demo 1. Add a product to the cart and check out.
 
-3. Show the cloud resources in the Azure portal (sign in with your Concordia account):
+4. Show the cloud resources in the Azure portal (sign in with your Concordia account):
    [resource group rg-poc-group-d](https://portal.azure.com/#resource/subscriptions/30bf2f60-c2e2-40c7-9504-001b63a13a60/resourceGroups/rg-poc-group-d/overview):
    the 10 shop services (Container Apps), Cosmos DB (database for the AI's decisions) and Log Analytics (logs).
+
+5. **After the demo, turn it off:**
+
+   ```bash
+   ./cloud.sh stop
+   ```
+
+   `./cloud.sh status` shows whether it is on or off (`Stopped` and `0` copies = off, no cost).
 
 ---
 
@@ -137,6 +153,9 @@ The same shop, with v1, running on Azure Container Apps:
 | Demo 2 shows random products | Check `./shop.sh status`: it must say `v2 (AI recommendations)`. Make sure you opened the address `shop.sh` printed |
 | Demo 2: no "You May Also Like" box | The AI service is still starting: wait 30 seconds and refresh |
 | Demo 2 page waits 20-60 s | Normal: the AI runs on your processor. Open one product at a time |
+| Demo 3 link shows "404" or "not found" | The cloud shop is off: run `./cloud.sh start` in `infra/azure` |
+| `az: command not found` | Close and reopen Git Bash (the Azure CLI was installed after it was opened) |
+| `Not logged in to Azure` | Run `az login` and sign in with your Concordia account |
 
 Other commands: `./shop.sh status` (which version is running, and where),
 `./shop.sh test` (checks the shop, expects `4/4 checks passed`).
