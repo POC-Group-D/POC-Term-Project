@@ -54,3 +54,21 @@ Prompt: "Break the README into two sections: one to demo the Azure service, and 
   12 containers; a product page took 31 s with an `AGENT` decision and was
   instant on repeat (`CACHED`); `./shop.sh test` 4/4; switching to v1 and
   back worked.
+
+## Follow-up: README as three demos
+
+Prompt: the member could not see AI recommendations locally and asked for the
+README to be rewritten as three demos: local v1, local v2 with AI, Azure v1.
+
+- Cause: `localhost:8080` was an older, unrelated Online Boutique stack
+  (`boutique-*` containers, plain v1); this project's shop ran on 8081 because
+  of the local `.env`, and the README did not make that visible.
+- `shop.sh` now refuses to start when another container holds the port (and
+  names it), and always prints the shop address and which version is running
+  (`./shop.sh status` too).
+- README rewritten as Demo 1 (local v1), Demo 2 (local v2 with AI), Demo 3
+  (Azure v1), each with commands and expected output.
+- Verified as written: Demo 1 Mug -> Polo Shirt, Rain Boots, Travel Pillow,
+  Wool Slippers; Demo 2 Mug -> Silicone Spatula, Coffee Canister, Kitchen
+  Scale, Garlic Press (`AGENT 42.4 s`); Demo 3 smoke test 5/5 (about 3
+  minutes from cold).

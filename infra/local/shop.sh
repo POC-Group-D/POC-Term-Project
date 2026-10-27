@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Run the Online Boutique on this computer with one command.
 #
-#   ./shop.sh v2       start the shop with the AI agent (v2) and the local AI model
-#   ./shop.sh v1       start the shop with the original random recommendations (v1)
-#   ./shop.sh watch    show the AI agent's decisions live (Ctrl+C to stop)
+#   ./shop.sh v1       Demo 1: shop with random recommendations (v1)
+#   ./shop.sh v2       Demo 2: shop with AI recommendations (v2) and the local AI model
+#   ./shop.sh watch    show the AI's decisions live (Ctrl+C to stop)
 #   ./shop.sh test     check that the shop works
-#   ./shop.sh status   list the running containers
+#   ./shop.sh status   show which version is running and where
 #   ./shop.sh stop     stop everything and free the memory
 set -euo pipefail
 
@@ -19,27 +19,56 @@ port() {
   echo "${p:-8080}"
 }
 
+# Which recommendation service is running: v1 (random) or v2 (AI)?
+running_version() {
+  local image
+  image="$(docker ps --filter name=online-boutique-recommendationservice --format '{{.Image}}' 2>/dev/null)"
+  case "$image" in
+    *v2-local*) echo "v2 (AI recommendations)" ;;
+    "") echo "not running" ;;
+    *) echo "v1 (random recommendations)" ;;
+  esac
+}
+
+# Stop early if another program already uses the shop's port, so nobody opens
+# a different shop by mistake.
+check_port_free() {
+  local p other
+  p="$(port)"
+  other="$(docker ps --format '{{.Names}} {{.Ports}}' | grep -E ":${p}->" | grep -v '^online-boutique-' | cut -d' ' -f1 || true)"
+  if [[ -n "$other" ]]; then
+    echo "Port $p is already used by another container: $other" >&2
+    echo "That is a different program, not this project's shop. Either stop it, or use another port:" >&2
+    echo "  echo FRONTEND_PORT=8081 >> .env" >&2
+    exit 1
+  fi
+}
+
+ready() {
+  echo
+  echo "Ready: http://localhost:$(port)   Recommendations: $(running_version)"
+}
+
 if ! docker info >/dev/null 2>&1; then
   echo "Docker is not running. Start Docker Desktop, wait until it says 'Engine running', then try again." >&2
   exit 1
 fi
 
 case "${1:-}" in
-  v2)
-    echo "Starting the shop with the AI agent (v2)."
-    echo "The first run downloads the shop images and the AI model (about 5 GB), so it can take 5-15 minutes."
-    docker compose "${WITH_V2[@]}" up -d --build
-    echo
-    echo "Ready: http://localhost:$(port)"
-    echo "Open any product. The first time, the AI takes about 20-40 s to pick the 'You May Also Like' products."
-    echo "See the AI's decisions with: ./shop.sh watch"
-    ;;
   v1)
-    echo "Starting the shop with the original random recommendations (v1)."
+    check_port_free
+    echo "Starting the shop with random recommendations (v1)..."
     # --remove-orphans also stops the AI model containers (the model stays on disk).
     docker compose up -d --build --remove-orphans
-    echo
-    echo "Ready: http://localhost:$(port)"
+    ready
+    ;;
+  v2)
+    check_port_free
+    echo "Starting the shop with AI recommendations (v2)..."
+    echo "The first run downloads the shop images and the AI model (about 5 GB): 5-15 minutes."
+    docker compose "${WITH_V2[@]}" up -d --build
+    ready
+    echo "The first time you open a product, the AI needs 20-40 s to choose."
     ;;
   watch)
     exec ./watch-agent.sh
@@ -48,6 +77,7 @@ case "${1:-}" in
     exec ./smoke-test.sh
     ;;
   status)
+    echo "Shop: http://localhost:$(port)   Recommendations: $(running_version)"
     docker compose "${WITH_V2[@]}" ps --format "table {{.Service}}\t{{.Status}}"
     ;;
   stop)

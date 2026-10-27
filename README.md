@@ -1,30 +1,111 @@
 # Safely Replacing a Microservice with an AI Agent
 
 COEN 424/6313 Programming on Cloud, Fall 2026, Group D (Option B).
+Team: Mustafa Ghouri (40355660), Nofil Siddiqui (40292948), Rahil Shah (40329714)
 
-We run Google's [Online Boutique](https://github.com/GoogleCloudPlatform/microservices-demo)
-online shop (200 products) and replace its recommendation service, the
-"You May Also Like" box, with an AI version.
+We run Google's Online Boutique, an online shop with 200 products, and replace
+its recommendation service (the "You May Also Like" box under each product)
+with an AI version.
 
-| Version | How it picks "You May Also Like" |
-|---|---|
-| **v1** (Google's original) | 5 random products the shopper does not already have |
-| **v2** (our AI agent) | An AI model (Qwen3-4B from Hugging Face) picks products that go with what the shopper is viewing |
+## The three demos
 
-**Team:** Mustafa Ghouri (40355660), Nofil Siddiqui (40292948), Rahil Shah (40329714)
+| Demo | Where it runs | "You May Also Like" shows |
+|---|---|---|
+| **Demo 1** | Your computer (Docker) | **v1:** 5 random products that are not in the cart |
+| **Demo 2** | Your computer (Docker) | **v2:** products chosen by an AI model (Qwen3-4B from Hugging Face), running in Docker |
+| **Demo 3** | Azure (cloud) | **v1:** random products, like Demo 1 (connecting the AI on Azure is our next step) |
 
 ---
 
-## Part 1: Demo on Azure (v1, live)
+## Before Demos 1 and 2 (once)
 
-The shop runs on Azure Container Apps with v1:
+You need [Docker Desktop](https://www.docker.com/products/docker-desktop/)
+(running, with at least 8 GB of memory in Settings > Resources) and
+[Git](https://git-scm.com/downloads). On Windows, type every command in **Git Bash**.
+
+```bash
+git clone https://github.com/POC-Group-D/POC-Term-Project.git
+```
+
+```bash
+cd POC-Term-Project/infra/local
+```
+
+All commands for Demos 1 and 2 are run from this `infra/local` folder.
+
+---
+
+## Demo 1: Local shop, random recommendations (v1)
+
+1. Start the shop:
+
+   ```bash
+   ./shop.sh v1
+   ```
+
+   It ends with: `Ready: http://localhost:8080   Recommendations: v1 (random recommendations)`
+
+2. Open the address it printed and click any product, e.g. **Mug**. Scroll to
+   **"You May Also Like"**: the products are random (a Mug can get loafers or a tank top).
+
+---
+
+## Demo 2: Local shop, AI recommendations (v2)
+
+1. Switch the shop to the AI version (the first time, this downloads the AI
+   model, about 2.5 GB, and takes 5-15 minutes):
+
+   ```bash
+   ./shop.sh v2
+   ```
+
+   It ends with: `Ready: http://localhost:8080   Recommendations: v2 (AI recommendations)`
+
+2. Open a **second** Git Bash window, go to the same folder, and start the AI log:
+
+   ```bash
+   cd POC-Term-Project/infra/local
+   ```
+
+   ```bash
+   ./shop.sh watch
+   ```
+
+3. Wait about 30 seconds (the AI service is starting), then in the browser open
+   the same product as in Demo 1, e.g. **Mug**. The page takes **20-60 seconds**
+   (the AI runs on your computer's processor; the first product after starting
+   is the slowest). Now "You May Also Like" shows related products, and the AI
+   log prints its choice and reason, for example:
+
+   ```
+   AGENT     42.4 s | tools: ['recommend'] | tokens: 784 | These kitchen cookware items complement the shopper's existing mug...
+   ```
+
+   (Mug in Demo 1: Polo Shirt, Rain Boots, Travel Pillow, Wool Slippers.
+   Mug in Demo 2: Silicone Spatula, Coffee Canister, Kitchen Scale, Garlic Press.)
+
+   Opening the same product again is instant (`CACHED`: the AI's answer is reused for 10 minutes).
+
+   **Tip:** open 2-3 products before the demo so you can show them instantly,
+   then open one new product live.
+
+When you finish Demos 1 and 2, stop the local shop:
+
+```bash
+./shop.sh stop
+```
+
+---
+
+## Demo 3: Azure (cloud), random recommendations (v1)
+
+The same shop, with v1, running on Azure Container Apps:
 
 **https://frontend.blueflower-54b52d82.canadacentral.azurecontainerapps.io**
 
-1. **Wake it up 5 minutes before the demo.** The apps switch off when nobody
-   uses them (so they cost nothing), and the first visit after a pause can take
-   1-2 minutes. Run this in Git Bash from the `POC-Term-Project` folder (it
-   takes about 3 minutes from cold, then the shop is fast):
+1. **5 minutes before the demo, wake it up.** The cloud apps switch off when
+   nobody uses them (so they cost nothing), and starting again takes about
+   3 minutes. From the `POC-Term-Project` folder:
 
    ```bash
    cd infra/azure
@@ -34,92 +115,33 @@ The shop runs on Azure Container Apps with v1:
    ./smoke-test.sh https://frontend.blueflower-54b52d82.canadacentral.azurecontainerapps.io
    ```
 
-   Expected last line: `5/5 checks passed` (home page, product page,
-   recommendations, add to cart, checkout).
+   It ends with `5/5 checks passed` (home page, product page, recommendations,
+   add to cart, checkout). The shop is now fast.
 
-2. **Show the shop.** Open any product and scroll to "You May Also Like":
-   these are v1's random picks. Add something to the cart and check out.
+2. Open the link above, click a product: **"You May Also Like"** shows random
+   products, like Demo 1. Add a product to the cart and check out.
 
-3. **Show the Azure resources** (sign in with your Concordia account):
-   [resource group `rg-poc-group-d`](https://portal.azure.com/#resource/subscriptions/30bf2f60-c2e2-40c7-9504-001b63a13a60/resourceGroups/rg-poc-group-d/overview):
-   10 container apps, the Container Apps environment, Cosmos DB and Log Analytics.
+3. Show the cloud resources in the Azure portal (sign in with your Concordia account):
+   [resource group rg-poc-group-d](https://portal.azure.com/#resource/subscriptions/30bf2f60-c2e2-40c7-9504-001b63a13a60/resourceGroups/rg-poc-group-d/overview):
+   the 10 shop services (Container Apps), Cosmos DB (database for the AI's decisions) and Log Analytics (logs).
 
 ---
 
-## Part 2: Run everything on your computer (v2 with AI)
+## If something goes wrong
 
-This runs the whole shop and the AI model in Docker on your own computer. Free.
-
-### You need
-
-- [Docker Desktop](https://www.docker.com/products/docker-desktop/), running, with **at least 8 GB of memory** (Settings > Resources)
-- [Git](https://git-scm.com/downloads). On Windows, type all commands in **Git Bash**
-- About 6 GB of free disk space
-
-### Steps
-
-1. Get the code and go to the local folder:
-
-   ```bash
-   git clone https://github.com/POC-Group-D/POC-Term-Project.git
-   ```
-
-   ```bash
-   cd POC-Term-Project/infra/local
-   ```
-
-2. Start the shop with the AI (v2). The first run downloads about 5 GB and
-   takes 5-15 minutes; after that it starts in seconds:
-
-   ```bash
-   ./shop.sh v2
-   ```
-
-3. Open **http://localhost:8080** and click a product. The AI runs on your
-   computer's CPU, so the first time each product takes **20-40 seconds**.
-   The "You May Also Like" products now match the product (a Mug gets kitchen
-   and coffee items).
-
-4. In a second Git Bash window (in the same `infra/local` folder), watch the
-   AI decide:
-
-   ```bash
-   ./shop.sh watch
-   ```
-
-   One line per recommendation: `AGENT` = the AI chose (with its reason),
-   `CACHED` = the same answer reused (same product within 10 minutes),
-   `FALLBACK` = the AI failed or was too slow, so v1's random answer was used.
-
-5. When you are done, stop everything (frees about 7 GB of memory):
-
-   ```bash
-   ./shop.sh stop
-   ```
-
-### Other commands
-
-| Command | What it does |
-|---|---|
-| `./shop.sh v1` | Run the shop with v1 instead (fast, random picks), to compare |
-| `./shop.sh test` | Check that the shop works (expects `4/4 checks passed`) |
-| `./shop.sh status` | List the running containers |
-
-### If something goes wrong
-
-| Problem | Fix |
+| Message or problem | Fix |
 |---|---|
 | `Docker is not running` | Start Docker Desktop and wait for "Engine running" |
-| `port is already allocated` | Port 8080 is taken: run `cp .env.example .env`, set `FRONTEND_PORT=8081` in `.env`, start again, and open http://localhost:8081 |
-| `No such file or directory` | You are not in `POC-Term-Project/infra/local`, or not using Git Bash |
-| Pages wait 20-40 s with v2 | Normal: the AI runs on your CPU. Open one product at a time |
+| `Port 8080 is already used by another container` | Another shop or program is on port 8080. Run `echo FRONTEND_PORT=8081 >> .env`, start again, and open **http://localhost:8081** |
+| `No such file or directory` | You are not in `POC-Term-Project/infra/local`, or not in Git Bash |
+| Demo 2 shows random products | Check `./shop.sh status`: it must say `v2 (AI recommendations)`. Make sure you opened the address `shop.sh` printed |
+| Demo 2: no "You May Also Like" box | The AI service is still starting: wait 30 seconds and refresh |
+| Demo 2 page waits 20-60 s | Normal: the AI runs on your processor. Open one product at a time |
 
----
+Other commands: `./shop.sh status` (which version is running, and where),
+`./shop.sh test` (checks the shop, expects `4/4 checks passed`).
 
-## More detail
-
-- [agent-service/README.md](agent-service/README.md): how the AI agent works
-- [infra/local/README.md](infra/local/README.md): the local Docker setup
-- [infra/azure/README.md](infra/azure/README.md): the Azure deployment and costs
-- [docs/roadmap.md](docs/roadmap.md): project plan and progress
-- [CONTRIBUTING.md](CONTRIBUTING.md): branches, pull requests, secrets and cloud costs
+More detail: [agent-service](agent-service/README.md) (how the AI works),
+[infra/local](infra/local/README.md) (local setup),
+[infra/azure](infra/azure/README.md) (Azure and costs),
+[roadmap](docs/roadmap.md) (progress).
