@@ -22,6 +22,9 @@ Memory: about 4 GB for v1, about 7 GB for v2 (the model takes about 3 GB).
 
 ## Commands
 
+`./shop.sh v2 | v1 | watch | test | status | stop` covers the everyday tasks.
+The full Docker Compose commands it runs:
+
 | Task | Command |
 |---|---|
 | Start with v1 | `docker compose up -d --build` |

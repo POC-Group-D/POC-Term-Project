@@ -40,3 +40,17 @@
 ## Human review and changes
 
 <To be completed by the reviewer.>
+
+## Follow-up: demo-ready README
+
+Prompt: "Break the README into two sections: one to demo the Azure service, and one to run everything locally with Docker and the AI model. Keep it simple: commands I can type to run the pipeline."
+
+- `infra/local/shop.sh`: one command per task (`v2`, `v1`, `watch`, `test`,
+  `status`, `stop`); checks Docker is running and prints the shop URL.
+- `README.md` rewritten: Part 1 Azure demo (live URL, warm-up, portal link),
+  Part 2 local v2 with AI (5 steps), short troubleshooting.
+- Verified as written: Azure smoke test 5/5 (about 3 minutes from cold,
+  so the README says to warm up 5 minutes early); `./shop.sh v2` started all
+  12 containers; a product page took 31 s with an `AGENT` decision and was
+  instant on repeat (`CACHED`); `./shop.sh test` 4/4; switching to v1 and
+  back worked.
