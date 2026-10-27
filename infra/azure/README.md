@@ -85,6 +85,13 @@ and `az login`. All scripts pin the `Azure for Students` subscription (override
 with `AZ_SUBSCRIPTION`), so nothing is created in another subscription by
 mistake.
 
+**Each person uses their own account.** No credentials are stored in the
+repository; the scripts act as whoever is logged in with `az login`, in that
+person's own subscription, and spend only that person's credit. The live shop
+above is in Nofil's subscription. To run your own copy, log in with your own
+account and run `guardrails.sh` (your own budget and alerts) before `deploy.sh`;
+your shop gets its own address, printed by `deploy.sh`.
+
 ```bash
 cd infra/azure
 ./guardrails.sh you@example.com   # 1. resource group + budget (free, run once)
