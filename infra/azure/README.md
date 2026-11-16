@@ -126,6 +126,7 @@ decides which revision answers each request, and the frontend cannot tell.
 | `./canary.sh rollback` | Sends all traffic back to v1 |
 | `./canary.sh status` | Shows each revision and its share |
 | `./canary.sh watch` | Prints v2's decisions live, like `./shop.sh watch` locally |
+| `./canary.sh measure` | Runs the Online Boutique load generator (2 shoppers, 5 minutes) against the shop, then checks the [canary criteria](../../docs/canary-criteria.md) for that window with `canary_check.py`. Installs its Python tools into `infra/azure/.venv` the first time. `LOAD_USERS` and `MEASURE_MINUTES` change the load |
 
 v2 uses Groq Free (`openai/gpt-oss-20b`) in one model call per request, and
 writes every decision (latency, outcome, tokens) to Cosmos DB. Before the
@@ -144,4 +145,5 @@ branch is merged to `main`, deploy its image with
 | `modules/cosmos.bicep` | Free-tier Cosmos DB account, database and container |
 | `budget.bicep` | Monthly budget and alerts |
 | `canary.sh` | v2 revision and traffic split between v1 and v2 |
+| `canary_check.py`, `requirements.txt` | Canary criteria check, and the Python tools for measuring |
 | `common.sh` | Shared settings and the subscription guard |

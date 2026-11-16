@@ -26,8 +26,8 @@ agreement first.
 
 - [x] 7. `agent-service/`: same `ListRecommendations` API, catalog tools, model selects products, guardrails, v1 fallback, 23 unit tests (Nofil). Store extended to 200 products (`/catalog`) so recommendations are meaningful
 - [x] 8. Model: Hugging Face free account has no Inference Providers credits, so v2 runs `Qwen/Qwen3-4B-Instruct-2507` locally via Ollama (22-39 s on CPU), and Groq Free `openai/gpt-oss-20b` on Azure (5/5 model decisions, p95 924 ms) (Nofil)
-- [ ] 9. Per-request telemetry for both versions: done for v2 (JSON log + optional Cosmos DB record with latency, outcome, tokens, cost); v1 still to do
-- [ ] 10. Correctness checker (valid IDs, no cart items, at most 5, schema): rules exist in `infra/local/smoke_test.py` and the agent's guardrails; a canary-time checker is still to do
+- [x] 9. Per-request telemetry for both versions: v2 records every decision in Cosmos DB (latency, outcome, tokens); requests and errors of both revisions come from Azure Monitor (Nofil)
+- [x] 10. Correctness checker: `infra/azure/canary_check.py`, run by `./canary.sh measure` after 5 minutes of load (Nofil)
 
 ## Phase 4: Canary
 

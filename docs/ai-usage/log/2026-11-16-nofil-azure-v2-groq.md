@@ -55,3 +55,22 @@ The assistant listed the Azure Monitor metrics available for
 but `ResponseTime` cannot be split by revision. Availability therefore comes
 from Azure Monitor, and v2 latency, correctness and tokens come from the
 Cosmos DB decision records. Result: `docs/canary-criteria.md`.
+
+## Measurements (items 9, 10)
+
+Prompt: "Yes, measurements next."
+
+- Groq Free limits read from the API's response headers: 1000 requests per
+  day, 8000 tokens per minute. The load is therefore 2 simulated shoppers.
+- `infra/azure/canary_check.py` checks the four criteria for a time window;
+  `./canary.sh measure` runs the upstream Online Boutique load generator
+  (Locust) for 5 minutes and then the checker.
+- Live run at 50% (about 15 minutes of shop time, then stopped): 122 shop
+  pages, 0 failed, page p95 960 ms; v1 47 and v2 57 recommendation requests;
+  v2 p95 692 ms, 100% correct (14 model calls, 43 cached), 815 tokens per
+  model call, Azure spend $0.00. All criteria met.
+- Found during the run: Azure Monitor stamps requests 1-2 minutes late, so
+  the checker extends its Azure window by 3 minutes (counts then matched the
+  57 Cosmos DB records exactly). A quoting bug in the load summary line
+  stopped the first run before the check; fixed and the check re-run on the
+  same window.

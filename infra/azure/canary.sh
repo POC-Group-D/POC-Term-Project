@@ -7,6 +7,8 @@
 #   ./canary.sh rollback   send all traffic back to v1
 #   ./canary.sh status     show both versions and their traffic share
 #   ./canary.sh watch      show v2's decisions live (Ctrl+C to stop)
+#   ./canary.sh measure    put load on the shop for 5 minutes, then check the
+#                          canary criteria (docs/canary-criteria.md)
 #
 # The facade is Container Apps traffic splitting between the two revisions,
 # which carry the labels "v1" and "v2". The frontend keeps calling
@@ -38,6 +40,17 @@ groq_key() {
   echo "$key"
 }
 
+# Sets COSMOS_ENDPOINT and COSMOS_KEY for the existing free-tier account.
+cosmos_settings() {
+  local account
+  account="$(az deployment group show --resource-group "$AZ_RESOURCE_GROUP" --name online-boutique \
+    --query properties.outputs.cosmosAccountName.value --output tsv)"
+  COSMOS_ENDPOINT="$(az cosmosdb show --resource-group "$AZ_RESOURCE_GROUP" --name "$account" \
+    --query documentEndpoint --output tsv)"
+  COSMOS_KEY="$(az cosmosdb keys list --resource-group "$AZ_RESOURCE_GROUP" --name "$account" \
+    --query primaryMasterKey --output tsv)"
+}
+
 set_v2_share() {
   local v2_share="$1"
   [[ -n "$(label_of v2)" ]] || { echo "No v2 revision yet. Run: ./canary.sh deploy" >&2; exit 1; }
@@ -61,15 +74,9 @@ deploy() {
   fi
 
   # Secrets live in Azure, never in the repository.
-  local cosmos_account cosmos_endpoint
-  cosmos_account="$(az deployment group show --resource-group "$AZ_RESOURCE_GROUP" --name online-boutique \
-    --query properties.outputs.cosmosAccountName.value --output tsv)"
-  cosmos_endpoint="$(az cosmosdb show --resource-group "$AZ_RESOURCE_GROUP" --name "$cosmos_account" \
-    --query documentEndpoint --output tsv)"
+  cosmos_settings
   az containerapp secret set "${ARGS[@]}" --output none --secrets \
-    "groq-key=$(groq_key)" \
-    "cosmos-key=$(az cosmosdb keys list --resource-group "$AZ_RESOURCE_GROUP" --name "$cosmos_account" \
-      --query primaryMasterKey --output tsv)"
+    "groq-key=$(groq_key)" "cosmos-key=$COSMOS_KEY"
 
   # v2 = v1's settings (port, catalog address) + the agent image and model.
   local suffix v2
@@ -81,7 +88,7 @@ deploy() {
     MODEL_BASE_URL=https://api.groq.com/openai/v1 MODEL_API_KEY=secretref:groq-key \
     MODEL_NAME=openai/gpt-oss-20b MODEL_MAX_TOKENS=600 MODEL_REASONING_EFFORT=low \
     MODEL_TOOL_CHOICE=recommend MAX_AGENT_STEPS=1 SHORTLIST_SIZE=12 CACHE_TTL_SECONDS=600 \
-    "COSMOS_ENDPOINT=$cosmos_endpoint" COSMOS_KEY=secretref:cosmos-key
+    "COSMOS_ENDPOINT=$COSMOS_ENDPOINT" COSMOS_KEY=secretref:cosmos-key
 
   az containerapp revision label add "${ARGS[@]}" --revision "$v1" --label v1 --yes --output none
   az containerapp revision label add "${ARGS[@]}" --revision "$v2" --label v2 --yes --output none
@@ -120,14 +127,60 @@ for line in sys.stdin:
 '
 }
 
+# Python for the measuring tools (load generator, checker), in a local .venv.
+tools_python() {
+  local py
+  for py in .venv/Scripts/python.exe .venv/bin/python; do
+    [[ -x "$py" ]] && { echo "$py"; return; }
+  done
+  echo "Installing the measuring tools (once, about a minute)..." >&2
+  python -m venv .venv >&2
+  for py in .venv/Scripts/python.exe .venv/bin/python; do
+    [[ -x "$py" ]] && break
+  done
+  "$py" -m pip install --quiet --disable-pip-version-check -r requirements.txt >&2
+  echo "$py"
+}
+
+measure() {
+  local minutes="${MEASURE_MINUTES:-5}" users="${LOAD_USERS:-2}" py url v1 v2 start end
+  v1="$(label_of v1)"
+  v2="$(label_of v2)"
+  [[ -n "$v2" ]] || { echo "No v2 revision yet. Run: ./canary.sh deploy" >&2; exit 1; }
+  py="$(tools_python)"
+  url="$(az deployment group show --resource-group "$AZ_RESOURCE_GROUP" --name online-boutique \
+    --query properties.outputs.frontendUrl.value --output tsv)"
+  show_status
+
+  echo "Load: $users shoppers for $minutes minutes (Online Boutique load generator)..."
+  start="$(date +%s)"
+  "$py" -m locust -f ../../online-boutique/src/loadgenerator/locustfile.py --host "$url" \
+    --headless --users "$users" --spawn-rate 1 --run-time "${minutes}m" --csv .venv/load \
+    >/dev/null 2>&1 || true
+  end="$(date +%s)"
+  "$py" -c '
+import csv
+row = [r for r in csv.DictReader(open(".venv/load_stats.csv")) if r["Name"] == "Aggregated"][0]
+print("Shop pages: %s requests, %s failed, p95 %s ms" % (row["Request Count"], row["Failure Count"], row["95%"]))'
+
+  echo "Waiting 3 minutes for Azure Monitor to receive the request counts..."
+  sleep 180
+  cosmos_settings
+  COSMOS_ENDPOINT="$COSMOS_ENDPOINT" COSMOS_KEY="$COSMOS_KEY" "$py" canary_check.py \
+    --start "$start" --end "$end" --v1 "$v1" --v2 "$v2" \
+    --app-id "$(az containerapp show "${ARGS[@]}" --query id --output tsv)" \
+    --resource-group "$AZ_RESOURCE_GROUP" --budget poc-group-d-monthly
+}
+
 case "${1:-}" in
   deploy)   require_login; deploy ;;
   rollback) require_login; set_v2_share 0 ;;
   status)   require_login; show_status ;;
   watch)    require_login; watch_v2 ;;
+  measure)  require_login; measure ;;
   [0-9]|[0-9][0-9]|100) require_login; set_v2_share "$1" ;;
   *)
-    sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//'
+    sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'
     exit 1
     ;;
 esac

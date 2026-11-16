@@ -9,16 +9,17 @@ same load. If any threshold is violated, all traffic goes back to v1.
 | Metric | How it is measured | Threshold for v2 | Action when violated |
 |---|---|---|---|
 | **Availability** (error rate) | Azure Monitor `Requests` metric of `recommendationservice`, split by revision and status code. Errors = 5xx responses and timeouts, divided by all requests to that revision during the step | ≤ 1%, and no more than 1 percentage point above v1 in the same step | Roll back to v1 (`./canary.sh rollback`) |
-| **Latency** (p95) | `latencyMs` of every v2 request, stored in Cosmos DB (`agent-decisions`), 95th percentile over the step. v1 baseline: p95 of product pages from the load generator with v1 at 100% | ≤ 2000 ms | Roll back to v1 |
-| **Correctness** | Each v2 record in Cosmos DB is checked: the model made the decision (`outcome: agent`, not a fallback), at most 5 products, no duplicates, every ID exists in the 200-product catalog, none of the cart items is recommended. Correctness = share of v2 requests that pass all checks | ≥ 95% | Roll back to v1 |
-| **Cost** | Model: tokens per request from Cosmos DB (Groq Free plan, so $0 billed; tokens are the usage measure). Azure: spend in Cost Management against the $10 monthly budget | ≤ 1500 tokens per request on average, and Azure spend below 80% of the budget ($8) | Roll back to v1 and stop the canary |
+| **Latency** (p95) | `latencyMs` of every v2 request, stored in Cosmos DB (`agent-decisions`), 95th percentile over the step. For comparison, the load generator also reports the p95 of all shop pages in each step | ≤ 2000 ms | Roll back to v1 |
+| **Correctness** | Each v2 record in Cosmos DB is checked: the model made the decision (`outcome: agent`, or `cached`: a recent model decision reused; not a fallback), at most 5 products, no duplicates, every ID exists in the 200-product catalog, none of the cart items is recommended. Correctness = share of v2 requests that pass all checks | ≥ 95% | Roll back to v1 |
+| **Cost** | Model: tokens per model call from Cosmos DB (Groq Free plan, so $0 billed; tokens are the usage measure; cached answers use none). Azure: spend in Cost Management against the $10 monthly budget | ≤ 1500 tokens per model call on average, and Azure spend below 80% of the budget ($8) | Roll back to v1 and stop the canary |
 
 ## How a canary run works
 
 1. Start with v1 at 100% and record the v1 baseline under the load.
 2. Steps: **10% → 25% → 50% → 100%** to v2.
-3. At each step, run the Online Boutique load generator with the same number
-   of users for **5 minutes**, then check the four criteria for that step.
+3. At each step, run `./canary.sh measure`: the Online Boutique load
+   generator (2 simulated shoppers) runs for **5 minutes**, then
+   `canary_check.py` checks the four criteria for that window.
 4. All criteria met: promote to the next step. After 100% passes, v2 is
    promoted.
 5. Any criterion violated: roll back to v1 (`./canary.sh rollback`) and stop.
@@ -37,14 +38,15 @@ the rollback.
   products when a check fails, so a wrong answer never reaches the shop. A
   fallback still counts as *not correct* here, because then v2 is not doing
   the job of an AI agent.
-- **1500 tokens:** a v2 request uses about 750 tokens. Twice that means the
+- **1500 tokens:** a v2 model call uses about 750 tokens. Twice that means the
   prompt or the model's behaviour has changed.
 - **$8 of $10:** matches the 80% budget alert set before the first deployment.
 
 ## Limits we accept
 
 - Groq Free has per-minute and per-day request limits. The load per step is
-  kept small enough to stay within them. Requests over the limit fall back
-  and would count against correctness.
+  kept small enough to stay within them (measured limits: 1000 requests per
+  day, 8000 tokens per minute, so about 10 model calls per minute).
+  Requests over the limit fall back and count against correctness.
 - Container Apps reports response time only for the whole app, not per
   revision. For that reason, v2's latency comes from its own records.
