@@ -44,3 +44,14 @@
 - `revision copy` takes settings from the app's latest template, so a value
   left by an earlier revision (`CACHE_TTL_SECONDS=0`) carried over;
   `canary.sh` now sets it explicitly.
+
+## Canary criteria table (item 11)
+
+Prompt: "Let's first build the criteria table. After you build it, write in
+simple words what you are doing so that I stay in the loop."
+
+The assistant listed the Azure Monitor metrics available for
+`recommendationservice`: `Requests` can be split by revision and status code,
+but `ResponseTime` cannot be split by revision. Availability therefore comes
+from Azure Monitor, and v2 latency, correctness and tokens come from the
+Cosmos DB decision records. Result: `docs/canary-criteria.md`.

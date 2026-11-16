@@ -31,7 +31,7 @@ agreement first.
 
 ## Phase 4: Canary
 
-- [ ] 11. Criteria table (availability, p95 latency, correctness, cost), fixed before the first canary
+- [x] 11. Criteria table (availability, p95 latency, correctness, cost), fixed before the first canary: [canary-criteria.md](canary-criteria.md) (Nofil)
 - [x] 12. Facade: v1 and v2 as labelled revisions of one Container App with weighted traffic (`infra/azure/canary.sh`) (Nofil)
 - [ ] 13. Canary scripts: 10 -> 25 -> 50 -> 100 with automatic rollback: manual steps and rollback done (`./canary.sh <percent>`, `./canary.sh rollback`); checking the criteria at each step still to do
 - [ ] 14. Azure Monitor dashboard comparing v1 and v2
