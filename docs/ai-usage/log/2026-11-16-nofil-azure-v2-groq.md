@@ -35,3 +35,12 @@
 - `check_groq.py`: 5/5 valid responses decided by the model, no fallbacks,
   p95 924 ms (target 2000 ms), 3089 input + 728 output tokens for 5 requests.
 - 27 agent unit tests pass; `az bicep build` succeeds; `bash -n canary.sh`.
+- Live run on Azure (6. prompt: "yes, but make sure the credits are not
+  exceeded"; spend before the run: $0 of the $10 monthly budget): smoke test
+  5/5; at v2 100% every decision was `AGENT` (250-930 ms, about 750 tokens);
+  at 50% about half the Mug pages showed coffee items and half random items;
+  after `rollback` all pages were random again. Cosmos DB held the v2 records
+  (`version: v2`, `outcome: agent`). The shop was stopped afterwards.
+- `revision copy` takes settings from the app's latest template, so a value
+  left by an earlier revision (`CACHE_TTL_SECONDS=0`) carried over;
+  `canary.sh` now sets it explicitly.

@@ -80,7 +80,7 @@ deploy() {
     --image "$V2_IMAGE" --output none --set-env-vars \
     MODEL_BASE_URL=https://api.groq.com/openai/v1 MODEL_API_KEY=secretref:groq-key \
     MODEL_NAME=openai/gpt-oss-20b MODEL_MAX_TOKENS=600 MODEL_REASONING_EFFORT=low \
-    MODEL_TOOL_CHOICE=recommend MAX_AGENT_STEPS=1 SHORTLIST_SIZE=12 \
+    MODEL_TOOL_CHOICE=recommend MAX_AGENT_STEPS=1 SHORTLIST_SIZE=12 CACHE_TTL_SECONDS=600 \
     "COSMOS_ENDPOINT=$cosmos_endpoint" COSMOS_KEY=secretref:cosmos-key
 
   az containerapp revision label add "${ARGS[@]}" --revision "$v1" --label v1 --yes --output none
