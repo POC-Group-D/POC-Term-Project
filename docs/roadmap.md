@@ -25,15 +25,15 @@ agreement first.
 ## Phase 3: v2 AI agent
 
 - [x] 7. `agent-service/`: same `ListRecommendations` API, catalog tools, model selects products, guardrails, v1 fallback, 23 unit tests (Nofil). Store extended to 200 products (`/catalog`) so recommendations are meaningful
-- [ ] 8. Model: Hugging Face free account has no Inference Providers credits, so v2 runs `Qwen/Qwen3-4B-Instruct-2507` locally via Ollama (free; 4/4 live requests decided by the model with relevant picks, 22-39 s on CPU in single-step mode). Still to decide: the backend for the Azure canary (GitHub Models free tier, or Ollama with more CPU)
+- [x] 8. Model: Hugging Face free account has no Inference Providers credits, so v2 runs `Qwen/Qwen3-4B-Instruct-2507` locally via Ollama (22-39 s on CPU), and Groq Free `openai/gpt-oss-20b` on Azure (5/5 model decisions, p95 924 ms) (Nofil)
 - [ ] 9. Per-request telemetry for both versions: done for v2 (JSON log + optional Cosmos DB record with latency, outcome, tokens, cost); v1 still to do
 - [ ] 10. Correctness checker (valid IDs, no cart items, at most 5, schema): rules exist in `infra/local/smoke_test.py` and the agent's guardrails; a canary-time checker is still to do
 
 ## Phase 4: Canary
 
 - [ ] 11. Criteria table (availability, p95 latency, correctness, cost), fixed before the first canary
-- [ ] 12. Facade: v1 and v2 as revisions of one Container App with weighted traffic (needs `activeRevisionsMode: Multiple` in `modules/container-app.bicep`)
-- [ ] 13. Canary scripts: 10 -> 25 -> 50 -> 100 with automatic rollback
+- [x] 12. Facade: v1 and v2 as labelled revisions of one Container App with weighted traffic (`infra/azure/canary.sh`) (Nofil)
+- [ ] 13. Canary scripts: 10 -> 25 -> 50 -> 100 with automatic rollback: manual steps and rollback done (`./canary.sh <percent>`, `./canary.sh rollback`); checking the criteria at each step still to do
 - [ ] 14. Azure Monitor dashboard comparing v1 and v2
 
 ## Phase 5: Extra feature

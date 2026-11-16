@@ -1,0 +1,19 @@
+# Apply over docker-compose.yml to run the V2 shop with Groq Free.
+services:
+  frontend:
+    ports: !override
+      - "127.0.0.1:${FRONTEND_PORT:-8080}:8080"
+
+  recommendationservice:
+    build:
+      context: ../../agent-service
+    image: poc-group-d/recommendationservice:v2-local
+    environment:
+      MODEL_BASE_URL: https://api.groq.com/openai/v1
+      MODEL_API_KEY: ${GROQ_API_KEY:?Add your Groq Free key as GROQ_API_KEY in infra/local/.env}
+      MODEL_NAME: openai/gpt-oss-20b
+      MODEL_MAX_TOKENS: "600"
+      MODEL_REASONING_EFFORT: low
+      MODEL_TOOL_CHOICE: recommend
+      MAX_AGENT_STEPS: "1"
+      SHORTLIST_SIZE: "12"

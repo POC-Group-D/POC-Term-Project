@@ -45,8 +45,13 @@ def build_model(settings):
     if not settings.model_base_url:
         logger.warning("MODEL_BASE_URL not set: every request will use the v1 fallback")
         return None
-    return ChatModel(settings.model_base_url, settings.model_api_key,
-                     settings.model_name, settings.model_max_tokens)
+    tool_choice = "auto"
+    if settings.model_tool_choice:
+        tool_choice = {"type": "function", "function": {"name": settings.model_tool_choice}}
+    return ChatModel(
+        settings.model_base_url, settings.model_api_key, settings.model_name, settings.model_max_tokens,
+        tool_choice=tool_choice, reasoning_effort=settings.model_reasoning_effort,
+    )
 
 
 def build_sink(settings):

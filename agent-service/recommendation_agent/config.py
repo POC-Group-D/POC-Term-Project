@@ -18,11 +18,13 @@ class Settings:
     catalog_addr: str
 
     # Model: any OpenAI-compatible chat API with tool calling, e.g. a local
-    # Ollama server, Hugging Face Inference Providers or GitHub Models.
+    # Ollama server, Groq or Hugging Face Inference Providers.
     model_base_url: str
     model_api_key: str
     model_name: str
     model_max_tokens: int
+    model_reasoning_effort: str | None
+    model_tool_choice: str
     # USD per million tokens, used to estimate cost per request.
     input_price_per_mtok: float
     output_price_per_mtok: float
@@ -54,6 +56,8 @@ class Settings:
             model_api_key=os.environ.get("MODEL_API_KEY", ""),
             model_name=os.environ.get("MODEL_NAME", "qwen3:4b-instruct"),
             model_max_tokens=_int("MODEL_MAX_TOKENS", 300),
+            model_reasoning_effort=os.environ.get("MODEL_REASONING_EFFORT") or None,
+            model_tool_choice=os.environ.get("MODEL_TOOL_CHOICE", ""),
             input_price_per_mtok=_float("MODEL_INPUT_PRICE_PER_MTOK", 0.0),
             output_price_per_mtok=_float("MODEL_OUTPUT_PRICE_PER_MTOK", 0.0),
             max_recommendations=_int("MAX_RECOMMENDATIONS", 5),

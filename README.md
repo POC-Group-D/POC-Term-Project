@@ -7,13 +7,14 @@ We run Google's Online Boutique, an online shop with 200 products, and replace
 its recommendation service (the "You May Also Like" box under each product)
 with an AI version.
 
-## The three demos
+## The four demos
 
 | Demo | Where it runs | "You May Also Like" shows |
 |---|---|---|
 | **Demo 1** | Your computer (Docker) | **v1:** 5 random products that are not in the cart |
 | **Demo 2** | Your computer (Docker) | **v2:** products chosen by an AI model (Qwen3-4B from Hugging Face), running in Docker |
-| **Demo 3** | Azure (cloud) | **v1:** random products, like Demo 1 (connecting the AI on Azure is our next step) |
+| **Demo 3** | Azure (cloud) | **v1:** random products, like Demo 1 |
+| **Demo 4** | Azure (cloud) | **v2:** products chosen by an AI model on Groq, with traffic moved between v1 and v2 (canary and rollback) |
 
 ---
 
@@ -52,6 +53,10 @@ All commands for Demos 1 and 2 are run from this `infra/local` folder.
 
 ## Demo 2: Local shop, AI recommendations (v2)
 
+This demo uses Qwen through Ollama on your processor. For the same demo with
+a hosted model (fast, about 1 s), see
+[Demo 2 with Groq](#optional-demo-2-with-groq-instead-of-ollama) below.
+
 1. Switch the shop to the AI version (the first time, this downloads the AI
    model, about 2.5 GB, and takes 5-15 minutes):
 
@@ -59,7 +64,7 @@ All commands for Demos 1 and 2 are run from this `infra/local` folder.
    ./shop.sh v2
    ```
 
-   It ends with: `Ready: http://localhost:8080   Recommendations: v2 (AI recommendations)`
+   It ends with: `Ready: http://localhost:8080   Recommendations: v2 (Ollama)`
 
 2. Open a **second** Git Bash window in the same `infra/local` folder (in File
    Explorer, right-click the `infra/local` folder > **Open Git Bash here**), and
@@ -92,6 +97,38 @@ When you finish Demos 1 and 2, stop the local shop:
 ```bash
 ./shop.sh stop
 ```
+
+### Optional: Demo 2 with Groq instead of Ollama
+
+This runs the same Online Boutique shop on your computer with Groq choosing
+the recommendations. You need Docker Desktop running and a Groq Free key
+saved as `GROQ_API_KEY=...` in `infra/local/.env`.
+
+1. Open **Docker Desktop** and wait for the engine to start. Then open
+   **Git Bash** in `infra/local` and run:
+
+   ```bash
+   ./shop.sh groq
+   ```
+
+   Wait for `Ready: http://localhost:8080   Recommendations: v2 (Groq)`.
+   The first startup may need to build and download images. Keep this
+   terminal open until you see `Ready`.
+
+2. Open a second **Git Bash** in the same folder and run `./shop.sh watch`.
+   Leave it open while you use the browser.
+3. Open [Mug in the local shop](http://localhost:8080/product/6E92ZMYYFZ) and
+   scroll to **You May Also Like**. If the script printed a different port,
+   use that port. In the watch window, look for `AGENT` and
+   `model: openai/gpt-oss-20b`. `CACHED` means the shop reused a previous
+   decision. Click a different product for a fresh model call. `FALLBACK`
+   means the shop displayed random picks for that request.
+4. When you finish, press **Ctrl+C** in the watch window and run
+   `./shop.sh stop` in the first window.
+
+If the browser says **site can't be reached**, check that Docker Desktop is
+running, run `./shop.sh status`, and open the URL printed by `./shop.sh groq`
+after it reports `Ready`. Use `http://` for the local shop.
 
 ---
 
@@ -139,13 +176,92 @@ own login works on their own subscription (see
    [resource group rg-poc-group-d](https://portal.azure.com/#resource/subscriptions/30bf2f60-c2e2-40c7-9504-001b63a13a60/resourceGroups/rg-poc-group-d/overview):
    the 10 shop services (Container Apps), Cosmos DB (database for the AI's decisions) and Log Analytics (logs).
 
-5. **After the demo, turn it off:**
+5. **After the demo, turn it off** (or keep it on and continue with Demo 4):
 
    ```bash
    ./cloud.sh stop
    ```
 
    `./cloud.sh status` shows whether it is on or off (`Stopped` and `0` copies = off, no cost).
+
+---
+
+## Demo 4: Azure (cloud), AI recommendations (v2) and canary
+
+The same Azure shop, now with v1 and v2 of the recommendation service running
+side by side. Azure decides which version answers each request, by the share
+you set. The shop's address does not change, and the shop cannot tell which
+version answered.
+
+**Once, before the first Demo 4 (not during class):** save your Groq key as
+`GROQ_API_KEY=...` in `infra/local/.env`, then from `infra/azure` run:
+
+```bash
+./canary.sh deploy
+```
+
+It ends with `Traffic: v1 100%, v2 0%`. Do this again only when v2 changes.
+
+1. Turn the shop on and check it, as in Demo 3 steps 1-2.
+
+2. Send all recommendation requests to v2:
+
+   ```bash
+   ./canary.sh 100
+   ```
+
+   It prints `Traffic: v1 0%, v2 100%`.
+
+3. Open a **second** Git Bash window in `infra/azure` and start the AI log:
+
+   ```bash
+   ./canary.sh watch
+   ```
+
+4. Open the [Mug on the Azure shop](https://frontend.blueflower-54b52d82.canadacentral.azurecontainerapps.io/product/6E92ZMYYFZ).
+   "You May Also Like" now shows related products (coffee and kitchen items),
+   in about a second. The AI log prints each decision, for example:
+
+   ```
+   AGENT      0.8 s | model: openai/gpt-oss-20b | tokens: 760 | <the model's reason>
+   ```
+
+   The first product after switching can take a few seconds while v2 starts.
+
+5. **Canary step and rollback.** Send only part of the traffic to v2, then
+   roll back:
+
+   ```bash
+   ./canary.sh 50
+   ```
+
+   ```bash
+   ./canary.sh status
+   ```
+
+   About half of the product pages now get AI picks, the rest random ones.
+   Then send everything back to v1:
+
+   ```bash
+   ./canary.sh rollback
+   ```
+
+   "You May Also Like" is random again, as in Demo 3.
+
+6. In the Azure portal (link in Demo 3 step 4), open **recommendationservice >
+   Revisions and replicas** to show the two versions and their traffic share,
+   and the Cosmos DB account **> Data Explorer > recommendations >
+   agent-decisions** to show the stored AI decisions (tokens, latency, outcome).
+
+7. **After the demo:** press Ctrl+C in the AI log window, then:
+
+   ```bash
+   ./canary.sh rollback
+   ```
+
+   ```bash
+   ./cloud.sh stop
+   ```
 
 ---
 
@@ -156,12 +272,14 @@ own login works on their own subscription (see
 | `Docker is not running` | Start Docker Desktop and wait for "Engine running" |
 | `Port 8080 is already used by another container` | Another shop or program is on port 8080. Run `echo FRONTEND_PORT=8081 >> .env`, start again, and open **http://localhost:8081** |
 | `No such file or directory` | You are not in `POC-Term-Project/infra/local`, or not in Git Bash |
-| Demo 2 shows random products | Check `./shop.sh status`: it must say `v2 (AI recommendations)`. Make sure you opened the address `shop.sh` printed |
+| Demo 2 shows random products | Check `./shop.sh status` for `v2 (Ollama)` and use `./shop.sh watch` to check for `FALLBACK`. Make sure you opened the address `shop.sh` printed |
 | Demo 2: no "You May Also Like" box | The AI service is still starting: wait 30 seconds and refresh |
 | Demo 2 page waits 20-60 s | Normal: the AI runs on your processor. Open one product at a time |
 | Demo 3 link shows "404" or "not found" | The cloud shop is off: run `./cloud.sh start` in `infra/azure` |
 | `az: command not found` | Close and reopen Git Bash (the Azure CLI was installed after it was opened) |
 | `Not logged in to Azure` | Run `az login` and sign in with your Concordia account |
+| Demo 4 still shows random products | Run `./canary.sh status`: v2 must have the share you set. Look for `FALLBACK` in `./canary.sh watch` |
+| `No v2 revision yet` | Run `./canary.sh deploy` once (see Demo 4) |
 
 Other commands: `./shop.sh status` (which version is running, and where),
 `./shop.sh test` (checks the shop, expects `4/4 checks passed`).

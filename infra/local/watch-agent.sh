@@ -25,7 +25,8 @@ for line in sys.stdin:
     tools = [c["name"] for c in r["toolCalls"]]
     tokens = r["promptTokens"] + r["completionTokens"]
     detail = r["reason"] or r["fallbackReason"]
-    print(f"{outcome:8} {seconds:5.1f} s | tools: {tools} | tokens: {tokens} | {detail}", flush=True)
+    model = r["model"]
+    print(f"{outcome:8} {seconds:5.1f} s | model: {model} | tools: {tools} | tokens: {tokens} | {detail}", flush=True)
 '
 
 echo "Watching v2 decisions (open product pages in the shop; Ctrl+C to stop)..."

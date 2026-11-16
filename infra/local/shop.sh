@@ -3,6 +3,7 @@
 #
 #   ./shop.sh v1       Demo 1: shop with random recommendations (v1)
 #   ./shop.sh v2       Demo 2: shop with AI recommendations (v2) and the local AI model
+#   ./shop.sh groq     Browser demo: v2 with Groq Free
 #   ./shop.sh watch    show the AI's decisions live (Ctrl+C to stop)
 #   ./shop.sh test     check that the shop works
 #   ./shop.sh status   show which version is running and where
@@ -12,25 +13,34 @@ set -euo pipefail
 cd "$(dirname "$0")"
 
 WITH_V2=(-f docker-compose.yml -f docker-compose.v2.yml)
+WITH_GROQ=(-f docker-compose.yml -f docker-compose.groq.yml)
 
 port() {
-  local p
+  local published p
+  published="$(docker compose -f docker-compose.yml port frontend 8080 2>/dev/null || true)"
+  if [[ -n "$published" ]]; then
+    echo "${published##*:}"
+    return
+  fi
   p="$(grep -E '^FRONTEND_PORT=' .env 2>/dev/null | cut -d= -f2 | tr -d '\r ' || true)"
-  echo "${p:-8080}"
+  echo "${FRONTEND_PORT:-${p:-8080}}"
 }
 
 # Which recommendation service is running: v1 (random) or v2 (AI)?
 running_version() {
-  local id
+  local id endpoint
   id="$(docker ps -q --filter name=online-boutique-recommendationservice 2>/dev/null)"
   if [[ -z "$id" ]]; then
     echo "not running"
-  # Only v2 is configured with an AI model endpoint.
-  elif docker inspect --format '{{range .Config.Env}}{{println .}}{{end}}' "$id" | grep -q '^MODEL_BASE_URL='; then
-    echo "v2 (AI recommendations)"
-  else
-    echo "v1 (random recommendations)"
+    return
   fi
+  endpoint="$(docker inspect --format '{{range .Config.Env}}{{println .}}{{end}}' "$id" | sed -n 's/^MODEL_BASE_URL=//p')"
+  case "$endpoint" in
+    https://api.groq.com/openai/v1) echo "v2 (Groq)" ;;
+    http://ollama:11434/v1) echo "v2 (Ollama)" ;;
+    '') echo "v1 (random recommendations)" ;;
+    *) echo "v2 (AI recommendations)" ;;
+  esac
 }
 
 # Stop early if another program already uses the shop's port, so nobody opens
@@ -48,8 +58,18 @@ check_port_free() {
 }
 
 ready() {
-  echo
-  echo "Ready: http://localhost:$(port)   Recommendations: $(running_version)"
+  local url="http://localhost:$(port)" attempt
+  echo "Waiting for the shop homepage..."
+  for ((attempt = 1; attempt <= 30; attempt++)); do
+    if curl --noproxy '*' --fail --silent --max-time 2 --output /dev/null "$url/"; then
+      echo "Ready: $url   Recommendations: $(running_version)"
+      return
+    fi
+    sleep 2
+  done
+  echo "The shop homepage did not become ready at $url." >&2
+  docker compose -f docker-compose.yml ps
+  return 1
 }
 
 if ! docker info >/dev/null 2>&1; then
@@ -73,6 +93,12 @@ case "${1:-}" in
     ready
     echo "The first time you open a product, the AI needs 20-40 s to choose."
     ;;
+  groq)
+    check_port_free
+    echo "Starting the shop with Groq recommendations (v2)..."
+    docker compose "${WITH_GROQ[@]}" up -d --build --remove-orphans
+    ready
+    ;;
   watch)
     exec ./watch-agent.sh
     ;;
@@ -88,7 +114,7 @@ case "${1:-}" in
     echo "Stopped. Downloaded images and the AI model stay on disk, so the next start is quick."
     ;;
   *)
-    sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//'
+    sed -n '2,10p' "$0" | sed 's/^# \{0,1\}//'
     exit 1
     ;;
 esac
