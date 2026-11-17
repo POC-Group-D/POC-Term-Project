@@ -28,7 +28,7 @@ MAX_P95_MS = 2000
 MIN_CORRECT = 95.0           # percent
 MAX_TOKENS_PER_REQUEST = 1500
 MAX_SPEND = 8.0              # USD, 80% of the $10 budget
-MAX_RECOMMENDATIONS = 5
+MAX_RECOMMENDATIONS = 10     # API cap on max_results
 
 
 def az(*args):
@@ -71,11 +71,14 @@ def request_counts(app_id, start, end):
 
 def is_correct(record, catalog_ids):
     ids = record["recommendedProductIds"]
+    # API version 2: one non-empty reason per product (older records have none).
+    reasons = record.get("productReasons", ["-"] * len(ids))
     return (record["outcome"] in ("agent", "cached")
             and 0 < len(ids) <= MAX_RECOMMENDATIONS
             and len(set(ids)) == len(ids)
             and all(i in catalog_ids for i in ids)
-            and not set(ids) & set(record["contextProductIds"]))
+            and not set(ids) & set(record["contextProductIds"])
+            and len(reasons) == len(ids) and all(reasons))
 
 
 def main():

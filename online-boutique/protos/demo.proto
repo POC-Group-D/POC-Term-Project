@@ -52,6 +52,12 @@ message Cart {
 message Empty {}
 
 // ---------------Recommendation service----------
+//
+// Version 2 of this API (Group D). Changes from Google's version 1 only add
+// fields, so clients and servers built for version 1 keep working:
+//   request:  max_results, how many recommendations the caller wants
+//   response: recommendations, each product with a reason for recommending it
+// Both implementations (v1 random, v2 AI agent) implement this version.
 
 service RecommendationService {
   rpc ListRecommendations(ListRecommendationsRequest) returns (ListRecommendationsResponse){}
@@ -59,11 +65,24 @@ service RecommendationService {
 
 message ListRecommendationsRequest {
     string user_id = 1;
+    // Products the shopper is looking at or has in the cart; never recommended back.
     repeated string product_ids = 2;
+    // How many recommendations to return: 1-10. 0 (not set, e.g. a version 1
+    // client) means the default of 5. Values above 10 are capped at 10.
+    int32 max_results = 3;
 }
 
 message ListRecommendationsResponse {
+    // The recommended product ids, best first. Kept for version 1 clients.
     repeated string product_ids = 1;
+    // The same products in the same order, each with a reason.
+    repeated Recommendation recommendations = 2;
+}
+
+message Recommendation {
+    string product_id = 1;
+    // One short sentence for the shopper, e.g. "Brews coffee for your mug".
+    string reason = 2;
 }
 
 // ---------------Product Catalog----------------

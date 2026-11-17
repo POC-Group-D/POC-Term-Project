@@ -575,6 +575,14 @@ similar to that of the hot-products-row.
   font-size: 18px;
 }
 
+/* Group D: the recommendation service's reason for each product. */
+.recommendations .recommendation-reason {
+  margin-top: 4px;
+  font-size: 14px;
+  font-style: italic;
+  color: #6b6b6b;
+}
+
 .recommendations img {
   height: 100%;
   width: 100%;

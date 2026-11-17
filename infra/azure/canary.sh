@@ -12,6 +12,7 @@
 #   ./canary.sh run        the canary: 10% -> 25% -> 50% -> 100%, measuring each
 #                          step; rolls back to v1 as soon as a criterion fails
 #   ./canary.sh deploy faulty   a v2 with an invalid Groq key (rollback demo)
+#   ./canary.sh deploy v1       replace v1 with our v1 image (recommendation API v2)
 #
 # The facade is Container Apps traffic splitting between the two revisions,
 # which carry the labels "v1" and "v2". The frontend keeps calling
@@ -22,6 +23,7 @@ source "$(dirname "$0")/common.sh"
 APP=recommendationservice
 ARGS=(--resource-group "$AZ_RESOURCE_GROUP" --name "$APP")
 V2_IMAGE="$GHCR_PREFIX/recommendationservice-v2:$IMAGE_TAG"
+V1_IMAGE="$GHCR_PREFIX/recommendationservice-v1:$IMAGE_TAG"
 
 # Name of the revision that carries a label ("v1" or "v2"), or nothing.
 label_of() {
@@ -66,12 +68,12 @@ deploy() {
   # Container Apps must keep several revisions active to split traffic.
   az containerapp revision set-mode "${ARGS[@]}" --mode multiple --output none
 
-  # v1 is the revision running the unmodified upstream image.
+  # v1 is the newest revision that does not run the v2 (agent) image.
   local v1
   v1="$(label_of v1)"
   if [[ -z "$v1" ]]; then
     v1="$(az containerapp revision list "${ARGS[@]}" \
-      --query "[?contains(properties.template.containers[0].image, '/recommendationservice:')] | sort_by(@, &properties.createdTime) | [-1].name" \
+      --query "[?!contains(properties.template.containers[0].image, 'recommendationservice-v2')] | sort_by(@, &properties.createdTime) | [-1].name" \
       --output tsv)"
     [[ -n "$v1" ]] || { echo "Could not find the v1 revision." >&2; exit 1; }
   fi
@@ -103,6 +105,25 @@ deploy() {
   az containerapp revision label add "${ARGS[@]}" --revision "$v2" --label v2 --yes --output none
   set_v2_share 0
   echo "Next: ./canary.sh 100 (all traffic to v2) or ./canary.sh 10 (a canary step)."
+}
+
+# Replace v1 with our v1 image (recommendation API version 2), keeping v1's
+# settings and leaving the traffic split as it is.
+deploy_v1() {
+  local v1 suffix new env
+  v1="$(label_of v1)"
+  [[ -n "$v1" ]] || { echo "No v1 label yet. Run: ./canary.sh deploy" >&2; exit 1; }
+  # A copied revision starts from the app's newest template (possibly v2), so
+  # set v1's own environment explicitly.
+  mapfile -t env < <(az containerapp revision show "${ARGS[@]}" --revision "$v1" \
+    --query "properties.template.containers[0].env[].join('=', [name, value])" --output tsv | tr -d '\r')
+  suffix="v1-$(date +%m%d-%H%M)"
+  new="$APP--$suffix"
+  echo "Creating $new from $V1_IMAGE"
+  az containerapp revision copy "${ARGS[@]}" --from-revision "$v1" --revision-suffix "$suffix" \
+    --image "$V1_IMAGE" --replace-env-vars "${env[@]}" --output none
+  az containerapp revision label add "${ARGS[@]}" --revision "$new" --label v1 --yes --output none
+  show_status
 }
 
 show_status() {
@@ -202,7 +223,8 @@ run_canary() {
 }
 
 case "${1:-}" in
-  deploy)   require_login; deploy "${2:-}" ;;
+  deploy)   require_login
+            if [[ "${2:-}" == v1 ]]; then deploy_v1; else deploy "${2:-}"; fi ;;
   run)      require_login; run_canary ;;
   rollback) require_login; set_v2_share 0 ;;
   status)   require_login; show_status ;;
@@ -210,7 +232,7 @@ case "${1:-}" in
   measure)  require_login; measure ;;
   [0-9]|[0-9][0-9]|100) require_login; set_v2_share "$1" ;;
   *)
-    sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'
+    sed -n '2,15p' "$0" | sed 's/^# \{0,1\}//'
     exit 1
     ;;
 esac

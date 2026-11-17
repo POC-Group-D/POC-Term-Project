@@ -31,6 +31,9 @@
                   <h5>
                     {{ .Name }}
                   </h5>
+                  {{ if .Reason }}
+                  <p class="recommendation-reason">{{ .Reason }}</p>
+                  {{ end }}
                 </div>
               </div>
             </div>

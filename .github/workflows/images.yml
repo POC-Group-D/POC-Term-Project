@@ -3,8 +3,9 @@
 #
 # Only the images we change are built:
 #   recommendationservice-v2  the AI agent (agent-service/); its Dockerfile runs the unit tests
+#   recommendationservice-v1  Google's random recommender on our recommendation API version 2
 #   productcatalogservice-200 upstream image + the 200-product catalog (catalog/)
-#   frontend                  upstream image + pictures for the new products (catalog/)
+#   frontend                  Google's frontend source with API version 2 + pictures for the new products
 #
 # Tags: sha-<commit> on every build, the branch name, and "latest" on main.
 # GitHub Actions and GHCR are free for this public repository.
@@ -17,6 +18,9 @@ on:
     paths:
       - "agent-service/**"
       - "catalog/**"
+      - "online-boutique/protos/**"
+      - "online-boutique/src/frontend/**"
+      - "online-boutique/src/recommendationservice/**"
       - ".github/workflows/images.yml"
   workflow_dispatch:
 
@@ -38,13 +42,20 @@ jobs:
         include:
           - image: recommendationservice-v2
             context: agent-service
+            file: agent-service/Dockerfile
+            base: ""
+          - image: recommendationservice-v1
+            context: online-boutique/src/recommendationservice
+            file: online-boutique/src/recommendationservice/Dockerfile
             base: ""
           - image: productcatalogservice-200
             context: catalog/productcatalogservice
+            file: catalog/productcatalogservice/Dockerfile
             base: productcatalogservice
           - image: frontend
-            context: catalog/frontend
-            base: frontend
+            context: .
+            file: catalog/frontend/Dockerfile
+            base: ""
     steps:
       - uses: actions/checkout@v4
 
@@ -76,6 +87,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: ${{ matrix.context }}
+          file: ${{ matrix.file }}
           platforms: linux/amd64
           push: true
           tags: ${{ steps.meta.outputs.tags }}

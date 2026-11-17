@@ -4,8 +4,8 @@
 #
 # Refuses to run until guardrails.sh has created the budget.
 #
-# The frontend and product catalog use our 200-product images from GHCR
-# (IMAGE_TAG, default "latest"); recommendationservice is upstream v1.
+# The frontend, product catalog and recommendationservice v1 use our images
+# from GHCR (IMAGE_TAG, default "latest"). v2 is added by canary.sh.
 #
 # Usage:
 #   ./deploy.sh              # deploy / update everything
@@ -48,6 +48,7 @@ az deployment group "$action" \
       deployCosmos="$deploy_cosmos" \
       cosmosLocation="$AZ_COSMOS_LOCATION" \
       frontendImage="$GHCR_PREFIX/frontend:$IMAGE_TAG" \
+      recommendationImage="$GHCR_PREFIX/recommendationservice-v1:$IMAGE_TAG" \
       productCatalogImage="$GHCR_PREFIX/productcatalogservice-200:$IMAGE_TAG"
 
 if [[ "$action" == "create" ]]; then

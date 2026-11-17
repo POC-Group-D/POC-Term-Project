@@ -68,10 +68,13 @@ def initStackdriverProfiling():
 
 class RecommendationService(demo_pb2_grpc.RecommendationServiceServicer):
     def ListRecommendations(self, request, context):
-        max_responses = 5
+        # Group D, recommendation API version 2: the caller chooses how many
+        # (max_results: 0 = default 5, at most 10) and every product gets a reason.
+        max_responses = min(request.max_results, 10) if request.max_results > 0 else 5
         # fetch list of products from product catalog stub
         cat_response = product_catalog_stub.ListProducts(demo_pb2.Empty())
-        product_ids = [x.id for x in cat_response.products]
+        products = {x.id: x for x in cat_response.products}
+        product_ids = list(products)
         filtered_products = list(set(product_ids)-set(request.product_ids))
         num_products = len(filtered_products)
         num_return = min(max_responses, num_products)
@@ -83,6 +86,11 @@ class RecommendationService(demo_pb2_grpc.RecommendationServiceServicer):
         # build and return response
         response = demo_pb2.ListRecommendationsResponse()
         response.product_ids.extend(prod_list)
+        for pid in prod_list:
+            # v1 has no model, so the reason is a rule: the product's category.
+            categories = products[pid].categories
+            category = categories[0] if categories else "store"
+            response.recommendations.add(product_id=pid, reason="From our {} collection".format(category))
         return response
 
     def Check(self, request, context):

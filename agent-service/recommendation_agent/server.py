@@ -27,7 +27,8 @@ class RecommendationService(demo_pb2_grpc.RecommendationServiceServicer):
         started = time.perf_counter()
         context_ids = list(request.product_ids)
         try:
-            decision = self._agent.recommend(context_ids, time_budget=context.time_remaining())
+            decision = self._agent.recommend(context_ids, time_budget=context.time_remaining(),
+                                             limit=request.max_results)
         except grpc.RpcError as exc:
             # The catalog is down; v1 fails the same way in this case.
             logger.error("catalog unavailable: %s", exc)
@@ -38,7 +39,11 @@ class RecommendationService(demo_pb2_grpc.RecommendationServiceServicer):
                              self._settings.input_price_per_mtok, self._settings.output_price_per_mtok)
         self._log.write(build_record(request.user_id, context_ids, decision, latency_ms,
                                      self._agent.model_name, cost))
-        return demo_pb2.ListRecommendationsResponse(product_ids=decision.product_ids)
+        return demo_pb2.ListRecommendationsResponse(
+            product_ids=decision.product_ids,
+            recommendations=[demo_pb2.Recommendation(product_id=pid, reason=decision.product_reasons.get(pid, ""))
+                             for pid in decision.product_ids],
+        )
 
 
 def build_model(settings):

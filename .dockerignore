@@ -1,0 +1,5 @@
+# Only the frontend image is built from the repository root
+# (catalog/frontend/Dockerfile); send it just the folders it needs.
+*
+!online-boutique/src/frontend
+!catalog/frontend
