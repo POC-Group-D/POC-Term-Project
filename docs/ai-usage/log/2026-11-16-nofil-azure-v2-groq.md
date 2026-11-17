@@ -149,3 +149,12 @@ make these changes and then make sure that everything is running on Azure."
   2-minute canary step at 50% passed all criteria (v2 p95 658 ms, 100% correct
   including the reason rule, 864 tokens per model call). Fixed afterwards:
   `deploy v1` now re-applies the traffic split after moving the v1 label.
+
+## D4 report draft
+
+Prompt: "Yes, draft the report."
+
+`docs/report/D4-report-GroupD.tex` (IEEEtran), compiled with the
+`texlive/texlive:latest-medium` Docker image to a 5-page PDF. All figures
+come from the repository's recorded results. Member contributions for
+Mustafa and Rahil are left as TODOs for the team.
