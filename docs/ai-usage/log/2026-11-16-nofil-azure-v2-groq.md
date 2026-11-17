@@ -99,3 +99,14 @@ If you have any doubts, ask me."
 - The summary query was checked against the logs first (good v2: 269
   requests, p95 777 ms, 100% AI decisions; faulty v2: 11 fallbacks), then all
   panels were checked in the portal. No shop or load was started for this.
+
+## Cost report (item 17)
+
+Prompt: "Yes, cost report."
+
+Read-only: Azure Cost Management (month to date $0.00), the Azure Retail
+Prices API (Container Apps, Canada Central), Groq's model page
+($0.075 / $0.30 per million input / output tokens), the Azure Monitor
+`Replicas` and `Requests` metrics, and v2's token counts in Log Analytics.
+Result: `docs/cost-report.md` (v1 $0.000097 and v2 $0.000140 per request at
+list prices; $0 billed).
