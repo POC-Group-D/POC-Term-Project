@@ -7,14 +7,15 @@ We run Google's Online Boutique, an online shop with 200 products, and replace
 its recommendation service (the "You May Also Like" box under each product)
 with an AI version.
 
-## The four demos
+## The five demos
 
 | Demo | Where it runs | "You May Also Like" shows |
 |---|---|---|
 | **Demo 1** | Your computer (Docker) | **v1:** 5 random products that are not in the cart |
 | **Demo 2** | Your computer (Docker) | **v2:** products chosen by an AI model (Qwen3-4B from Hugging Face), running in Docker |
 | **Demo 3** | Azure (cloud) | **v1:** random products, like Demo 1 |
-| **Demo 4** | Azure (cloud) | **v2:** products chosen by an AI model on Groq, with traffic moved between v1 and v2 (canary and rollback) |
+| **Demo 4** | Azure (cloud) | **v2:** products chosen by an AI model on Groq, with traffic moved between v1 and v2 by hand |
+| **Demo 5** | Azure (cloud) | **Automatic canary:** v2 gets 10% → 25% → 50% → 100% while the criteria are checked; a faulty v2 is rolled back automatically |
 
 ---
 
@@ -265,6 +266,59 @@ It ends with `Traffic: v1 100%, v2 0%`. Do this again only when v2 changes.
 
 ---
 
+## Demo 5: Automatic canary with promotion and rollback
+
+The script moves traffic to v2 step by step (10% → 25% → 50% → 100%). At
+each step, simulated shoppers use the shop for a few minutes, then the
+[canary criteria](docs/canary-criteria.md) are checked: errors, speed
+(p95), correctness and cost. If every criterion passes, v2 moves to the next
+step. If any fails, all traffic goes back to v1. Our recorded runs are in
+[docs/canary-results.md](docs/canary-results.md).
+
+Each step takes about 8 minutes (5 minutes of load, 3 minutes for Azure's
+numbers to arrive), so run the full canary **before class** and show its
+output. Run the short rollback **live**. All commands are run from `infra/azure`,
+with the shop on (Demo 3 steps 1-2).
+
+1. **Promotion (before class, about 35 minutes):**
+
+   ```bash
+   ./canary.sh run
+   ```
+
+   Each step prints four `PASS` lines; it ends with
+   `PROMOTED: v2 met every criterion at each step and now serves 100% of traffic.`
+   Keep this window open, or take a screenshot to show in class.
+
+2. **Rollback (live, about 7 minutes):** deploy a faulty v2 (its Groq key is
+   invalid, so it can only return random picks), then start the canary with
+   2-minute steps:
+
+   ```bash
+   ./canary.sh deploy faulty
+   ```
+
+   ```bash
+   MEASURE_MINUTES=2 ./canary.sh run
+   ```
+
+   At the first step (10%), `Correctness` shows `FAIL 0% correct`, and the
+   script prints `ROLLBACK: a criterion was violated at 10%.` All traffic is
+   back on v1. Point out that `Availability` still passes: the faulty v2
+   never returned an error, so only the correctness check caught it.
+
+3. **After the demo,** put the good v2 back (at 0% traffic) and turn the shop off:
+
+   ```bash
+   ./canary.sh deploy
+   ```
+
+   ```bash
+   ./cloud.sh stop
+   ```
+
+---
+
 ## If something goes wrong
 
 | Message or problem | Fix |
@@ -280,6 +334,7 @@ It ends with `Traffic: v1 100%, v2 0%`. Do this again only when v2 changes.
 | `Not logged in to Azure` | Run `az login` and sign in with your Concordia account |
 | Demo 4 still shows random products | Run `./canary.sh status`: v2 must have the share you set. Look for `FALLBACK` in `./canary.sh watch` |
 | `No v2 revision yet` | Run `./canary.sh deploy` once (see Demo 4) |
+| Demo 5 fails at 10% with `no v2 requests` | Too little load reached v2 in that step. Run again with `MEASURE_MINUTES=5` |
 
 Other commands: `./shop.sh status` (which version is running, and where),
 `./shop.sh test` (checks the shop, expects `4/4 checks passed`).

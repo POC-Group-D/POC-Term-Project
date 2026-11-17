@@ -9,6 +9,9 @@
 #   ./canary.sh watch      show v2's decisions live (Ctrl+C to stop)
 #   ./canary.sh measure    put load on the shop for 5 minutes, then check the
 #                          canary criteria (docs/canary-criteria.md)
+#   ./canary.sh run        the canary: 10% -> 25% -> 50% -> 100%, measuring each
+#                          step; rolls back to v1 as soon as a criterion fails
+#   ./canary.sh deploy faulty   a v2 with an invalid Groq key (rollback demo)
 #
 # The facade is Container Apps traffic splitting between the two revisions,
 # which carry the labels "v1" and "v2". The frontend keeps calling
@@ -79,13 +82,19 @@ deploy() {
     "groq-key=$(groq_key)" "cosmos-key=$COSMOS_KEY"
 
   # v2 = v1's settings (port, catalog address) + the agent image and model.
-  local suffix v2
+  # The faulty v2 (rollback demo) gets an invalid Groq key, so every request
+  # falls back to random picks.
+  local suffix v2 model_key=secretref:groq-key
   suffix="v2-$(date +%m%d-%H%M)"
+  if [[ "${1:-}" == faulty ]]; then
+    suffix="v2-faulty-$(date +%m%d-%H%M)"
+    model_key=invalid-key-for-the-rollback-demo
+  fi
   v2="$APP--$suffix"
   echo "Creating $v2 from $V2_IMAGE"
   az containerapp revision copy "${ARGS[@]}" --from-revision "$v1" --revision-suffix "$suffix" \
     --image "$V2_IMAGE" --output none --set-env-vars \
-    MODEL_BASE_URL=https://api.groq.com/openai/v1 MODEL_API_KEY=secretref:groq-key \
+    MODEL_BASE_URL=https://api.groq.com/openai/v1 "MODEL_API_KEY=$model_key" \
     MODEL_NAME=openai/gpt-oss-20b MODEL_MAX_TOKENS=600 MODEL_REASONING_EFFORT=low \
     MODEL_TOOL_CHOICE=recommend MAX_AGENT_STEPS=1 SHORTLIST_SIZE=12 CACHE_TTL_SECONDS=600 \
     "COSMOS_ENDPOINT=$COSMOS_ENDPOINT" COSMOS_KEY=secretref:cosmos-key
@@ -172,15 +181,36 @@ print("Shop pages: %s requests, %s failed, p95 %s ms" % (row["Request Count"], r
     --resource-group "$AZ_RESOURCE_GROUP" --budget poc-group-d-monthly
 }
 
+# The canary: each step sends a larger share to v2 and measures it. All
+# criteria met: go on to the next step. Any criterion violated: roll back.
+run_canary() {
+  local share
+  for share in ${CANARY_STEPS:-10 25 50 100}; do
+    echo
+    echo "=== Canary step: v2 ${share}% ==="
+    set_v2_share "$share"
+    if ! measure; then
+      echo
+      echo "ROLLBACK: a criterion was violated at ${share}%."
+      set_v2_share 0
+      exit 1
+    fi
+    echo "Step passed."
+  done
+  echo
+  echo "PROMOTED: v2 met every criterion at each step and now serves 100% of traffic."
+}
+
 case "${1:-}" in
-  deploy)   require_login; deploy ;;
+  deploy)   require_login; deploy "${2:-}" ;;
+  run)      require_login; run_canary ;;
   rollback) require_login; set_v2_share 0 ;;
   status)   require_login; show_status ;;
   watch)    require_login; watch_v2 ;;
   measure)  require_login; measure ;;
   [0-9]|[0-9][0-9]|100) require_login; set_v2_share "$1" ;;
   *)
-    sed -n '2,11p' "$0" | sed 's/^# \{0,1\}//'
+    sed -n '2,14p' "$0" | sed 's/^# \{0,1\}//'
     exit 1
     ;;
 esac

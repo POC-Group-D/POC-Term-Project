@@ -74,3 +74,15 @@ Prompt: "Yes, measurements next."
   57 Cosmos DB records exactly). A quoting bug in the load summary line
   stopped the first run before the check; fixed and the check re-run on the
   same window.
+
+## Canary run and rollback (items 13, 16)
+
+Prompt: "Yes, canary run next."
+
+- `./canary.sh run` steps through 10/25/50/100%, runs `measure` at each step
+  and rolls back on the first failed criterion. `./canary.sh deploy faulty`
+  deploys v2 with an invalid Groq key for the rollback demo.
+- Live run (about 50 minutes of shop time, then stopped): promotion with all
+  criteria met at every step, then the faulty v2 was rolled back at 10%
+  (correctness 0%, availability still 0% errors). Results:
+  `docs/canary-results.md`. README: Demo 5.

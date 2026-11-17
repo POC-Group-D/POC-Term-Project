@@ -127,6 +127,8 @@ decides which revision answers each request, and the frontend cannot tell.
 | `./canary.sh status` | Shows each revision and its share |
 | `./canary.sh watch` | Prints v2's decisions live, like `./shop.sh watch` locally |
 | `./canary.sh measure` | Runs the Online Boutique load generator (2 shoppers, 5 minutes) against the shop, then checks the [canary criteria](../../docs/canary-criteria.md) for that window with `canary_check.py`. Installs its Python tools into `infra/azure/.venv` the first time. `LOAD_USERS` and `MEASURE_MINUTES` change the load |
+| `./canary.sh run` | The canary: 10% → 25% → 50% → 100%, `measure` at each step; rolls back to v1 when a criterion fails. `CANARY_STEPS` changes the steps |
+| `./canary.sh deploy faulty` | A v2 with an invalid Groq key, for the rollback demo; `./canary.sh deploy` replaces it with a working v2 |
 
 v2 uses Groq Free (`openai/gpt-oss-20b`) in one model call per request, and
 writes every decision (latency, outcome, tokens) to Cosmos DB. Before the
