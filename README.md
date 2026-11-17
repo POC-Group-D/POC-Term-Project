@@ -5,39 +5,86 @@ Team: Mustafa Ghouri (40355660), Nofil Siddiqui (40292948), Rahil Shah (40329714
 
 We run Google's Online Boutique, an online shop with 200 products, and replace
 its recommendation service (the "You May Also Like" box under each product)
-with an AI version.
+with an AI version. A canary moves shoppers to the AI version step by step,
+and rolls back automatically if it misbehaves.
 
 ## The five demos
 
-| Demo | Where it runs | "You May Also Like" shows |
-|---|---|---|
-| **Demo 1** | Your computer (Docker) | **v1:** 5 random products that are not in the cart |
-| **Demo 2** | Your computer (Docker) | **v2:** products chosen by an AI model (Qwen3-4B from Hugging Face), running in Docker |
-| **Demo 3** | Azure (cloud) | **v1:** random products, like Demo 1 |
-| **Demo 4** | Azure (cloud) | **v2:** products chosen by an AI model on Groq, with traffic moved between v1 and v2 by hand |
-| **Demo 5** | Azure (cloud) | **Automatic canary:** v2 gets 10% → 25% → 50% → 100% while the criteria are checked; a faulty v2 is rolled back automatically |
+| Demo | Where | What you show | Time |
+|---|---|---|---|
+| **1** | Your laptop (Docker) | **v1:** "You May Also Like" shows 5 random products | 2 min |
+| **2** | Your laptop (Docker) | **v2:** an AI model picks related products | 3 min |
+| **3** | Azure (cloud) | **v1** on Azure: the same shop in the cloud | 3 min |
+| **4** | Azure (cloud) | **v2** on Azure (AI on Groq), and moving traffic between v1 and v2 by hand | 4 min |
+| **5** | Azure (cloud) | **Automatic canary:** the promotion results, a live automatic rollback, and the monitoring dashboard | 8 min |
+
+Commands are typed in **Git Bash** (Windows). Demos 1-2 run from
+`POC-Term-Project/infra/local`, Demos 3-5 from `POC-Term-Project/infra/azure`.
+To open Git Bash in a folder: in File Explorer, right-click the folder and
+choose **Open Git Bash here**.
 
 ---
 
-## Before Demos 1 and 2 (once)
+## Before class (checklist)
 
-You need [Docker Desktop](https://www.docker.com/products/docker-desktop/)
-(running, with at least 8 GB of memory in Settings > Resources) and
-[Git](https://git-scm.com/downloads). On Windows, type every command in **Git Bash**.
+Do these in order. Steps 1-3 can be done the day before.
 
-```bash
-git clone https://github.com/POC-Group-D/POC-Term-Project.git
-```
+1. **Docker Desktop** is open and shows "Engine running" (Settings > Resources: at least 8 GB memory).
+2. **Download the local AI model once** (about 2.5 GB, 5-15 minutes). In `infra/local`:
 
-```bash
-cd POC-Term-Project/infra/local
-```
+   ```bash
+   ./shop.sh v2
+   ```
 
-All commands for Demos 1 and 2 are run from this `infra/local` folder.
+   Wait for `Ready: ...`, open 2-3 products in the browser (so they are cached and instant in class), then:
+
+   ```bash
+   ./shop.sh stop
+   ```
+
+3. **Sign in to Azure** with your Concordia account:
+
+   ```bash
+   az login
+   ```
+
+4. **15 minutes before class, turn the cloud shop on.** In `infra/azure`:
+
+   ```bash
+   ./cloud.sh start
+   ```
+
+   then wake it up and check it (about 3 minutes):
+
+   ```bash
+   ./smoke-test.sh https://frontend.blueflower-54b52d82.canadacentral.azurecontainerapps.io
+   ```
+
+   It must end with `5/5 checks passed`.
+
+5. **Check the canary is ready:**
+
+   ```bash
+   ./canary.sh status
+   ```
+
+   You should see `v1 ... 100` and `v2 ... 0`. If not, run `./canary.sh rollback`.
+
+6. **Open these browser tabs:**
+   - Local shop: http://localhost:8080 (it works once Demo 1 starts)
+   - Azure shop: https://frontend.blueflower-54b52d82.canadacentral.azurecontainerapps.io
+   - [Azure portal: resource group rg-poc-group-d](https://portal.azure.com/#resource/subscriptions/30bf2f60-c2e2-40c7-9504-001b63a13a60/resourceGroups/rg-poc-group-d/overview) (signed in)
+   - The canary dashboard: run `./dashboard.sh` in `infra/azure` and open the link it prints
+   - [docs/canary-results.md](docs/canary-results.md) on GitHub (the recorded promotion)
+
+> **Cost:** the cloud shop costs credit only while it is on. Turn it off right
+> after class (see [After class](#after-class-checklist)). Groq is free.
 
 ---
 
 ## Demo 1: Local shop, random recommendations (v1)
+
+In Git Bash, in `infra/local`:
 
 1. Start the shop:
 
@@ -45,284 +92,243 @@ All commands for Demos 1 and 2 are run from this `infra/local` folder.
    ./shop.sh v1
    ```
 
-   It ends with: `Ready: http://localhost:8080   Recommendations: v1 (random recommendations)`
+   **You should see:** `Ready: http://localhost:8080   Recommendations: v1 (random recommendations)`
 
-2. Open the address it printed and click any product, e.g. **Mug**. Scroll to
-   **"You May Also Like"**: the products are random (a Mug can get loafers or a tank top).
+2. Open http://localhost:8080 and click **Mug**. Scroll to **"You May Also Like"**.
+
+   **You should see:** random products, e.g. a Polo Shirt or Rain Boots next to a Mug.
+
+   **Say:** "This is the original microservice, v1. It picks 5 random products."
 
 ---
 
 ## Demo 2: Local shop, AI recommendations (v2)
 
-This demo uses Qwen through Ollama on your processor. For the same demo with
-a hosted model (fast, about 1 s), see
-[Demo 2 with Groq](#optional-demo-2-with-groq-instead-of-ollama) below.
+Still in `infra/local`:
 
-1. Switch the shop to the AI version (the first time, this downloads the AI
-   model, about 2.5 GB, and takes 5-15 minutes):
+1. Switch to the AI version:
 
    ```bash
    ./shop.sh v2
    ```
 
-   It ends with: `Ready: http://localhost:8080   Recommendations: v2 (Ollama)`
+   **You should see:** `Ready: http://localhost:8080   Recommendations: v2 (Ollama)`
 
-2. Open a **second** Git Bash window in the same `infra/local` folder (in File
-   Explorer, right-click the `infra/local` folder > **Open Git Bash here**), and
-   start the AI log:
+2. Open a **second** Git Bash window in `infra/local` and start the AI log:
 
    ```bash
    ./shop.sh watch
    ```
 
-3. Wait about 30 seconds (the AI service is starting), then in the browser open
-   the same product as in Demo 1, e.g. **Mug**. The page takes **20-60 seconds**
-   (the AI runs on your computer's processor; the first product after starting
-   is the slowest). Now "You May Also Like" shows related products, and the AI
-   log prints its choice and reason, for example:
+3. In the browser, open **Mug** again (wait about 30 seconds after step 1 first).
+
+   **You should see:** related products (coffee and kitchen items). The AI log
+   prints a line such as:
 
    ```
-   AGENT     42.4 s | tools: ['recommend'] | tokens: 784 | These kitchen cookware items complement the shopper's existing mug...
+   AGENT     42.4 s | model: qwen3:4b-instruct | tools: ['recommend'] | tokens: 784 | These kitchen items complement the mug...
    ```
 
-   (Mug in Demo 1: Polo Shirt, Rain Boots, Travel Pillow, Wool Slippers.
-   Mug in Demo 2: Silicone Spatula, Coffee Canister, Kitchen Scale, Garlic Press.)
+   **Say:** "Same shop, same API, but now an AI model (Qwen3-4B from Hugging
+   Face) chooses the products, and gives its reason. It runs on my laptop's
+   processor, so it is slow (20-60 s). On Azure we use a hosted model that
+   answers in under a second."
 
-   Opening the same product again is instant (`CACHED`: the AI's answer is reused for 10 minutes).
+   `CACHED` in the log means the AI's answer for the same product was reused (10 minutes).
 
-   **Tip:** open 2-3 products before the demo so you can show them instantly,
-   then open one new product live.
-
-When you finish Demos 1 and 2, stop the local shop:
-
-```bash
-./shop.sh stop
-```
-
-### Optional: Demo 2 with Groq instead of Ollama
-
-This runs the same Online Boutique shop on your computer with Groq choosing
-the recommendations. You need Docker Desktop running and a Groq Free key
-saved as `GROQ_API_KEY=...` in `infra/local/.env`.
-
-1. Open **Docker Desktop** and wait for the engine to start. Then open
-   **Git Bash** in `infra/local` and run:
+4. Stop the local shop (press **Ctrl+C** in the AI log window first):
 
    ```bash
-   ./shop.sh groq
+   ./shop.sh stop
    ```
-
-   Wait for `Ready: http://localhost:8080   Recommendations: v2 (Groq)`.
-   The first startup may need to build and download images. Keep this
-   terminal open until you see `Ready`.
-
-2. Open a second **Git Bash** in the same folder and run `./shop.sh watch`.
-   Leave it open while you use the browser.
-3. Open [Mug in the local shop](http://localhost:8080/product/6E92ZMYYFZ) and
-   scroll to **You May Also Like**. If the script printed a different port,
-   use that port. In the watch window, look for `AGENT` and
-   `model: openai/gpt-oss-20b`. `CACHED` means the shop reused a previous
-   decision. Click a different product for a fresh model call. `FALLBACK`
-   means the shop displayed random picks for that request.
-4. When you finish, press **Ctrl+C** in the watch window and run
-   `./shop.sh stop` in the first window.
-
-If the browser says **site can't be reached**, check that Docker Desktop is
-running, run `./shop.sh status`, and open the URL printed by `./shop.sh groq`
-after it reports `Ready`. Use `http://` for the local shop.
 
 ---
 
 ## Demo 3: Azure (cloud), random recommendations (v1)
 
-The same shop, with v1, running on Azure Container Apps:
+In Git Bash, in `infra/azure` (the shop is already on from the checklist):
 
-**https://frontend.blueflower-54b52d82.canadacentral.azurecontainerapps.io**
+1. Open https://frontend.blueflower-54b52d82.canadacentral.azurecontainerapps.io
+   and click **Mug**.
 
-The cloud shop is kept **off** between demos, so it uses no credit (internet
-bots visit public websites all the time and would otherwise keep it running).
-These commands need the Azure CLI and `az login` with your Concordia account.
+   **You should see:** random products, like Demo 1. Add something to the cart and check out.
 
-**Whose Azure account is used?** The repository contains no Azure credentials.
-Every Azure script acts as whoever ran `az login` on that computer, in that
-person's own "Azure for Students" subscription. The shop at the link above
-belongs to Nofil's subscription: only Nofil can turn it on or off, and only
-Nofil's student credit pays for it. A teammate who runs the scripts with their
-own login works on their own subscription (see
-[infra/azure/README.md](infra/azure/README.md) to deploy a separate copy).
+   **Say:** "This is the same shop on Azure Container Apps: 10 microservices,
+   one Container App each, talking over gRPC."
 
-1. **10 minutes before the demo, turn it on.** From the `POC-Term-Project` folder:
-
-   ```bash
-   cd infra/azure
-   ```
-
-   ```bash
-   ./cloud.sh start
-   ```
-
-2. **Wake it up and check it** (about 3 minutes):
-
-   ```bash
-   ./smoke-test.sh https://frontend.blueflower-54b52d82.canadacentral.azurecontainerapps.io
-   ```
-
-   It ends with `5/5 checks passed` (home page, product page, recommendations,
-   add to cart, checkout). The shop is now fast.
-
-3. Open the link above, click a product: **"You May Also Like"** shows random
-   products, like Demo 1. Add a product to the cart and check out.
-
-4. Show the cloud resources in the Azure portal (sign in with your Concordia account):
-   [resource group rg-poc-group-d](https://portal.azure.com/#resource/subscriptions/30bf2f60-c2e2-40c7-9504-001b63a13a60/resourceGroups/rg-poc-group-d/overview):
-   the 10 shop services (Container Apps), Cosmos DB (database for the AI's decisions) and Log Analytics (logs).
-
-5. **After the demo, turn it off** (or keep it on and continue with Demo 4):
-
-   ```bash
-   ./cloud.sh stop
-   ```
-
-   `./cloud.sh status` shows whether it is on or off (`Stopped` and `0` copies = off, no cost).
+2. In the Azure portal tab (resource group **rg-poc-group-d**), show:
+   - the 10 **Container Apps** (the shop's services),
+   - **Cosmos DB** (the NoSQL database where v2 stores its decisions),
+   - **Log Analytics** (logs), and the **budget** ($10/month with alerts).
 
 ---
 
-## Demo 4: Azure (cloud), AI recommendations (v2) and canary
+## Demo 4: Azure, AI recommendations (v2) and moving traffic by hand
 
-The same Azure shop, now with v1 and v2 of the recommendation service running
-side by side. Azure decides which version answers each request, by the share
-you set. The shop's address does not change, and the shop cannot tell which
-version answered.
+v1 and v2 run side by side as two versions (revisions) of the recommendation
+service. Azure sends each request to one of them, by the share we set. The
+shop cannot tell which one answered.
 
-**Once, before the first Demo 4 (not during class):** save your Groq key as
-`GROQ_API_KEY=...` in `infra/local/.env`, then from `infra/azure` run:
-
-```bash
-./canary.sh deploy
-```
-
-It ends with `Traffic: v1 100%, v2 0%`. Do this again only when v2 changes.
-
-1. Turn the shop on and check it, as in Demo 3 steps 1-2.
-
-2. Send all recommendation requests to v2:
+1. Send all recommendation requests to v2:
 
    ```bash
    ./canary.sh 100
    ```
 
-   It prints `Traffic: v1 0%, v2 100%`.
+   **You should see:** `Traffic: v1 0%, v2 100%`
 
-3. Open a **second** Git Bash window in `infra/azure` and start the AI log:
+2. Open a **second** Git Bash window in `infra/azure` and start the AI log:
 
    ```bash
    ./canary.sh watch
    ```
 
-4. Open the [Mug on the Azure shop](https://frontend.blueflower-54b52d82.canadacentral.azurecontainerapps.io/product/6E92ZMYYFZ).
-   "You May Also Like" now shows related products (coffee and kitchen items),
-   in about a second. The AI log prints each decision, for example:
+3. Open the [Mug on the Azure shop](https://frontend.blueflower-54b52d82.canadacentral.azurecontainerapps.io/product/6E92ZMYYFZ).
+
+   **You should see:** coffee items (Gooseneck Kettle, Burr Coffee Grinder,
+   Milk Frother, ...), in about a second. The AI log prints:
 
    ```
-   AGENT      0.8 s | model: openai/gpt-oss-20b | tokens: 760 | <the model's reason>
+   AGENT      0.6 s | model: openai/gpt-oss-20b | tokens: 760 | Complementary coffee accessories for your mug
    ```
 
-   The first product after switching can take a few seconds while v2 starts.
+   The first product after switching can take a few seconds while v2 wakes up.
 
-5. **Canary step and rollback.** Send only part of the traffic to v2, then
-   roll back:
+   **Say:** "v2 now runs on Azure. The model is `gpt-oss-20b` on Groq's free
+   plan; every decision is stored in Cosmos DB."
+
+4. Split the traffic:
 
    ```bash
    ./canary.sh 50
    ```
 
-   ```bash
-   ./canary.sh status
-   ```
+   Refresh the Mug page a few times: **about half** the refreshes show coffee
+   items (v2), the others show random products (v1).
 
-   About half of the product pages now get AI picks, the rest random ones.
-   Then send everything back to v1:
+5. Roll back:
 
    ```bash
    ./canary.sh rollback
    ```
 
-   "You May Also Like" is random again, as in Demo 3.
+   **You should see:** `Traffic: v1 100%, v2 0%`. Refreshing shows random products again.
 
-6. In the Azure portal (link in Demo 3 step 4), open **recommendationservice >
-   Revisions and replicas** to show the two versions and their traffic share,
-   and the Cosmos DB account **> Data Explorer > recommendations >
-   agent-decisions** to show the stored AI decisions (tokens, latency, outcome).
+   **Say:** "This traffic split is the facade of the strangler pattern. Next,
+   the canary does this automatically."
 
-7. **After the demo:** press Ctrl+C in the AI log window, then:
-
-   ```bash
-   ./canary.sh rollback
-   ```
-
-   ```bash
-   ./cloud.sh stop
-   ```
+6. Press **Ctrl+C** in the AI log window.
 
 ---
 
-## Demo 5: Automatic canary with promotion and rollback
+## Demo 5: Automatic canary (promotion, rollback, dashboard)
 
-The script moves traffic to v2 step by step (10% → 25% → 50% → 100%). At
-each step, simulated shoppers use the shop for a few minutes, then the
-[canary criteria](docs/canary-criteria.md) are checked: errors, speed
-(p95), correctness and cost. If every criterion passes, v2 moves to the next
-step. If any fails, all traffic goes back to v1. Our recorded runs are in
-[docs/canary-results.md](docs/canary-results.md).
+The canary sends v2 a growing share of traffic: **10% → 25% → 50% → 100%**.
+At each step, simulated shoppers (the Online Boutique load generator) use the
+shop, then four rules are checked ([criteria table](docs/canary-criteria.md)):
 
-Each step takes about 8 minutes (5 minutes of load, 3 minutes for Azure's
-numbers to arrive), so run the full canary **before class** and show its
-output. Run the short rollback **live**. All commands are run from `infra/azure`,
-with the shop on (Demo 3 steps 1-2).
+| Rule | v2 must have |
+|---|---|
+| Availability | at most 1% errors |
+| Latency | 95% of answers within 2 seconds |
+| Correctness | at least 95% real AI picks (valid products, at most 5, none from the cart) |
+| Cost | at most 1500 tokens per AI call, Azure spend under $8 |
 
-1. **Promotion (before class, about 35 minutes):**
+All pass: go to the next step. Any fails: all traffic goes back to v1.
 
-   ```bash
-   ./canary.sh run
-   ```
-
-   Each step prints four `PASS` lines; it ends with
-   `PROMOTED: v2 met every criterion at each step and now serves 100% of traffic.`
-   Keep this window open, or take a screenshot to show in class.
-
-2. **Rollback (live, about 7 minutes):** deploy a faulty v2 (its Groq key is
-   invalid, so it can only return random picks), then start the canary with
-   2-minute steps:
+1. **Start the live rollback first** (it takes about 7 minutes, so talk over it).
+   Deploy a **faulty v2**: its Groq key is wrong, so it can never reach the AI:
 
    ```bash
-   ./canary.sh deploy faulty
+   IMAGE_TAG=nofil-azure-v2-groq ./canary.sh deploy faulty
    ```
+
+   **You should see:** `Traffic: v1 100%, v2 0%`. Then start the canary with 2-minute steps:
 
    ```bash
    MEASURE_MINUTES=2 ./canary.sh run
    ```
 
-   At the first step (10%), `Correctness` shows `FAIL 0% correct`, and the
-   script prints `ROLLBACK: a criterion was violated at 10%.` All traffic is
-   back on v1. Point out that `Availability` still passes: the faulty v2
-   never returned an error, so only the correctness check caught it.
+2. **While it runs, show the promotion we recorded:** open
+   [docs/canary-results.md](docs/canary-results.md). In Run 1, the good v2
+   passed every rule at 10%, 25%, 50% and 100% and was **promoted**.
 
-3. **Show the dashboard** (Azure Monitor): open the link printed by
-   `./dashboard.sh`, or in the Azure portal **Monitor > Workbooks > Canary
-   dashboard**. Set the time range to cover the runs. It shows requests per
-   revision (the traffic split), errors, v2's p95 latency, AI decisions vs
-   fallbacks (the faulty v2 appears as all fallbacks), and tokens per model
-   call. Run `./dashboard.sh` once beforehand to create it (free).
+3. **Back in Git Bash, the rollback:** after about 7 minutes:
 
-4. **After the demo,** put the good v2 back (at 0% traffic) and turn the shop off:
+   ```
+     PASS  Availability  v2 errors 0.0% (v1 0.0%)
+     PASS  Latency       v2 p95 249 ms
+     FAIL  Correctness   0% correct
+     PASS  Cost          0 tokens per model call
+   ROLLBACK: a criterion was violated at 10%.
+   ```
+
+   **Say:** "The faulty v2 never returned an error, and it was even faster.
+   An error-rate check alone would have promoted it. The correctness check
+   caught that it was returning random products, and rolled back to v1
+   automatically."
+
+4. **Show the dashboard** (the tab from the checklist; press refresh, time
+   range **Last hour**):
+   - **Requests per revision:** the traffic split over time
+   - **Errors by status code:** all successful (2xx)
+   - **Latency:** v2's p95
+   - **Correctness:** AI decisions vs fallbacks (the faulty v2 is all fallbacks)
+   - **Cost:** tokens per AI call
+
+5. Optionally, show the [cost report](docs/cost-report.md) (v1 vs v2 cost per
+   request) and the [data model](docs/data-model.md).
+
+---
+
+## After class (checklist)
+
+In `infra/azure`:
+
+1. Put the good v2 back (at 0% traffic, about 1 minute):
 
    ```bash
-   ./canary.sh deploy
+   IMAGE_TAG=nofil-azure-v2-groq ./canary.sh deploy
    ```
+
+2. **Turn the cloud shop off** (no compute cost while off):
 
    ```bash
    ./cloud.sh stop
    ```
+
+3. Check it is off: every app must show `Stopped` and `0`.
+
+   ```bash
+   ./cloud.sh status
+   ```
+
+> `IMAGE_TAG=nofil-azure-v2-groq` picks the v2 image with the Groq settings.
+> Once pull request #4 is merged into `main`, plain `./canary.sh deploy` works too.
+
+---
+
+## Optional: run the full canary again (about 35 minutes)
+
+Only needed for new results. The shop must be on, and it uses about 35 minutes of shop time:
+
+```bash
+./canary.sh run
+```
+
+Each step prints four `PASS` lines; it ends with
+`PROMOTED: v2 met every criterion at each step and now serves 100% of traffic.`
+
+## Optional: Demo 2 with Groq instead of Ollama
+
+The local shop with Groq choosing (fast). It needs your Groq key saved as
+`GROQ_API_KEY=...` in `infra/local/.env`. In `infra/local`:
+
+```bash
+./shop.sh groq
+```
+
+Then `./shop.sh watch` in a second window, open Mug, and `./shop.sh stop` when done.
 
 ---
 
@@ -331,22 +337,34 @@ with the shop on (Demo 3 steps 1-2).
 | Message or problem | Fix |
 |---|---|
 | `Docker is not running` | Start Docker Desktop and wait for "Engine running" |
-| `Port 8080 is already used by another container` | Another shop or program is on port 8080. Run `echo FRONTEND_PORT=8081 >> .env`, start again, and open **http://localhost:8081** |
-| `No such file or directory` | You are not in `POC-Term-Project/infra/local`, or not in Git Bash |
-| Demo 2 shows random products | Check `./shop.sh status` for `v2 (Ollama)` and use `./shop.sh watch` to check for `FALLBACK`. Make sure you opened the address `shop.sh` printed |
+| `Port 8080 is already used by another container` | Run `echo FRONTEND_PORT=8081 >> .env` in `infra/local`, start again, and open **http://localhost:8081** |
+| `No such file or directory` | You are in the wrong folder (`infra/local` for Demos 1-2, `infra/azure` for 3-5), or not in Git Bash |
+| Demo 2 shows random products | Run `./shop.sh status`: it must say `v2 (Ollama)`. Look for `FALLBACK` in `./shop.sh watch` |
 | Demo 2: no "You May Also Like" box | The AI service is still starting: wait 30 seconds and refresh |
 | Demo 2 page waits 20-60 s | Normal: the AI runs on your processor. Open one product at a time |
-| Demo 3 link shows "404" or "not found" | The cloud shop is off: run `./cloud.sh start` in `infra/azure` |
-| `az: command not found` | Close and reopen Git Bash (the Azure CLI was installed after it was opened) |
+| Azure link shows "404" or "not found" | The cloud shop is off: run `./cloud.sh start`, then the smoke test |
+| `az: command not found` | Close and reopen Git Bash |
 | `Not logged in to Azure` | Run `az login` and sign in with your Concordia account |
 | Demo 4 still shows random products | Run `./canary.sh status`: v2 must have the share you set. Look for `FALLBACK` in `./canary.sh watch` |
-| `No v2 revision yet` | Run `./canary.sh deploy` once (see Demo 4) |
-| Demo 5 fails at 10% with `no v2 requests` | Too little load reached v2 in that step. Run again with `MEASURE_MINUTES=5` |
+| `No v2 revision yet` | Run `IMAGE_TAG=nofil-azure-v2-groq ./canary.sh deploy` |
+| Demo 5 fails with `no v2 requests` | Too little traffic reached v2 in 2 minutes. Run `./canary.sh rollback`, then `./canary.sh run` again without `MEASURE_MINUTES=2` |
+| The dashboard is empty | Data arrives 2-5 minutes late; refresh, and check the time range |
 
-Other commands: `./shop.sh status` (which version is running, and where),
-`./shop.sh test` (checks the shop, expects `4/4 checks passed`).
+**Whose Azure account is it?** The repository contains no credentials. Every
+Azure script acts as whoever ran `az login`, in that person's own Azure for
+Students subscription. The shop above is in Nofil's subscription. A teammate
+can deploy their own copy: see [infra/azure/README.md](infra/azure/README.md).
 
-More detail: [agent-service](agent-service/README.md) (how the AI works),
-[infra/local](infra/local/README.md) (local setup),
-[infra/azure](infra/azure/README.md) (Azure and costs),
-[roadmap](docs/roadmap.md) (progress).
+## More detail
+
+| Document | What it covers |
+|---|---|
+| [docs/canary-criteria.md](docs/canary-criteria.md) | The four canary rules and why |
+| [docs/canary-results.md](docs/canary-results.md) | Recorded promotion and rollback runs |
+| [docs/cost-report.md](docs/cost-report.md) | Cost per request and total cost, v1 vs v2 |
+| [docs/data-model.md](docs/data-model.md) | The shop's data and what v2 adds |
+| [agent-service](agent-service/README.md) | How the AI agent works |
+| [infra/local](infra/local/README.md) | Local Docker setup |
+| [infra/azure](infra/azure/README.md) | Azure setup, scripts and costs |
+| [docs/roadmap.md](docs/roadmap.md) | Progress |
+| [docs/ai-usage](docs/ai-usage/) | AI-assisted development log |
