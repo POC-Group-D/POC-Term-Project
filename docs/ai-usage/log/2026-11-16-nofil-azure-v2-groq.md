@@ -110,3 +110,13 @@ Prices API (Container Apps, Canada Central), Groq's model page
 `Replicas` and `Requests` metrics, and v2's token counts in Log Analytics.
 Result: `docs/cost-report.md` (v1 $0.000097 and v2 $0.000140 per request at
 list prices; $0 billed).
+
+## Data model
+
+Prompt: "Yes, data model."
+
+`docs/data-model.md`, written from `demo.proto`, the catalog JSON, the Bicep
+templates and the agent's telemetry code. It covers the existing data
+(products, carts in Redis, orders not stored, currency, ads, session), the
+data v2 adds (Cosmos DB decision records, stateless agent context, in-memory
+decision cache), and a Mermaid ER diagram.

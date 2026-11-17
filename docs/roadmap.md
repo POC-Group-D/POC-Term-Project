@@ -45,6 +45,10 @@ agreement first.
 - [x] 16. Canary runs with the load generator; one promotion and one fault-injected rollback: [canary-results.md](canary-results.md) (Nofil)
 - [x] 17. Cost per request and total cost for v1 and v2: [cost-report.md](cost-report.md); latency and correctness comparison: [canary-results.md](canary-results.md) (Nofil)
 
+## Documentation
+
+- [x] Data model: existing data and what v2 adds: [data-model.md](data-model.md) (Nofil)
+
 ## Phase 7: Deliverables
 
 - [ ] 18. D3 progress slides (if still outstanding)
