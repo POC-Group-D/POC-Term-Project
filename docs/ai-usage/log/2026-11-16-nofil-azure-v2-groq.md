@@ -86,3 +86,16 @@ Prompt: "Yes, canary run next."
   criteria met at every step, then the faulty v2 was rolled back at 10%
   (correctness 0%, availability still 0% errors). Results:
   `docs/canary-results.md`. README: Demo 5.
+
+## Canary dashboard (item 14)
+
+Prompt: "Yes, dashboard next." Later: "Do not do anything which costs money...
+If you have any doubts, ask me."
+
+- `infra/azure/dashboard.bicep` / `dashboard.sh`: an Azure Monitor workbook
+  (free). Requests and status codes per revision come from Azure Monitor
+  metrics; v2 latency, outcomes and tokens come from v2's console logs in Log
+  Analytics (v1 is the upstream image and does not log each request).
+- The summary query was checked against the logs first (good v2: 269
+  requests, p95 777 ms, 100% AI decisions; faulty v2: 11 fallbacks), then all
+  panels were checked in the portal. No shop or load was started for this.

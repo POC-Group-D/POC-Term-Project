@@ -34,7 +34,7 @@ agreement first.
 - [x] 11. Criteria table (availability, p95 latency, correctness, cost), fixed before the first canary: [canary-criteria.md](canary-criteria.md) (Nofil)
 - [x] 12. Facade: v1 and v2 as labelled revisions of one Container App with weighted traffic (`infra/azure/canary.sh`) (Nofil)
 - [x] 13. Canary scripts: 10 -> 25 -> 50 -> 100 with automatic rollback (`./canary.sh run`) (Nofil)
-- [ ] 14. Azure Monitor dashboard comparing v1 and v2
+- [x] 14. Azure Monitor dashboard comparing v1 and v2: workbook in `infra/azure/dashboard.bicep`, created by `./dashboard.sh` (Nofil)
 
 ## Phase 5: Extra feature
 

@@ -307,7 +307,14 @@ with the shop on (Demo 3 steps 1-2).
    back on v1. Point out that `Availability` still passes: the faulty v2
    never returned an error, so only the correctness check caught it.
 
-3. **After the demo,** put the good v2 back (at 0% traffic) and turn the shop off:
+3. **Show the dashboard** (Azure Monitor): open the link printed by
+   `./dashboard.sh`, or in the Azure portal **Monitor > Workbooks > Canary
+   dashboard**. Set the time range to cover the runs. It shows requests per
+   revision (the traffic split), errors, v2's p95 latency, AI decisions vs
+   fallbacks (the faulty v2 appears as all fallbacks), and tokens per model
+   call. Run `./dashboard.sh` once beforehand to create it (free).
+
+4. **After the demo,** put the good v2 back (at 0% traffic) and turn the shop off:
 
    ```bash
    ./canary.sh deploy
