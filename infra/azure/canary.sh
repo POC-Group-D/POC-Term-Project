@@ -123,6 +123,15 @@ deploy_v1() {
   az containerapp revision copy "${ARGS[@]}" --from-revision "$v1" --revision-suffix "$suffix" \
     --image "$V1_IMAGE" --replace-env-vars "${env[@]}" --output none
   az containerapp revision label add "${ARGS[@]}" --revision "$new" --label v1 --yes --output none
+  # Moving a label does not move its traffic; re-apply the split by label.
+  local v2_share
+  v2_share="$(az containerapp show "${ARGS[@]}" \
+    --query "properties.configuration.ingress.traffic[?label=='v2'].weight | [0]" --output tsv)"
+  if [[ -n "$v2_share" ]]; then
+    set_v2_share "$v2_share"
+  else
+    az containerapp ingress traffic set "${ARGS[@]}" --label-weight v1=100 --output none
+  fi
   show_status
 }
 

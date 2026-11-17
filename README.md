@@ -96,9 +96,12 @@ In Git Bash, in `infra/local`:
 
 2. Open http://localhost:8080 and click **Mug**. Scroll to **"You May Also Like"**.
 
-   **You should see:** random products, e.g. a Polo Shirt or Rain Boots next to a Mug.
+   **You should see:** 4 random products, e.g. a Canvas Tote Bag next to a Mug,
+   each with a grey line such as *From our accessories collection*.
 
-   **Say:** "This is the original microservice, v1. It picks 5 random products."
+   **Say:** "This is v1, Google's random recommender, moved to our redesigned
+   recommendation API: the shop asks for 4 products, and each comes back with a
+   reason. v1 has no AI, so its reason is just the product's category."
 
 ---
 
@@ -122,8 +125,8 @@ Still in `infra/local`:
 
 3. In the browser, open **Mug** again (wait about 30 seconds after step 1 first).
 
-   **You should see:** related products (coffee and kitchen items). The AI log
-   prints a line such as:
+   **You should see:** related products (coffee and kitchen items), each with
+   the AI's own reason under it. The AI log prints a line such as:
 
    ```
    AGENT     42.4 s | model: qwen3:4b-instruct | tools: ['recommend'] | tokens: 784 | These kitchen items complement the mug...
@@ -185,17 +188,24 @@ shop cannot tell which one answered.
 
 3. Open the [Mug on the Azure shop](https://frontend.blueflower-54b52d82.canadacentral.azurecontainerapps.io/product/6E92ZMYYFZ).
 
-   **You should see:** coffee items (Gooseneck Kettle, Burr Coffee Grinder,
-   Milk Frother, ...), in about a second. The AI log prints:
+   **You should see:** coffee items in about a second, each with the AI's
+   reason, e.g. *Gooseneck Kettle: Perfect for brewing with your mug*. The AI
+   log prints:
 
    ```
-   AGENT      0.6 s | model: openai/gpt-oss-20b | tokens: 760 | Complementary coffee accessories for your mug
+   AGENT      0.6 s | model: openai/gpt-oss-20b | tokens: 800 | Complementary coffee accessories for your mug
    ```
 
    The first product after switching can take a few seconds while v2 wakes up.
 
    **Say:** "v2 now runs on Azure. The model is `gpt-oss-20b` on Groq's free
    plan; every decision is stored in Cosmos DB."
+
+   **Show the API change:** open [docs/api.md](docs/api.md). **Say:** "We
+   redesigned the recommendation API: the caller sends `max_results`, and the
+   response carries a `reason` per product. The change only adds fields, so
+   old clients still work. Both v1 and v2 implement it, so the canary still
+   compares two services with the same API."
 
 4. Split the traffic:
 
@@ -231,7 +241,7 @@ shop, then four rules are checked ([criteria table](docs/canary-criteria.md)):
 |---|---|
 | Availability | at most 1% errors |
 | Latency | 95% of answers within 2 seconds |
-| Correctness | at least 95% real AI picks (valid products, at most 5, none from the cart) |
+| Correctness | at least 95% real AI picks (valid products, none from the cart, a reason for each) |
 | Cost | at most 1500 tokens per AI call, Azure spend under $8 |
 
 All pass: go to the next step. Any fails: all traffic goes back to v1.
@@ -362,6 +372,7 @@ can deploy their own copy: see [infra/azure/README.md](infra/azure/README.md).
 | [docs/canary-criteria.md](docs/canary-criteria.md) | The four canary rules and why |
 | [docs/canary-results.md](docs/canary-results.md) | Recorded promotion and rollback runs |
 | [docs/cost-report.md](docs/cost-report.md) | Cost per request and total cost, v1 vs v2 |
+| [docs/api.md](docs/api.md) | Our recommendation API (version 2): `max_results` and a reason per product |
 | [docs/data-model.md](docs/data-model.md) | The shop's data and what v2 adds |
 | [agent-service](agent-service/README.md) | How the AI agent works |
 | [infra/local](infra/local/README.md) | Local Docker setup |

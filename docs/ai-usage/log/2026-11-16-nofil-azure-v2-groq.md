@@ -120,3 +120,32 @@ templates and the agent's telemetry code. It covers the existing data
 (products, carts in Redis, orders not stored, currency, ads, session), the
 data v2 adds (Cosmos DB decision records, stateless agent context, in-memory
 decision cache), and a Mermaid ER diagram.
+
+## Recommendation API version 2 (professor's feedback)
+
+Prompt: "[The professor said] we need to do something with the API interface...
+she recommended that we design and change the API interface ourselves in the
+recommendation service API." Then: "I'm going to go with your recommendation...
+make these changes and then make sure that everything is running on Azure."
+
+- `demo.proto`: `ListRecommendationsRequest.max_results` and
+  `ListRecommendationsResponse.recommendations` (`Recommendation {product_id,
+  reason}`). Only fields were added, so version 1 clients and servers keep working.
+- v2: the `recommend` tool takes `product_reasons`; random picks get v1's
+  rule-based reason; `max_results` honoured (default 5, cap 10); 5 new tests
+  (32 total).
+- v1: Google's recommender on the new API (category as the reason), built
+  as `recommendationservice-v1`. Stubs generated with grpcio-tools 1.76 to
+  match its protobuf 6 runtime.
+- Frontend: built from source; asks for 4 and shows each reason. Go stubs
+  generated in a `golang:1.27.0-alpine` container with protoc-gen-go v1.34.2
+  and protoc-gen-go-grpc v1.5.1.
+- Checked locally: v1 (4 products with category reasons, shop test 4/4), v2
+  with Groq (per-product AI reasons, about 800-870 tokens), v2 with Ollama (21-36 s,
+  outcome `agent`). Docs: `docs/api.md`; data model, criteria and README updated.
+- Azure (about 20 minutes of shop time, then stopped): new frontend, `./canary.sh
+  deploy v1` and `./canary.sh deploy`; smoke test 5/5; Mug with v1 showed 4
+  products with category reasons, with v2 4 coffee items with AI reasons; one
+  2-minute canary step at 50% passed all criteria (v2 p95 658 ms, 100% correct
+  including the reason rule, 864 tokens per model call). Fixed afterwards:
+  `deploy v1` now re-applies the traffic split after moving the v1 label.

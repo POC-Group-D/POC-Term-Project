@@ -69,15 +69,20 @@ erDiagram
 | **Ads** | adservice | In memory, hard-coded | `Ad { redirectUrl, text }` by category |
 | **Session** | frontend | Browser cookie | `shop_session-id` (becomes the `userId`) and the chosen currency |
 
-**The recommendation interface (same for v1 and v2):**
+**The recommendation interface**, version 2 (our design; implemented by both
+v1 and v2; see [api.md](api.md)):
 
 ```
-ListRecommendationsRequest  { user_id: string, product_ids: string[] }   // product being viewed + cart
-ListRecommendationsResponse { product_ids: string[] }                    // up to 5, none from the request
+ListRecommendationsRequest  { user_id: string, product_ids: string[],      // product being viewed + cart
+                              max_results: int32 }                         // NEW: 1-10, 0 = default 5
+ListRecommendationsResponse { product_ids: string[],                       // none from the request
+                              recommendations: Recommendation[] }          // NEW: same products + reasons
+Recommendation              { product_id: string, reason: string }         // NEW
 ```
 
-v1 keeps no state: it reads the catalog and returns up to 5 random products
-that are not in the request.
+v1 keeps no state: it reads the catalog and returns up to `max_results`
+random products that are not in the request. Each product gets a rule-based
+reason: its category.
 
 ## 2. Data added by the AI agent (v2)
 
@@ -104,6 +109,7 @@ measurements.
 | `version` | string | `v2` |
 | `contextProductIds` | string[] | Request input: product viewed + cart |
 | `recommendedProductIds` | string[] | Response output (what the shop showed) |
+| `productReasons` | string[] | The reason for each recommended product, same order (API version 2) |
 | `outcome` | string | `agent` (the model decided), `cached` (a recent model decision reused), `fallback` (random picks, like v1) |
 | `fallbackReason` | string | Why the model's answer was not used (timeout, error, invalid picks) |
 | `reason` | string | The model's one-sentence explanation |
