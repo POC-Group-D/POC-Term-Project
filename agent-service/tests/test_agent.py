@@ -213,3 +213,48 @@ def test_sanitize_respects_limit_and_order():
     catalog_ids = set(PRODUCTS)
     proposed = ["6E92ZMYYFZ", "9SIQT8TOJO", "LS4PSXUNUM", "L9ECAV7KIM", "1YMWWN1N4O", "66VCHSJNUP"]
     assert sanitize(proposed, catalog_ids, set(), 3) == proposed[:3]
+
+
+# API version 2: max_results and a reason per product.
+
+def test_model_reasons_are_kept_per_product_and_random_picks_get_rule_reasons(catalog, clock):
+    model = ScriptedModel(tool_turn("recommend", product_ids=["9SIQT8TOJO", "6E92ZMYYFZ", "LS4PSXUNUM"],
+                                    product_reasons=["Cook with it", "Drink from it", "You own this"]))
+    decision = make_agent(catalog, model, clock).recommend(["LS4PSXUNUM"])
+
+    reasons = decision.product_reasons
+    assert reasons["9SIQT8TOJO"] == "Cook with it"
+    assert reasons["6E92ZMYYFZ"] == "Drink from it"
+    assert set(reasons) == set(decision.product_ids)  # the owned product was dropped with its reason
+    for pid in decision.product_ids[2:]:  # topped up at random
+        assert reasons[pid].startswith("From our ")
+
+
+def test_fallback_gives_every_product_a_rule_reason(catalog, clock):
+    decision = make_agent(catalog, None, clock).recommend(["LS4PSXUNUM"])
+
+    assert decision.outcome == "fallback"
+    assert all(decision.product_reasons[pid].startswith("From our ") for pid in decision.product_ids)
+
+
+def test_limit_is_the_callers_max_results_capped_at_ten(catalog, clock):
+    agent = make_agent(catalog, None, clock)
+
+    assert len(agent.recommend([], limit=3).product_ids) == 3
+    assert len(agent.recommend([], limit=0).product_ids) == LIMIT
+    assert len(agent.recommend([], limit=50).product_ids) == min(10, len(PRODUCTS))
+
+
+def test_cache_is_per_limit_and_keeps_reasons(catalog, clock):
+    model = ScriptedModel(
+        tool_turn("recommend", product_ids=["6E92ZMYYFZ"], product_reasons=["Mug for tea"]),
+        tool_turn("recommend", product_ids=["9SIQT8TOJO"]),
+    )
+    agent = make_agent(catalog, model, clock, cache_ttl_seconds=600)
+
+    agent.recommend(["LS4PSXUNUM"], limit=4)
+    cached = agent.recommend(["LS4PSXUNUM"], limit=4)
+    other_limit = agent.recommend(["LS4PSXUNUM"], limit=2)
+
+    assert cached.outcome == "cached" and cached.product_reasons["6E92ZMYYFZ"] == "Mug for tea"
+    assert other_limit.outcome == "agent" and len(model.calls) == 2

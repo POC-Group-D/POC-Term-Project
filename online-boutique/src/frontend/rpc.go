@@ -96,22 +96,36 @@ func (fe *frontendServer) getShippingQuote(ctx context.Context, items []*pb.Cart
 	return localized, errors.Wrap(err, "failed to convert currency for shipping cost")
 }
 
-func (fe *frontendServer) getRecommendations(ctx context.Context, userID string, productIDs []string) ([]*pb.Product, error) {
+// recommendedProduct is a product with the recommendation service's reason
+// for it (recommendation API version 2, Group D).
+type recommendedProduct struct {
+	*pb.Product
+	Reason string
+}
+
+// recommendationsShown is how many recommendations fit the UI.
+const recommendationsShown = 4
+
+func (fe *frontendServer) getRecommendations(ctx context.Context, userID string, productIDs []string) ([]recommendedProduct, error) {
 	resp, err := pb.NewRecommendationServiceClient(fe.recommendationSvcConn).ListRecommendations(ctx,
-		&pb.ListRecommendationsRequest{UserId: userID, ProductIds: productIDs})
+		&pb.ListRecommendationsRequest{UserId: userID, ProductIds: productIDs, MaxResults: recommendationsShown})
 	if err != nil {
 		return nil, err
 	}
-	out := make([]*pb.Product, len(resp.GetProductIds()))
+	reasons := make(map[string]string, len(resp.GetRecommendations()))
+	for _, r := range resp.GetRecommendations() {
+		reasons[r.GetProductId()] = r.GetReason()
+	}
+	out := make([]recommendedProduct, len(resp.GetProductIds()))
 	for i, v := range resp.GetProductIds() {
 		p, err := fe.getProduct(ctx, v)
 		if err != nil {
 			return nil, errors.Wrapf(err, "failed to get recommended product info (#%s)", v)
 		}
-		out[i] = p
+		out[i] = recommendedProduct{Product: p, Reason: reasons[v]}
 	}
-	if len(out) > 4 {
-		out = out[:4] // take only first four to fit the UI
+	if len(out) > recommendationsShown {
+		out = out[:recommendationsShown] // a version 1 server ignores max_results
 	}
 	return out, err
 }

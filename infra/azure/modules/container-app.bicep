@@ -42,6 +42,10 @@ param minReplicas int = 0
 @minValue(1)
 param maxReplicas int = 1
 
+@description('Multiple keeps several revisions active, so traffic can be split between them (canary).')
+@allowed(['Single', 'Multiple'])
+param revisionsMode string = 'Single'
+
 resource app 'Microsoft.App/containerApps@2024-03-01' = {
   name: name
   location: location
@@ -50,7 +54,7 @@ resource app 'Microsoft.App/containerApps@2024-03-01' = {
     managedEnvironmentId: environmentId
     workloadProfileName: 'Consumption'
     configuration: {
-      activeRevisionsMode: 'Single'
+      activeRevisionsMode: revisionsMode
       ingress: {
         external: external
         targetPort: targetPort

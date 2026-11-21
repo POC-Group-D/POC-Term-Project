@@ -51,22 +51,31 @@ def _parse_arguments(raw):
 
 
 class ChatModel:
-    def __init__(self, base_url, api_key, model, max_tokens):
+    def __init__(self, base_url, api_key, model, max_tokens, *, tool_choice="auto", reasoning_effort=None):
         # Retries are disabled: the agent has its own deadline and falls back to v1.
         # Local servers such as Ollama ignore the key but the client requires one.
         self._client = OpenAI(api_key=api_key or "unused", base_url=base_url, max_retries=0)
         self.name = model
         self._max_tokens = max_tokens
+        self._tool_choice = tool_choice
+        self._reasoning_effort = reasoning_effort
 
     def complete(self, messages, tools, timeout):
+        if self._reasoning_effort is None:
+            completion_options = {"max_tokens": self._max_tokens}
+        else:
+            completion_options = {
+                "max_completion_tokens": self._max_tokens,
+                "reasoning_effort": self._reasoning_effort,
+            }
         response = self._client.chat.completions.create(
             model=self.name,
             messages=messages,
             tools=tools,
-            tool_choice="auto",
+            tool_choice=self._tool_choice,
             temperature=0.2,
-            max_tokens=self._max_tokens,
             timeout=timeout,
+            **completion_options,
         )
         message = response.choices[0].message
         usage = response.usage

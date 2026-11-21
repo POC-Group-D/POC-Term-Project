@@ -65,6 +65,12 @@ _RECOMMEND = {
                     "items": {"type": "string"},
                     "description": "Catalog product ids, never ones the shopper already has.",
                 },
+                "product_reasons": {
+                    "type": "array",
+                    "items": {"type": "string"},
+                    "description": "For each product, in the same order, why the shopper may want it "
+                                   "(at most 10 words, addressed to the shopper).",
+                },
                 "reason": {"type": "string", "description": "One short sentence explaining the choice."},
             },
             "required": ["product_ids"],

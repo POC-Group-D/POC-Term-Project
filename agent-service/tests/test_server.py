@@ -92,3 +92,16 @@ def test_same_api_as_v1_and_one_record_per_request(stack):
     assert record["promptTokens"] == 200 and record["completionTokens"] == 40
     assert record["estimatedCostUsd"] == pytest.approx((200 * 0.5 + 40 * 1.0) / 1_000_000)
     assert record["latencyMs"] > 0
+
+
+def test_api_v2_returns_a_reason_per_product_and_honours_max_results(stack):
+    stub, log = stack
+    request = demo_pb2.ListRecommendationsRequest(user_id="s", product_ids=["LS4PSXUNUM"], max_results=3)
+
+    response = stub.ListRecommendations(request, timeout=5)
+
+    ids = list(response.product_ids)
+    assert len(ids) == 3
+    assert [r.product_id for r in response.recommendations] == ids
+    assert all(r.reason for r in response.recommendations)
+    assert log.records[-1]["productReasons"] == [r.reason for r in response.recommendations]

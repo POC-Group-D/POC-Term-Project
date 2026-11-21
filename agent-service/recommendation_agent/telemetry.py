@@ -53,6 +53,7 @@ def build_record(user_id, context_ids, decision, latency_ms, model_name, cost_us
         "version": SERVICE_VERSION,
         "contextProductIds": list(context_ids),
         "recommendedProductIds": list(decision.product_ids),
+        "productReasons": [decision.product_reasons.get(pid, "") for pid in decision.product_ids],
         "outcome": decision.outcome,
         "fallbackReason": decision.fallback_reason,
         "reason": decision.reason,

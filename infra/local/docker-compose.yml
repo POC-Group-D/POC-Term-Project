@@ -23,11 +23,11 @@ x-common-env: &common-env
 
 services:
   frontend:
-    # Upstream frontend plus pictures for the extended catalog (see /catalog).
+    # Our frontend: Google's source with recommendation API version 2 (a reason
+    # under each recommended product), plus pictures for the extended catalog.
     build:
-      context: ../../catalog/frontend
-      args:
-        BASE_IMAGE: ${IMAGE_REGISTRY:-us-central1-docker.pkg.dev/online-boutique-ci/microservices-demo}/frontend:${IMAGE_TAG:-v0.10.7}
+      context: ../..
+      dockerfile: catalog/frontend/Dockerfile
     image: poc-group-d/frontend:local
     ports:
       - "${FRONTEND_PORT:-8080}:8080"

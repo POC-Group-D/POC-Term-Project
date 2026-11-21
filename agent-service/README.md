@@ -89,7 +89,7 @@ purely by configuration:
 | Provider | `MODEL_BASE_URL` | `MODEL_NAME` | Cost |
 |---|---|---|---|
 | Local Ollama (default in `docker-compose.v2.yml`) | `http://ollama:11434/v1` | `qwen3:4b-instruct` (Hugging Face `Qwen/Qwen3-4B-Instruct-2507`, 4-bit) | Free; CPU inference, seconds per request |
-| GitHub Models (free tier, rate limited) | `https://models.github.ai/inference` | e.g. `openai/gpt-4o-mini` | Free within daily limits |
+| Groq Free (optional local check) | `https://api.groq.com/openai/v1` | `openai/gpt-oss-20b` | Free within account limits |
 | Hugging Face Inference Providers | `https://router.huggingface.co/v1` | `Qwen/Qwen3-4B-Instruct-2507` | Pre-paid credits; the free account had none |
 
 ### Measured: local Qwen3-4B on CPU (2026-10-24, 200-product catalog)
@@ -119,10 +119,38 @@ Lessons from tuning on CPU (about 30 prompt tokens/s):
 - Ollama keeps working on a request after the caller gives up, so timed-out
   requests queue up and slow everything behind them. Avoid overlapping
   requests when running locally.
-- A hosted API runs the same prompts in about 1-2 s per call, so the full
-  multi-step loop (browse, search, then recommend) is the configuration for
-  the Azure canary. At Hugging Face list prices for this model ($0.01 / $0.03
-  per million tokens) a request would cost about $0.00001.
+- Use the check below to measure a hosted model before choosing the Azure
+  canary settings.
+
+### Check Groq locally
+
+1. Save `GROQ_API_KEY=<your key>` in the git-ignored `infra/local/.env`.
+   Use a key from a Groq Free account.
+2. Open PowerShell in the repository root and run the commands below. If the
+   virtual environment is missing, follow [Development](#development) first.
+
+   ```powershell
+   Set-Location .\agent-service
+   .\.venv\Scripts\python.exe .\check_groq.py
+   ```
+
+3. Read the five case rows and the two summary lines in the same terminal.
+   A pass shows `Valid responses 5/5`, `model decisions 5/5`, `fallbacks 0`,
+   and `Local agent p95` at or below `2000 ms`. Each case row shows the
+   returned products and how many the model picked. A row marked `fallback`
+   means the agent returned random picks for that case.
+
+The check makes five sequential requests through the existing agent with one
+model call per request and the decision cache disabled. It uses low reasoning
+effort and requests the `recommend` tool explicitly. It uses the checked-in
+200-product catalog and runs without the shop, Docker, or Azure. The key is
+separate from `MODEL_API_KEY` used by the shop, so adding it leaves the Ollama
+demo configuration unchanged.
+
+The check prints results in PowerShell. To see Groq recommendations on a
+product page, follow the
+[Groq browser demo](../README.md#optional-demo-2-with-groq-instead-of-ollama).
+Check your Groq rate limits before using `--rounds` for a larger sample.
 
 ## Configuration
 
@@ -134,6 +162,8 @@ Lessons from tuning on CPU (about 30 prompt tokens/s):
 | `MODEL_API_KEY` | empty | **Secret**: Container Apps secret or local `.env`, never in git. Not needed for Ollama. |
 | `MODEL_NAME` | `qwen3:4b-instruct` | Any chat model with tool calling on that endpoint |
 | `MODEL_MAX_TOKENS` | `300` | Per model call |
+| `MODEL_REASONING_EFFORT` | empty | Optional OpenAI-compatible reasoning setting, e.g. `low` for Groq |
+| `MODEL_TOOL_CHOICE` | empty | Optional name of a specific tool to require, e.g. `recommend` in a single-step run |
 | `MODEL_INPUT_PRICE_PER_MTOK`, `MODEL_OUTPUT_PRICE_PER_MTOK` | `0` | USD per million tokens, for cost per request (0 for local inference) |
 | `MAX_RECOMMENDATIONS` | `5` | Same as v1 |
 | `MAX_AGENT_STEPS` | `4` | `1` = decide in one call from the shortlist (used for local CPU inference) |

@@ -113,6 +113,33 @@ Settings such as region, budget amount and resource group live in `common.sh`
 and can be overridden with environment variables, e.g.
 `AZ_BUDGET_AMOUNT=20 ./guardrails.sh you@example.com`.
 
+## v2 and the canary (canary.sh)
+
+`recommendationservice` runs v1 and v2 as two revisions of one Container App,
+labelled `v1` and `v2`. Container Apps traffic splitting is the facade: it
+decides which revision answers each request, and the frontend cannot tell.
+
+| Command | What it does |
+|---|---|
+| `./canary.sh deploy` | Adds a new v2 revision (image `recommendationservice-v2:$IMAGE_TAG`) with 0% traffic. Stores the Groq key (from `GROQ_API_KEY`, `infra/local/.env`, or a hidden prompt) and the Cosmos DB key as Container Apps secrets |
+| `./canary.sh 10` | Sends 10% of recommendation requests to v2 (any value 0-100) |
+| `./canary.sh rollback` | Sends all traffic back to v1 |
+| `./canary.sh status` | Shows each revision and its share |
+| `./canary.sh watch` | Prints v2's decisions live, like `./shop.sh watch` locally |
+| `./canary.sh measure` | Runs the Online Boutique load generator (2 shoppers, 5 minutes) against the shop, then checks the [canary criteria](../../docs/canary-criteria.md) for that window with `canary_check.py`. Installs its Python tools into `infra/azure/.venv` the first time. `LOAD_USERS` and `MEASURE_MINUTES` change the load |
+| `./canary.sh run` | The canary: 10% → 25% → 50% → 100%, `measure` at each step; rolls back to v1 when a criterion fails. `CANARY_STEPS` changes the steps |
+| `./canary.sh deploy faulty` | A v2 with an invalid Groq key, for the rollback demo; `./canary.sh deploy` replaces it with a working v2 |
+| `./canary.sh deploy v1` | Replaces v1 with our `recommendationservice-v1` image (Google's random recommender on [recommendation API version 2](../../docs/api.md)), keeping its settings and the traffic split |
+| `./dashboard.sh` | Creates or updates the canary dashboard (an Azure Monitor workbook, free) and prints its link: requests and errors per revision from Azure Monitor metrics; v2 latency, AI decisions and tokens from v2's logs in Log Analytics |
+
+v2 uses Groq Free (`openai/gpt-oss-20b`) in one model call per request, and
+writes every decision (latency, outcome, tokens) to Cosmos DB. Before the
+branch is merged to `main`, deploy its image with
+`IMAGE_TAG=<branch-name> ./canary.sh deploy`.
+
+`./deploy.sh` redeploys the v1 template and resets the traffic split. Run
+`./canary.sh deploy` again afterwards.
+
 ## Files
 
 | File | Purpose |
@@ -121,4 +148,7 @@ and can be overridden with environment variables, e.g.
 | `modules/container-app.bicep` | One service as a Container App |
 | `modules/cosmos.bicep` | Free-tier Cosmos DB account, database and container |
 | `budget.bicep` | Monthly budget and alerts |
+| `canary.sh` | v2 revision and traffic split between v1 and v2 |
+| `dashboard.bicep`, `dashboard.sh` | Canary dashboard (Azure Monitor workbook) |
+| `canary_check.py`, `requirements.txt` | Canary criteria check, and the Python tools for measuring |
 | `common.sh` | Shared settings and the subscription guard |

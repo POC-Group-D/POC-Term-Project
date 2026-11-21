@@ -304,6 +304,8 @@ module apps 'modules/container-app.bicep' = [for svc in services: {
     sidecars: svc.sidecars
     minReplicas: minReplicas
     maxReplicas: 1
+    // v1 and v2 run as revisions of recommendationservice; canary.sh splits traffic.
+    revisionsMode: svc.name == 'recommendationservice' ? 'Multiple' : 'Single'
   }
 }]
 

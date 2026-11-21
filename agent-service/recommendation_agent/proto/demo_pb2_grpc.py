@@ -5,7 +5,7 @@ import warnings
 
 from . import demo_pb2 as demo__pb2
 
-GRPC_GENERATED_VERSION = '1.84.1'
+GRPC_GENERATED_VERSION = '1.84.0'
 GRPC_VERSION = grpc.__version__
 _version_not_supported = False
 
@@ -192,6 +192,12 @@ class CartService:
 class RecommendationServiceStub:
     """---------------Recommendation service----------
 
+    Version 2 of this API (Group D). Changes from Google's version 1 only add
+    fields, so clients and servers built for version 1 keep working:
+    request:  max_results, how many recommendations the caller wants
+    response: recommendations, each product with a reason for recommending it
+    Both implementations (v1 random, v2 AI agent) implement this version.
+
     """
 
     def __init__(self, channel):
@@ -209,6 +215,12 @@ class RecommendationServiceStub:
 
 class RecommendationServiceServicer:
     """---------------Recommendation service----------
+
+    Version 2 of this API (Group D). Changes from Google's version 1 only add
+    fields, so clients and servers built for version 1 keep working:
+    request:  max_results, how many recommendations the caller wants
+    response: recommendations, each product with a reason for recommending it
+    Both implementations (v1 random, v2 AI agent) implement this version.
 
     """
 
@@ -236,6 +248,12 @@ def add_RecommendationServiceServicer_to_server(servicer, server):
  # This class is part of an EXPERIMENTAL API.
 class RecommendationService:
     """---------------Recommendation service----------
+
+    Version 2 of this API (Group D). Changes from Google's version 1 only add
+    fields, so clients and servers built for version 1 keep working:
+    request:  max_results, how many recommendations the caller wants
+    response: recommendations, each product with a reason for recommending it
+    Both implementations (v1 random, v2 AI agent) implement this version.
 
     """
 

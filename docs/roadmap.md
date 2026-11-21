@@ -25,16 +25,16 @@ agreement first.
 ## Phase 3: v2 AI agent
 
 - [x] 7. `agent-service/`: same `ListRecommendations` API, catalog tools, model selects products, guardrails, v1 fallback, 23 unit tests (Nofil). Store extended to 200 products (`/catalog`) so recommendations are meaningful
-- [ ] 8. Model: Hugging Face free account has no Inference Providers credits, so v2 runs `Qwen/Qwen3-4B-Instruct-2507` locally via Ollama (free; 4/4 live requests decided by the model with relevant picks, 22-39 s on CPU in single-step mode). Still to decide: the backend for the Azure canary (GitHub Models free tier, or Ollama with more CPU)
-- [ ] 9. Per-request telemetry for both versions: done for v2 (JSON log + optional Cosmos DB record with latency, outcome, tokens, cost); v1 still to do
-- [ ] 10. Correctness checker (valid IDs, no cart items, at most 5, schema): rules exist in `infra/local/smoke_test.py` and the agent's guardrails; a canary-time checker is still to do
+- [x] 8. Model: Hugging Face free account has no Inference Providers credits, so v2 runs `Qwen/Qwen3-4B-Instruct-2507` locally via Ollama (22-39 s on CPU), and Groq Free `openai/gpt-oss-20b` on Azure (5/5 model decisions, p95 924 ms) (Nofil)
+- [x] 9. Per-request telemetry for both versions: v2 records every decision in Cosmos DB (latency, outcome, tokens); requests and errors of both revisions come from Azure Monitor (Nofil)
+- [x] 10. Correctness checker: `infra/azure/canary_check.py`, run by `./canary.sh measure` after 5 minutes of load (Nofil)
 
 ## Phase 4: Canary
 
-- [ ] 11. Criteria table (availability, p95 latency, correctness, cost), fixed before the first canary
-- [ ] 12. Facade: v1 and v2 as revisions of one Container App with weighted traffic (needs `activeRevisionsMode: Multiple` in `modules/container-app.bicep`)
-- [ ] 13. Canary scripts: 10 -> 25 -> 50 -> 100 with automatic rollback
-- [ ] 14. Azure Monitor dashboard comparing v1 and v2
+- [x] 11. Criteria table (availability, p95 latency, correctness, cost), fixed before the first canary: [canary-criteria.md](canary-criteria.md) (Nofil)
+- [x] 12. Facade: v1 and v2 as labelled revisions of one Container App with weighted traffic (`infra/azure/canary.sh`) (Nofil)
+- [x] 13. Canary scripts: 10 -> 25 -> 50 -> 100 with automatic rollback (`./canary.sh run`) (Nofil)
+- [x] 14. Azure Monitor dashboard comparing v1 and v2: workbook in `infra/azure/dashboard.bicep`, created by `./dashboard.sh` (Nofil)
 
 ## Phase 5: Extra feature
 
@@ -42,8 +42,16 @@ agreement first.
 
 ## Phase 6: Experiments
 
-- [ ] 16. Canary runs with the load generator; one promotion and one fault-injected rollback
-- [ ] 17. Cost per request and total cost for v1 and v2; latency and correctness comparison
+- [x] 16. Canary runs with the load generator; one promotion and one fault-injected rollback: [canary-results.md](canary-results.md) (Nofil)
+- [x] 17. Cost per request and total cost for v1 and v2: [cost-report.md](cost-report.md); latency and correctness comparison: [canary-results.md](canary-results.md) (Nofil)
+
+## API redesign (professor's feedback after the first demo)
+
+- [x] Recommendation API version 2: `max_results` and a reason per product; additive and backward compatible; implemented by v1 and v2, shown by the frontend: [api.md](api.md) (Nofil)
+
+## Documentation
+
+- [x] Data model: existing data and what v2 adds: [data-model.md](data-model.md) (Nofil)
 
 ## Phase 7: Deliverables
 

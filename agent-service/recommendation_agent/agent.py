@@ -3,9 +3,10 @@
 The model decides what to recommend. The agent hands it the shopper's
 products, the store's categories and a shortlist of related candidates; the
 model may browse or search the catalog for more, then calls `recommend`.
-The agent enforces the v1
+The agent enforces the API
 contract on whatever the model returns and falls back to v1's random choice
-on any failure, so the client always gets a valid answer.
+on any failure, so the client always gets a valid answer. Every product
+carries a reason: the model's, or v1's rule-based one for random picks.
 
 Outcomes recorded per request:
   agent     the model chose the products (possibly topped up to the limit)
@@ -20,7 +21,7 @@ import threading
 import time
 from dataclasses import dataclass, field
 
-from .fallback import random_recommendations
+from .fallback import random_recommendations, rule_reason
 from .tools import ALL_TOOLS, FINAL_TOOLS, RECOMMEND, ToolExecutor
 
 logger = logging.getLogger(__name__)
@@ -32,10 +33,13 @@ complementary items first, then items from related categories.
 The shortlist is usually enough: then call `recommend` immediately.
 Call browse_category, search_catalog or get_products only if you need more options or detail.
 Only recommend ids you have seen in this conversation, never the shopper's own products,
-and finish by calling `recommend` exactly once."""
+and finish by calling `recommend` exactly once, with a short reason for each product."""
 
 # Candidates included in the prompt; the rest of the catalog is reachable via tools.
 DEFAULT_SHORTLIST_SIZE = 20
+
+# Callers may ask for 1-10 recommendations (API field max_results).
+MAX_LIMIT = 10
 
 # Leave this much of the time budget for the fallback path.
 _SAFETY_MARGIN_SECONDS = 0.3
@@ -51,6 +55,7 @@ class Decision:
     outcome: str
     fallback_reason: str = ""
     reason: str = ""
+    product_reasons: dict = field(default_factory=dict)  # product id -> reason for the shopper
     tool_calls: list = field(default_factory=list)
     steps: int = 0
     topped_up: int = 0
@@ -101,23 +106,23 @@ class _DecisionCache:
         self._entries = {}
 
     def get(self, key):
-        """Return (product_ids, reason) of a fresh decision, or None."""
+        """Return (product_ids, reason, product_reasons) of a fresh decision, or None."""
         if self._ttl <= 0:
             return None
         with self._lock:
             entry = self._entries.get(key)
             if entry and self._clock() - entry[0] < self._ttl:
-                return list(entry[1]), entry[2]
+                return list(entry[1]), entry[2], dict(entry[3])
             self._entries.pop(key, None)
             return None
 
-    def put(self, key, product_ids, reason):
+    def put(self, key, product_ids, reason, product_reasons):
         if self._ttl <= 0:
             return
         with self._lock:
             if len(self._entries) >= self._max:
                 self._entries.pop(next(iter(self._entries)))
-            self._entries[key] = (self._clock(), list(product_ids), reason)
+            self._entries[key] = (self._clock(), list(product_ids), reason, dict(product_reasons))
 
 
 class RecommendationAgent:
@@ -138,44 +143,48 @@ class RecommendationAgent:
     def model_name(self):
         return getattr(self._model, "name", "none")
 
-    def recommend(self, context_ids, time_budget=None):
+    def recommend(self, context_ids, time_budget=None, limit=0):
         """Return a Decision for the shopper's products.
 
         time_budget caps the work at the caller's gRPC deadline, if it has one.
+        limit is the caller's max_results: 0 means the default, at most MAX_LIMIT.
         Raises only if the catalog itself is unreachable (v1 fails then too).
         """
+        limit = min(limit, MAX_LIMIT) if limit > 0 else self._limit
         catalog_ids = set(self._catalog.all_products())
         excluded = set(context_ids)
         budget = self._timeout if time_budget is None else min(self._timeout, time_budget)
         deadline = self._clock() + budget - _SAFETY_MARGIN_SECONDS
-        cache_key = tuple(sorted(excluded))
+        cache_key = (tuple(sorted(excluded)), limit)
 
         cached = self._cache.get(cache_key)
         if cached is not None:
-            cached_ids, cached_reason = cached
-            chosen = sanitize(cached_ids, catalog_ids, excluded, self._limit)
+            cached_ids, cached_reason, cached_product_reasons = cached
+            chosen = sanitize(cached_ids, catalog_ids, excluded, limit)
             if chosen:
-                decision = Decision(product_ids=chosen, outcome="cached", reason=cached_reason)
-                return self._top_up(decision, catalog_ids, excluded)
+                decision = Decision(product_ids=chosen, outcome="cached", reason=cached_reason,
+                                    product_reasons=cached_product_reasons)
+                return self._top_up(decision, catalog_ids, excluded, limit)
 
         decision = Decision(product_ids=[], outcome="agent")
         try:
             if self._model is None:
                 raise AgentError("no model configured")
-            self._run(context_ids, catalog_ids, excluded, deadline, decision)
+            self._run(context_ids, catalog_ids, excluded, deadline, decision, limit)
         except Exception as exc:  # any model, network or parsing failure
             logger.warning("agent fallback: %s", exc)
             decision.outcome = "fallback"
             decision.fallback_reason = f"{type(exc).__name__}: {exc}"[:300]
-            decision.product_ids = random_recommendations(catalog_ids, excluded, self._limit, self._rng)
-            return decision
+            decision.product_ids = random_recommendations(catalog_ids, excluded, limit, self._rng)
+            decision.product_reasons = {}
+            return self._add_rule_reasons(decision)
 
-        self._cache.put(cache_key, decision.product_ids, decision.reason)
-        return self._top_up(decision, catalog_ids, excluded)
+        self._cache.put(cache_key, decision.product_ids, decision.reason, decision.product_reasons)
+        return self._top_up(decision, catalog_ids, excluded, limit)
 
-    def _run(self, context_ids, catalog_ids, excluded, deadline, decision):
+    def _run(self, context_ids, catalog_ids, excluded, deadline, decision, limit):
         messages = [
-            {"role": "system", "content": SYSTEM_PROMPT.format(limit=self._limit)},
+            {"role": "system", "content": SYSTEM_PROMPT.format(limit=limit)},
             {"role": "user", "content": self._describe_context(context_ids)},
         ]
         for step in range(1, self._max_steps + 1):
@@ -195,14 +204,15 @@ class RecommendationAgent:
                 # Some models answer in text instead of calling the tool; keep
                 # the ids in the order the model wrote them.
                 mentioned = sorted((pid for pid in catalog_ids if pid in turn.content), key=turn.content.index)
-                return self._accept(mentioned, "", catalog_ids, excluded, decision)
+                return self._accept(mentioned, "", [], catalog_ids, excluded, decision, limit)
 
             messages.append(turn.as_message())
             for call in turn.tool_calls:
                 decision.tool_calls.append({"name": call.name, "arguments": call.arguments})
                 if call.name == RECOMMEND:
-                    return self._accept(call.arguments.get("product_ids", []),
-                                        call.arguments.get("reason", ""), catalog_ids, excluded, decision)
+                    return self._accept(call.arguments.get("product_ids", []), call.arguments.get("reason", ""),
+                                        call.arguments.get("product_reasons", []), catalog_ids, excluded,
+                                        decision, limit)
                 messages.append({
                     "role": "tool",
                     "tool_call_id": call.id,
@@ -210,14 +220,20 @@ class RecommendationAgent:
                 })
         raise AgentError(f"no recommendation after {self._max_steps} steps")
 
-    def _accept(self, proposed, reason, catalog_ids, excluded, decision):
+    def _accept(self, proposed, reason, product_reasons, catalog_ids, excluded, decision, limit):
         if isinstance(proposed, str):  # a single id instead of a list
             proposed = [proposed]
-        chosen = sanitize(proposed, catalog_ids, excluded, self._limit)
+        chosen = sanitize(proposed, catalog_ids, excluded, limit)
         if not chosen:
             raise AgentError(f"model proposed no valid products: {json.dumps(proposed)[:200]}")
         decision.product_ids = chosen
         decision.reason = str(reason)[:300]
+        # product_reasons is aligned with the model's product_ids; keep the
+        # reasons of the products that passed the guardrails.
+        if isinstance(product_reasons, list) and isinstance(proposed, list):
+            for pid, text in zip(proposed, product_reasons):
+                if pid in chosen and isinstance(text, str) and text.strip():
+                    decision.product_reasons.setdefault(pid, text.strip()[:120])
 
     def _describe_context(self, context_ids):
         """Pre-fetch what most decisions need, so the model can usually answer in
@@ -247,11 +263,20 @@ class RecommendationAgent:
                 f"Store categories: {categories}\n"
                 "Shortlist:\n" + "\n".join(line(p) for p in shortlist))
 
-    def _top_up(self, decision, catalog_ids, excluded):
+    def _top_up(self, decision, catalog_ids, excluded, limit):
         """Fill to the limit with random products so the response size matches v1."""
-        missing = self._limit - len(decision.product_ids)
+        missing = limit - len(decision.product_ids)
         if missing > 0:
             extra = random_recommendations(catalog_ids, excluded | set(decision.product_ids), missing, self._rng)
             decision.product_ids += extra
             decision.topped_up = len(extra)
+        return self._add_rule_reasons(decision)
+
+    def _add_rule_reasons(self, decision):
+        """Give every product without a model reason v1's rule-based reason."""
+        products = self._catalog.all_products()
+        decision.product_reasons = {
+            pid: decision.product_reasons.get(pid) or rule_reason(products.get(pid))
+            for pid in decision.product_ids
+        }
         return decision

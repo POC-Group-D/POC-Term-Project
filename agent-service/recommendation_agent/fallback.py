@@ -7,3 +7,9 @@ def random_recommendations(catalog_ids, excluded, limit, rng=random):
     """Up to `limit` random catalog products not in `excluded` (same as v1)."""
     candidates = sorted(set(catalog_ids) - set(excluded))
     return rng.sample(candidates, min(limit, len(candidates)))
+
+
+def rule_reason(product):
+    """The reason v1 gives for a product: its catalog category (same as v1)."""
+    category = product.categories[0] if product and product.categories else "store"
+    return f"From our {category} collection"

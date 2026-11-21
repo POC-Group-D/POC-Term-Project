@@ -6,11 +6,7 @@
 # served locally by Ollama: free and unlimited, but on a laptop CPU each new
 # decision takes 20-40 s. The first start downloads the model (about 2.5 GB).
 #
-# Any OpenAI-compatible provider works instead; set in .env, for example:
-#   MODEL_BASE_URL=https://models.github.ai/inference   (GitHub Models)
-#   MODEL_API_KEY=<token>                               (secret: .env only)
-#   MODEL_NAME=openai/gpt-4o-mini
-# The local ollama services still start but are then unused.
+# To test Groq without starting the shop or Ollama, see agent-service/README.md.
 
 services:
   recommendationservice:
