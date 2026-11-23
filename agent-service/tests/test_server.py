@@ -105,3 +105,28 @@ def test_api_v2_returns_a_reason_per_product_and_honours_max_results(stack):
     assert [r.product_id for r in response.recommendations] == ids
     assert all(r.reason for r in response.recommendations)
     assert log.records[-1]["productReasons"] == [r.reason for r in response.recommendations]
+    assert log.records[-1]["maxResults"] == 3
+
+
+def test_catalog_outage_is_a_grpc_error_and_is_recorded(monkeypatch):
+    # Nothing listens on this port, so every catalog call fails.
+    monkeypatch.setenv("PRODUCT_CATALOG_SERVICE_ADDR", "127.0.0.1:1")
+    settings = Settings.from_env()
+    agent = RecommendationAgent(CatalogClient(settings.catalog_addr, rpc_timeout=0.5), ScriptedModel(),
+                                cache_ttl_seconds=0)
+    log = RecordingLog()
+    server, addr = start_server(
+        lambda s: demo_pb2_grpc.add_RecommendationServiceServicer_to_server(
+            RecommendationService(agent, log, settings), s))
+    channel = grpc.insecure_channel(addr)
+    try:
+        with pytest.raises(grpc.RpcError) as failure:
+            demo_pb2_grpc.RecommendationServiceStub(channel).ListRecommendations(
+                demo_pb2.ListRecommendationsRequest(user_id="s", product_ids=["LS4PSXUNUM"]), timeout=5)
+        assert failure.value.code() == grpc.StatusCode.UNAVAILABLE
+        [record] = log.records
+        assert record["outcome"] == "error"
+        assert record["recommendedProductIds"] == []
+    finally:
+        channel.close()
+        server.stop(None)

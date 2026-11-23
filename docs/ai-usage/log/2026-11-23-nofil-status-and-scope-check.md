@@ -37,3 +37,37 @@
 
 - The changes are documentation only; no code or Azure resources changed.
 - The report PDF still needs recompiling (Docker was not running).
+
+## Code review and fixes
+
+Prompts:
+
+4. "Now, do an independent code review (run and test everything). We will
+   complete the report once we have the final code."
+5. "Fix all four" (the findings of step 4).
+
+What was run: 32 agent unit tests, `bash -n` on every script, `az bicep
+build` on every template, the Compose files, the local shop with v1 and with
+v2 on Groq (smoke test and a contract test of API version 2), and two faults:
+an invalid Groq key (v2 falls back, valid answers) and a stopped catalog
+(gRPC `UNAVAILABLE`).
+
+Findings and fixes:
+
+1. A failed v2 request (non-OK gRPC status) left no decision record, and
+   Azure Monitor counts it as HTTP 200, so the availability criterion could
+   not see it. v2 now records it (`outcome: error`), and `canary_check.py`
+   counts those records as errors.
+2. Tokens per model call were averaged over fallbacks too (0 tokens). Now
+   only `agent` decisions count.
+3. Correctness checked "at most 10 products". Records now carry `maxResults`,
+   and the check uses it.
+4. The local smoke test did not cover API version 2. It now checks
+   `max_results` (4, and 15 capped to 10) and a reason per product: 6 checks.
+
+Verification: 33 unit tests (one new); `canary_check.py` with mocked Azure
+data (a healthy step passes; 2 gRPC errors in 41 requests fail availability);
+local smoke test 6/6 on v1 and on v2 (Groq); the stopped catalog now leaves an
+`error` record. Observation: one empty-cart request got Groq's
+`tool_use_failed` (the model did not call `recommend`) and fell back, as
+designed.

@@ -8,6 +8,9 @@ Checks:
   1. The frontend serves the home page and a product page.
   2. ListRecommendations honours its contract: at most 5 product IDs, every ID
      exists in the catalog, and no ID from the request is echoed back.
+  3. Recommendation API version 2 (docs/api.md): max_results is honoured
+     (0 = 5, capped at 10), and `recommendations` lists the same products as
+     `product_ids`, each with a non-empty reason.
 
 These rules are the baseline correctness criteria v2 (the AI agent) must meet.
 """
@@ -25,6 +28,7 @@ FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://frontend:8080")
 RECOMMENDATION_ADDR = os.environ.get("RECOMMENDATION_ADDR", "recommendationservice:8080")
 CATALOG_ADDR = os.environ.get("CATALOG_ADDR", "productcatalogservice:3550")
 MAX_RECOMMENDATIONS = 5
+MAX_RESULTS_CAP = 10
 RPC_TIMEOUT_SECONDS = 5
 # v2 on a local CPU model needs 20-40 s per new decision. A shorter deadline
 # would make v2 fall back (still a valid answer) but leave the abandoned model
@@ -47,12 +51,16 @@ def list_catalog_ids():
     return {product.id for product in response.products}
 
 
-def list_recommendations(cart_ids):
+def call_recommendations(cart_ids, max_results=0):
     with grpc.insecure_channel(RECOMMENDATION_ADDR) as channel:
         stub = demo_pb2_grpc.RecommendationServiceStub(channel)
-        request = demo_pb2.ListRecommendationsRequest(user_id="smoke-test", product_ids=cart_ids)
-        response = stub.ListRecommendations(request, timeout=RECOMMENDATION_TIMEOUT_SECONDS)
-    return list(response.product_ids)
+        request = demo_pb2.ListRecommendationsRequest(user_id="smoke-test", product_ids=cart_ids,
+                                                      max_results=max_results)
+        return stub.ListRecommendations(request, timeout=RECOMMENDATION_TIMEOUT_SECONDS)
+
+
+def list_recommendations(cart_ids):
+    return list(call_recommendations(cart_ids).product_ids)
 
 
 def check_recommendation_contract(catalog_ids, cart_ids):
@@ -68,6 +76,21 @@ def check_recommendation_contract(catalog_ids, cart_ids):
     if echoed:
         raise AssertionError(f"cart items echoed back: {sorted(echoed)}")
     return recommended
+
+
+def check_api_version_2(catalog_ids, cart_ids, max_results):
+    response = call_recommendations(cart_ids, max_results)
+    ids = list(response.product_ids)
+    expected = min(max_results, MAX_RESULTS_CAP) if max_results > 0 else MAX_RECOMMENDATIONS
+    if len(ids) != expected:
+        raise AssertionError(f"max_results={max_results}: expected {expected} products, got {len(ids)}")
+    if [r.product_id for r in response.recommendations] != ids:
+        raise AssertionError("recommendations do not match product_ids")
+    if not all(r.reason.strip() for r in response.recommendations):
+        raise AssertionError("a product has no reason")
+    if set(ids) - catalog_ids or set(ids) & set(cart_ids) or len(set(ids)) != len(ids):
+        raise AssertionError(f"invalid, repeated or cart product IDs: {ids}")
+    return f"{len(ids)} products, e.g. {response.recommendations[0].reason!r}"
 
 
 def main():
@@ -90,8 +113,13 @@ def main():
     run("recommendations, empty cart", lambda: check_recommendation_contract(catalog_ids, []))
     run("recommendations, two-item cart",
         lambda: check_recommendation_contract(catalog_ids, sorted(catalog_ids)[:2]))
+    cart = sorted(catalog_ids)[:2]
+    for max_results in (4, 15):
+        run(f"API version 2, max_results={max_results}",
+            lambda m=max_results: check_api_version_2(catalog_ids, cart, m))
 
-    print(f"\n{4 - failures}/4 checks passed")
+    total = 6
+    print(f"\n{total - failures}/{total} checks passed")
     return 1 if failures else 0
 
 

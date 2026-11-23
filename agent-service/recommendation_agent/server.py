@@ -7,7 +7,7 @@ from concurrent import futures
 import grpc
 from grpc_health.v1 import health, health_pb2, health_pb2_grpc
 
-from .agent import RecommendationAgent
+from .agent import Decision, RecommendationAgent
 from .catalog import CatalogClient
 from .config import Settings
 from .model import ChatModel
@@ -30,8 +30,15 @@ class RecommendationService(demo_pb2_grpc.RecommendationServiceServicer):
             decision = self._agent.recommend(context_ids, time_budget=context.time_remaining(),
                                              limit=request.max_results)
         except grpc.RpcError as exc:
-            # The catalog is down; v1 fails the same way in this case.
+            # The catalog is down; v1 fails the same way in this case. Record
+            # the failure too, so the canary's availability check counts it:
+            # a gRPC error is not an HTTP 5xx in the platform's request metric.
             logger.error("catalog unavailable: %s", exc)
+            failed = Decision(product_ids=[], outcome="error", fallback_reason=f"catalog unavailable: {exc.code()}",
+                              limit=request.max_results)
+            latency_ms = (time.perf_counter() - started) * 1000
+            self._log.write(build_record(request.user_id, context_ids, failed, latency_ms,
+                                         self._agent.model_name, 0.0))
             context.abort(grpc.StatusCode.UNAVAILABLE, "product catalog unavailable")
 
         latency_ms = (time.perf_counter() - started) * 1000

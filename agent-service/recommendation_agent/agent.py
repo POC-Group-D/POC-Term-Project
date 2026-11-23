@@ -12,6 +12,7 @@ Outcomes recorded per request:
   agent     the model chose the products (possibly topped up to the limit)
   cached    a recent model decision for the same context was reused
   fallback  the model failed, timed out or returned nothing usable; v1 answered
+  error     the catalog was unreachable, so the request failed (recorded by the server)
 """
 
 import json
@@ -61,6 +62,7 @@ class Decision:
     topped_up: int = 0
     prompt_tokens: int = 0
     completion_tokens: int = 0
+    limit: int = 0  # how many products the caller asked for (max_results after defaults)
 
 
 def build_shortlist(products, context_ids, size, rng):
@@ -163,10 +165,10 @@ class RecommendationAgent:
             chosen = sanitize(cached_ids, catalog_ids, excluded, limit)
             if chosen:
                 decision = Decision(product_ids=chosen, outcome="cached", reason=cached_reason,
-                                    product_reasons=cached_product_reasons)
+                                    product_reasons=cached_product_reasons, limit=limit)
                 return self._top_up(decision, catalog_ids, excluded, limit)
 
-        decision = Decision(product_ids=[], outcome="agent")
+        decision = Decision(product_ids=[], outcome="agent", limit=limit)
         try:
             if self._model is None:
                 raise AgentError("no model configured")

@@ -1,8 +1,12 @@
 """Check the canary criteria (docs/canary-criteria.md) for one time window.
 
 Reads v2's decision records from Cosmos DB and the request counts of both
-revisions from Azure Monitor, prints one line per criterion, and exits with
-0 when every criterion passes and 1 when any fails.
+revisions from Azure Monitor. v2's errors are counted from both: the platform
+metric sees HTTP 5xx (e.g. a crashed or unreachable revision), while a gRPC
+error status travels as HTTP 200 and is seen only in v2's own records.
+
+Prints one line per criterion, and exits with 0 when every criterion passes
+and 1 when any fails.
 
 Run by ./canary.sh measure; it passes the window and the revision names.
 """
@@ -28,7 +32,7 @@ MAX_P95_MS = 2000
 MIN_CORRECT = 95.0           # percent
 MAX_TOKENS_PER_REQUEST = 1500
 MAX_SPEND = 8.0              # USD, 80% of the $10 budget
-MAX_RECOMMENDATIONS = 10     # API cap on max_results
+MAX_RECOMMENDATIONS = 10     # API cap on max_results (records older than maxResults)
 
 
 def az(*args):
@@ -71,10 +75,12 @@ def request_counts(app_id, start, end):
 
 def is_correct(record, catalog_ids):
     ids = record["recommendedProductIds"]
+    # The caller's max_results after defaults; older records do not have it.
+    limit = record.get("maxResults") or MAX_RECOMMENDATIONS
     # API version 2: one non-empty reason per product (older records have none).
     reasons = record.get("productReasons", ["-"] * len(ids))
     return (record["outcome"] in ("agent", "cached")
-            and 0 < len(ids) <= MAX_RECOMMENDATIONS
+            and 0 < len(ids) <= limit
             and len(set(ids)) == len(ids)
             and all(i in catalog_ids for i in ids)
             and not set(ids) & set(record["contextProductIds"])
@@ -104,21 +110,29 @@ def main():
     v1_total, v1_failed = counts.get(args.v1, (0, 0))
     v2_total, v2_failed = counts.get(args.v2, (0, 0))
     v1_rate = 100 * v1_failed / v1_total if v1_total else 0.0
-    v2_rate = 100 * v2_failed / v2_total if v2_total else 0.0
+    monitor_rate = 100 * v2_failed / v2_total if v2_total else 0.0
+    errors = [r for r in records if r["outcome"] == "error"]
+    record_rate = 100 * len(errors) / len(records) if records else 0.0
+    v2_rate = max(monitor_rate, record_rate)
 
-    latency = p95([r["latencyMs"] for r in records])
-    correct = 100 * sum(is_correct(r, catalog_ids) for r in records) / len(records) if records else None
-    model_calls = [r for r in records if r["outcome"] != "cached"]
+    # Latency and correctness are judged on the responses v2 actually served;
+    # failed requests count against availability above.
+    served = [r for r in records if r["outcome"] != "error"]
+    latency = p95([r["latencyMs"] for r in served])
+    correct = 100 * sum(is_correct(r, catalog_ids) for r in served) / len(served) if served else None
+    # Tokens per model call: only decisions the model made (cached answers and
+    # fallbacks would pull the average down).
+    model_calls = [r for r in records if r["outcome"] == "agent"]
     tokens = (sum(r["promptTokens"] + r["completionTokens"] for r in model_calls) / len(model_calls)
               if model_calls else 0.0)
     spend = float(az("consumption", "budget", "show", "--budget-name", args.budget,
                      "--resource-group", args.resource_group,
                      "--query", "currentSpend.amount") or 0)
-    outcomes = {o: sum(r["outcome"] == o for r in records) for o in ("agent", "cached", "fallback")}
+    outcomes = {o: sum(r["outcome"] == o for r in records) for o in ("agent", "cached", "fallback", "error")}
 
     print(f"Requests to recommendationservice: v1 {v1_total:.0f}, v2 {v2_total:.0f}. "
           f"v2 decisions: {outcomes['agent']} by the model, {outcomes['cached']} cached, "
-          f"{outcomes['fallback']} fallback")
+          f"{outcomes['fallback']} fallback, {outcomes['error']} failed")
     rows = [
         ("Availability", f"v2 errors {v2_rate:.1f}% (v1 {v1_rate:.1f}%)", "<= 1%, at most 1 pt above v1",
          v2_rate <= MAX_ERROR_RATE and v2_rate - v1_rate <= MAX_ERROR_RATE_ABOVE_V1),

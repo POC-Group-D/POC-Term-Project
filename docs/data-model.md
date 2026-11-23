@@ -50,6 +50,7 @@ erDiagram
         string userId "partition key"
         string version
         string outcome
+        int maxResults
         string[] recommendedProductIds
         int promptTokens
         int completionTokens
@@ -108,14 +109,15 @@ measurements.
 | `timestamp` | ISO 8601 | When the decision was made |
 | `version` | string | `v2` |
 | `contextProductIds` | string[] | Request input: product viewed + cart |
+| `maxResults` | int | How many products the caller asked for (API version 2 `max_results`; 0 becomes 5, at most 10) |
 | `recommendedProductIds` | string[] | Response output (what the shop showed) |
 | `productReasons` | string[] | The reason for each recommended product, same order (API version 2) |
-| `outcome` | string | `agent` (the model decided), `cached` (a recent model decision reused), `fallback` (random picks, like v1) |
+| `outcome` | string | `agent` (the model decided), `cached` (a recent model decision reused), `fallback` (random picks, like v1), `error` (the request failed with gRPC `UNAVAILABLE` because the catalog was unreachable; no products) |
 | `fallbackReason` | string | Why the model's answer was not used (timeout, error, invalid picks) |
 | `reason` | string | The model's one-sentence explanation |
 | `toolCalls` | object[] | Tools the model called, with their arguments |
 | `steps` | int | Number of model calls in this decision |
-| `toppedUp` | int | Products added at random when the model returned fewer than 5 valid ones |
+| `toppedUp` | int | Products added at random when the model returned fewer than `maxResults` valid ones |
 | `model` | string | e.g. `openai/gpt-oss-20b` |
 | `promptTokens`, `completionTokens` | int | Model usage (the cost driver) |
 | `estimatedCostUsd` | float | Tokens × configured price ($0 on Groq Free) |

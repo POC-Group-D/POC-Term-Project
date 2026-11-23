@@ -30,7 +30,7 @@ The full Docker Compose commands it runs:
 | Start with v1 | `docker compose up -d --build` |
 | Start with v2 | `docker compose -f docker-compose.yml -f docker-compose.v2.yml up -d --build` |
 | Back to v1 from v2 | `docker compose up -d --build recommendationservice` |
-| Check it works | `./smoke-test.sh` (expects `4/4 checks passed`; works with v1 or v2) |
+| Check it works | `./smoke-test.sh` (expects `6/6 checks passed`; works with v1 or v2) |
 | Watch v2 decisions | `./watch-agent.sh` |
 | Status | `docker compose -f docker-compose.yml -f docker-compose.v2.yml ps` |
 | Logs of one service | `docker compose logs -f recommendationservice` |

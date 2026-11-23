@@ -52,6 +52,7 @@ def build_record(user_id, context_ids, decision, latency_ms, model_name, cost_us
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "version": SERVICE_VERSION,
         "contextProductIds": list(context_ids),
+        "maxResults": decision.limit,
         "recommendedProductIds": list(decision.product_ids),
         "productReasons": [decision.product_reasons.get(pid, "") for pid in decision.product_ids],
         "outcome": decision.outcome,

@@ -342,7 +342,9 @@ billed account by accident.
 \textbf{Criteria.} Before the first canary we fixed the criteria in
 Table~\ref{tab:criteria}~\cite{sre-canary}. At each step v2 is judged under
 the load generator's traffic~\cite{locust}. Availability comes from the
-Azure Monitor \texttt{Requests} metric per revision. Latency, correctness
+Azure Monitor \texttt{Requests} metric per revision (HTTP 5xx) and from v2's
+records of failed requests, because a non-OK gRPC status reaches the
+platform as HTTP 200. Latency, correctness
 and tokens come from v2's decision records. A response is \emph{correct}
 when the model made the choice (\texttt{agent} or \texttt{cached}, not a
 fallback), every ID exists, there are no duplicates or owned products, the
@@ -360,7 +362,7 @@ generator. v1 needs only one catalog call and no model call.
 \toprule
 Metric & Measured as & v2 threshold \\
 \midrule
-Availability & 5xx and timeouts / requests, per revision & $\le$1\%, $\le$v1+1 pt \\
+Availability & 5xx, timeouts and gRPC errors / requests, per revision & $\le$1\%, $\le$v1+1 pt \\
 Latency & p95 of v2 \texttt{latencyMs} over the step & $\le$2000\,ms \\
 Correctness & share of v2 responses passing all rules & $\ge$95\% \\
 Cost & tokens per model call; Azure spend & $\le$1500; $<$\$8 \\
