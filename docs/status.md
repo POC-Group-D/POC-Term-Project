@@ -88,15 +88,14 @@ From `Project_Description-Fall2026_Updated.pdf`.
 
 ## Code and branch state
 
-- All of the work above is on branch **`nofil-azure-v2-groq`**, in **pull
-  request #4** (open, not merged; 13 commits ahead of `main`). `main` still
-  has only v1 on Azure.
-- **Until PR #4 is merged**, every v2 or v1 deploy needs
-  `IMAGE_TAG=nofil-azure-v2-groq`. The `latest` images are the old ones from
-  before Groq and before the API change. The README's commands already
-  include it.
+- All of the work above is on **`main`** (pull request #4 merged on
+  2026-11-23, commit `f32206e`). New work goes on a fresh `nofil-...` branch
+  from `main`.
+- CI publishes the `latest` images from `main`, so a plain
+  `./canary.sh deploy` uses the current v2. The README's
+  `IMAGE_TAG=nofil-azure-v2-groq` commands still work (same code).
 - **Tests:** 33 unit tests for the agent (`agent-service/tests`), run in the
-  image build.
+  image build; the local smoke test runs 6 checks.
 
 ## How to run things
 
@@ -142,25 +141,22 @@ after-class checklist.
 
 ## What is left
 
-1. **Merge PR #4** into `main` (a teammate reviews it). Afterwards a plain
-   `./canary.sh deploy` works without `IMAGE_TAG`, and the CI `latest`
-   images become the new ones.
-2. **Report:** fill in the red TODOs (member contributions, especially
+1. **Report:** fill in the red TODOs (member contributions, especially
    Mustafa's and Rahil's), proofread, recompile, and submit as
    `D4-report-GroupD.pdf`.
-3. **D4 slides** (`D4-presentation-GroupD.pdf/.ppt`): 15 minutes covering
+2. **D4 slides** (`D4-presentation-GroupD.pdf/.ppt`): 15 minutes covering
    service, architecture, data model, migration method, criteria, v1-v2
    comparison (cost plus one quality attribute), canary steps, dashboard,
    promote/rollback decisions, extra feature, cost monitoring, what works
    and what doesn't, cloud strengths and limits. Every member presents,
    demos or answers questions.
-4. **Backup demo video** of Demos 3-5. It needs the Azure shop on for about
+3. **Backup demo video** of Demos 3-5. It needs the Azure shop on for about
    20-30 minutes; ask before starting.
-5. **Rehearse** the live demo from the README once.
-6. **Source package** `D4-project-GroupD.zip` (without `.venv` folders or
+4. **Rehearse** the live demo from the README once.
+5. **Source package** `D4-project-GroupD.zip` (without `.venv` folders or
    `infra/local/.env`).
-7. **After grading:** tear down the Azure resources (`infra/azure/teardown.sh`).
-8. Optional: re-run the full canary (`./canary.sh run`, about 35 minutes of
+6. **After grading:** tear down the Azure resources (`infra/azure/teardown.sh`).
+7. Optional: re-run the full canary (`./canary.sh run`, about 35 minutes of
    shop time) so `canary-results.md` reflects API version 2. The recorded
    runs predate it; the 50% step after the change passed.
 
