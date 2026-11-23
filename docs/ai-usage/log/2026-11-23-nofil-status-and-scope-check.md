@@ -71,3 +71,15 @@ local smoke test 6/6 on v1 and on v2 (Groq); the stopped catalog now leaves an
 `error` record. Observation: one empty-cart request got Groq's
 `tool_use_failed` (the model did not call `recommend`) and fell back, as
 designed.
+
+## Azure redeploy
+
+Prompt 6: "Yes, deploy on Azure."
+
+Spend before: $0.00 of the $10 budget. `./cloud.sh start`, smoke test 5/5,
+`IMAGE_TAG=nofil-azure-v2-groq ./canary.sh deploy` (new revision
+`recommendationservice--v2-1123-1840`, CI image of commit 7211e1f), one
+2-minute measured step at 50%: all four criteria passed (0% errors, p95
+524 ms, 100% correct, 838 tokens per model call). Cosmos DB records carry
+`maxResults` (4). Then `./canary.sh rollback` (v1 100%) and `./cloud.sh stop`;
+spend after: $0.00.

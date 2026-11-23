@@ -62,6 +62,10 @@ From `Project_Description-Fall2026_Updated.pdf`.
   Only the correctness check caught it, which is the key talking point.
 - **After API version 2:** one 2-minute step at 50% passed every criterion
   (p95 658 ms, 100% correct including "a reason per product", 864 tokens).
+- **After the code review (2026-11-23):** v2 now records failed requests
+  (gRPC errors) and `maxResults`. Redeployed as `v2-1123-1840`; one 2-minute
+  step at 50% passed every criterion (v1 21 / v2 19 requests, 0% errors,
+  p95 524 ms, 100% correct, 838 tokens per model call, $0.00).
 - **Cost:** $0.00 billed (free grants). At list prices v2 is about 1.45× v1
   per request; idle compute dominates both, and the model adds about
   $0.00002 per request with the cache.
@@ -76,7 +80,7 @@ From `Project_Description-Fall2026_Updated.pdf`.
   It is **stopped** between demos (`./cloud.sh start` / `stop`).
 - **recommendationservice revisions:** label `v1` =
   `recommendationservice--v1-1116-2130` (our v1 image, API version 2), label
-  `v2` = `recommendationservice--v2-1116-2131` (Groq). The split is v1 100%,
+  `v2` = `recommendationservice--v2-1123-1840` (Groq). The split is v1 100%,
   v2 0%. Older revisions have 0% and scale to zero, so they cost nothing.
 - **Images:** `ghcr.io/poc-group-d/{recommendationservice-v2,
   recommendationservice-v1, productcatalogservice-200, frontend}`. The live
@@ -91,7 +95,7 @@ From `Project_Description-Fall2026_Updated.pdf`.
   `IMAGE_TAG=nofil-azure-v2-groq`. The `latest` images are the old ones from
   before Groq and before the API change. The README's commands already
   include it.
-- **Tests:** 32 unit tests for the agent (`agent-service/tests`), run in the
+- **Tests:** 33 unit tests for the agent (`agent-service/tests`), run in the
   image build.
 
 ## How to run things
