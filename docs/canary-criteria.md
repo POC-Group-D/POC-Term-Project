@@ -49,4 +49,11 @@ the rollback.
   day, 8000 tokens per minute, so about 10 model calls per minute).
   Requests over the limit fall back and count against correctness.
 - Container Apps reports response time only for the whole app, not per
-  revision. For that reason, v2's latency comes from its own records.
+  revision. For that reason, v2's latency comes from its own records, and the
+  threshold judges v2 on its own. We still compare it with v1 under the same
+  load in two ways:
+  - v1 makes one internal call to the product catalog and no model call, so
+    its time is small next to v2's 0.5-1.4 s model call.
+  - Every step also records the p95 of whole shop pages from the load
+    generator ("Shop pages p95" in [canary-results.md](canary-results.md)).
+    That shows what shoppers feel as v2's share grows from 10% to 100%.

@@ -291,8 +291,11 @@ field is renamed, renumbered or removed, so Protobuf's rules for unknown and
 default fields~\cite{protobuf} keep every client--server combination
 working (Table~\ref{tab:compat}). \emph{Both} implementations
 use version~2: v1 gives a rule-based reason (``From our kitchen
-collection''), v2 the model's own. The requirement that a client cannot tell
-which version served a request still holds. We built v1 from Google's
+collection''), v2 the model's own. The project description asks the agent
+to keep the replaced component's interface unchanged; we therefore changed
+the API once, before the canary, for both versions together. During the
+canary v1 and v2 expose the same contract, so a client still cannot tell
+which version served a request. We built v1 from Google's
 source with this change, and the frontend from source to show the reasons.
 Each service's stubs were generated with the tool version that matches its
 Protobuf runtime.
@@ -317,7 +320,9 @@ v1 & v1 & unchanged \\
 Log Analytics (capped at 0.15\,GB/day), the Container Apps environment, the
 ten apps and Cosmos DB. A budget with alerts at 50/80/100\% was created
 before the first deployment. Resources are tagged with \texttt{project},
-\texttt{component} and \texttt{version}. A GitHub Actions workflow builds
+\texttt{component} and \texttt{version}. Tags apply to a whole app, not to a
+revision, so v1's and v2's compute is split by each revision's Azure Monitor
+usage instead (Section~\ref{sec:cost}). A GitHub Actions workflow builds
 the four images we change (v1, v2, catalog, frontend) and pushes them to
 GitHub Container Registry with commit, branch and \texttt{latest} tags.
 \texttt{cloud.sh} stops and starts the whole shop between demos.
@@ -342,6 +347,10 @@ and tokens come from v2's decision records. A response is \emph{correct}
 when the model made the choice (\texttt{agent} or \texttt{cached}, not a
 fallback), every ID exists, there are no duplicates or owned products, the
 count is within \texttt{max\_results}, and every product has a reason.
+Container Apps reports response time per app, not per revision, so the
+latency threshold judges v2 on its own. To compare with v1 under the same
+load, each step also records the p95 of whole shop pages from the load
+generator. v1 needs only one catalog call and no model call.
 
 \begin{table}[t]
 \caption{Canary criteria (fixed in advance; violation $\Rightarrow$ roll back to v1)}

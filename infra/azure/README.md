@@ -70,7 +70,12 @@ Every resource carries `project=poc-group-d`, `course=coen6313`,
 - `component`: the service name, or `platform` / `monitoring`
 - `version`: `v1` (recommendationservice), `v2` (agent resources such as Cosmos DB), or `shared`
 
-Filter Cost Analysis by these tags to separate v1 and v2 costs.
+Filter Cost Analysis by these tags to separate the cost of each service and
+of the resources only v2 uses (Cosmos DB). v1 and v2 themselves are two
+revisions of the same `recommendationservice` app, and Azure tags apply to
+the app, not to a revision. Their compute is therefore split by each
+revision's usage (replica time and requests from Azure Monitor), as shown in
+[docs/cost-report.md](../../docs/cost-report.md).
 
 ## Internal networking
 

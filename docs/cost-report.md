@@ -44,6 +44,12 @@ page; checked 2026-11-16, in USD):
 Each revision runs one replica with 0.25 vCPU and 0.5 GiB, so a replica costs
 $0.00063 per minute: 15 vCPU-seconds plus 30 GiB-seconds.
 
+**How v1 and v2 are separated.** Tags (`component`, `version`) separate each
+service and the resources only v2 uses, such as Cosmos DB. v1 and v2 are two
+revisions of the same Container App, and Azure tags apply to the app, not to
+a revision, so tags alone cannot split their compute. We split it by each
+revision's own usage instead, from Azure Monitor metrics filtered by revision.
+
 **Usage on the canary day**, per revision:
 - Replica-minutes come from the Azure Monitor `Replicas` metric.
 - Request counts come from the `Requests` metric.

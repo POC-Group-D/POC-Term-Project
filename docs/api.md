@@ -6,6 +6,15 @@ recommendations it wants, and returns a reason for each product. Both
 implementations, v1 (random picks) and v2 (AI agent), implement version 2, so
 the canary still compares two services with the same API.
 
+**Why we changed the interface.** For Option B, the project description says
+the AI agent version must keep the interface of the component it replaces
+unchanged. After our D3 demo, the lecturer asked us to design the API
+ourselves instead of reusing Google's as it is. We met both: the API changed
+once, *before* the canary, for both versions at the same time. During the
+canary v1 and v2 expose exactly the same contract, so a client cannot tell
+which one served a request. The change only adds fields, so old clients keep
+working (see [Backward compatibility](#backward-compatibility)).
+
 The contract lives in
 [`online-boutique/protos/demo.proto`](../online-boutique/protos/demo.proto)
 (gRPC / Protocol Buffers).
