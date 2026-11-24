@@ -140,9 +140,8 @@ after-class checklist.
 
 ## What is left
 
-1. **Report:** fill in the red TODOs (member contributions, especially
-   Mustafa's and Rahil's), proofread, recompile, and submit as
-   `D4-report-GroupD.pdf`.
+1. **Report:** complete (5 pages, contributions filled in). Proofread once
+   and submit `docs/report/D4-report-GroupD.pdf`.
 2. **D4 slides** (`D4-presentation-GroupD.pdf/.ppt`): 15 minutes covering
    service, architecture, data model, migration method, criteria, v1-v2
    comparison (cost plus one quality attribute), canary steps, dashboard,
