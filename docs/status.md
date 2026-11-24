@@ -42,7 +42,7 @@ From `Project_Description-Fall2026_Updated.pdf`.
 | — | Monitoring dashboard | ✅ Azure Monitor workbook | `infra/azure/dashboard.bicep`, `./dashboard.sh` |
 | — | Extra feature | ✅ Docker + GitHub Actions CI building 4 images to GHCR | `.github/workflows/images.yml` |
 | D1-D3 | Group info, scope slides, progress demo | ✅ Done (D3: Demos 1-3 shown; feedback about the API) | slides in the parent folder |
-| D4 | Presentation, live demo with a canary step and a rollback, backup video, IEEE report (5-8 pages), source zip | ⏳ Report drafted; the rest to do | [report/](report/) |
+| D4 | Presentation, live demo with a canary step and a rollback, backup video, IEEE report (5-8 pages), source zip | ⏳ Report complete; slides, video, zip to do | [report/](report/) |
 
 ## Key results
 
