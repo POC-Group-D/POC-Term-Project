@@ -565,12 +565,15 @@ traffic.
 
 \section{Contribution of Each Member}
 \begin{itemize}
-\item \textbf{Mustafa Ghouri:} proposed Online Boutique (Option B) as the
-project's service; created the group's GitHub organization and the project
-repository; forked Google's \texttt{microservices-demo} into the
-organization; laid out the repository's folder structure; and imported the
-Online Boutique source into the repository, which became the base of all
-later work.
+\item \textbf{Mustafa Ghouri:} selected Online Boutique (Option B), an
+eleven-service gRPC application, as the system to migrate; set up the
+group's GitHub organization and repository, and forked Google's
+\texttt{microservices-demo} into it; imported release v0.10.7 (364 files,
+all eleven services) into the project repository, converting the embedded
+Git submodule link into tracked source so that the services could be
+modified and built by our CI pipeline; and defined the repository layout
+that separates the upstream application, the agent service
+(\texttt{agent-service/}) and infrastructure as code (\texttt{infra/}).
 \item \textbf{Nofil Siddiqui:} local Docker stack; Azure foundation (budget,
 Bicep, Container Apps, Cosmos DB); the v2 agent and its tests; GitHub
 Actions; canary tooling, criteria, measurements and dashboard; cost report;
