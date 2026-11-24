@@ -113,7 +113,10 @@ Bicep templates and v1 on Container Apps;
 \item the v2 agent, unit-tested against a scripted model;
 \item canary tooling, criteria and measurements;
 \item the API redesign, which answered the lecturer's feedback after the
-first demo.
+first demo;
+\item an end-to-end review: every test and script run again, faults
+injected locally, four findings fixed, and v2 redeployed and re-measured on
+Azure before the code was merged into \texttt{main}.
 \end{enumerate}
 Infrastructure is code (Bicep and shell scripts), and images are built by
 GitHub Actions. AI coding assistants were used throughout. The prompts,
@@ -135,6 +138,7 @@ Week 2--3 & D1 group, D2 scope: Option B, recommendation service as agent, Azure
 Week 6 (Oct.\ 23--26) & Local stack; v2 agent (local Qwen3-4B); v1 and Cosmos DB on Azure; D3 demo \\
 Nov.\ 16 & v2 on Azure (Groq); canary scripts, criteria, measurements; dashboard; cost report \\
 Nov.\ 16 & Recommendation API version 2 (lecturer's feedback) \\
+Nov.\ 23 & Code review and fixes; v2 redeployed and re-measured; merged into \texttt{main} \\
 Week 12 & D4 presentation, live demo, report \\
 \bottomrule
 \end{tabularx}
@@ -208,9 +212,9 @@ items and quantities). Orders are not stored: they are charged, e-mailed
 (both mocked) and discarded. Prices use a \texttt{Money} type of whole
 units plus nanos, which avoids floating-point rounding. v2 adds one
 document per response to a free-tier Cosmos DB container. The document holds
-the context, recommended IDs and their reasons, the outcome
-(\texttt{agent}, \texttt{cached} or \texttt{fallback}), the model, tokens
-and latency. The partition key is \texttt{/userId}, and a 30-day TTL keeps
+the context, the requested number of results, the recommended IDs and their
+reasons, the outcome (\texttt{agent}, \texttt{cached}, \texttt{fallback},
+or \texttt{error} when the request failed), the model, tokens and latency. The partition key is \texttt{/userId}, and a 30-day TTL keeps
 storage inside the free tier. Writes are asynchronous, so a slow database
 never delays a recommendation. The agent keeps no conversation: each
 request is one stateless exchange. An in-memory cache (10 minutes, keyed by
@@ -228,9 +232,10 @@ Field & Meaning \\
 \texttt{id}, \texttt{userId} & document ID; shopper session (partition key) \\
 \texttt{timestamp}, \texttt{version} & when; \texttt{v2} \\
 \texttt{contextProductIds} & request: viewed product and cart \\
+\texttt{maxResults} & products requested (\texttt{max\_results}) \\
 \texttt{recommendedProductIds} & response, in order \\
 \texttt{productReasons} & reason per product (API version 2) \\
-\texttt{outcome} & \texttt{agent}, \texttt{cached} or \texttt{fallback} \\
+\texttt{outcome} & \texttt{agent}, \texttt{cached}, \texttt{fallback} or \texttt{error} \\
 \texttt{fallbackReason}, \texttt{reason} & why the model was bypassed; the model's summary \\
 \texttt{toolCalls}, \texttt{steps}, \texttt{toppedUp} & tools called, model calls, random fill \\
 \texttt{model}, \texttt{promptTokens}, \texttt{completionTokens} & model and usage (the cost driver) \\
@@ -252,8 +257,12 @@ rephrases v1's output. Guardrails drop IDs that are unknown, duplicated or
 already owned, and cap the list. If fewer products remain than requested,
 the list is topped up at random. If the model fails, times out or returns
 nothing usable, the agent answers with v1's random choice. The client
-therefore always receives a valid response. Thirty-two unit tests run
-against a scripted model, and the image build runs them.
+therefore always receives a valid response; only an unreachable catalog
+makes the request fail (gRPC \texttt{UNAVAILABLE}, as in v1), and that
+failure is recorded too. Thirty-three unit tests run against a scripted
+model and a fake catalog, and the image build runs them. A smoke test checks
+the running shop and the API contract (\texttt{max\_results} and a reason
+per product) against either version.
 
 \textbf{Model.} The Hugging Face free account had no inference credits. We
 therefore first ran Qwen3-4B-Instruct~\cite{qwen3} locally with Ollama: the
@@ -426,7 +435,9 @@ every criterion at every step and was promoted. Only 45 of 212 v2 requests
 needed a model call; the rest reused a cached decision, because the load
 generator visits only nine products. After the API change, a two-minute step
 at 50\% again passed every criterion (p95 658\,ms, 100\% correct including
-the reason rule, 864 tokens per model call).
+the reason rule, 864 tokens per model call). After the code review, the
+redeployed v2 passed a two-minute step at 50\% once more: 19 v2 requests,
+0\% errors, p95 524\,ms, 100\% correct and 838 tokens per model call.
 
 \textbf{Rollback.} We deployed a v2 with an invalid model key and ran the
 canary again. At 10\%, all 11 v2 responses were fallbacks: correctness 0\%,
@@ -445,7 +456,7 @@ cups), with a reason for each.
 
 \textbf{Monitoring.} An Azure Monitor workbook, deployed from Bicep, shows
 requests per revision (the traffic split over time), status codes, v2's
-p95, outcomes (agent, cached or fallback) and tokens per model call.
+p95, outcomes (agent, cached, fallback or error) and tokens per model call.
 
 \subsection{Cost Report}\label{sec:cost}
 The actual bill was \textbf{\$0.00}. Cost Management showed no charge for
@@ -512,8 +523,12 @@ load fit: it cut model calls by about 78\%, along with latency and cost.
 requests 1--2 minutes late. Our first check undercounted v2 until we compared
 it minute by minute with the Cosmos DB records. Container Apps reports
 response time only per app, not per revision, so v2's latency comes from its
-own records. Copying a revision also inherited settings from the newest
-revision, so our scripts set every value explicitly.
+own records. The request metric also classifies responses by HTTP status,
+and a gRPC error travels as HTTP 200, so our review found that a failed v2
+request was invisible to the availability check. v2 now records its failed
+requests, and the checker counts them. Copying a revision also inherited
+settings from the newest revision, so our scripts set every value
+explicitly.
 
 \textbf{API evolution in a migration.} Changing the API while two
 implementations run side by side is only safe when the change is additive.
@@ -527,7 +542,9 @@ and rollback, the dashboard and the cost figures. Three things work less
 well. The local CPU model is too slow for real shoppers (20--60\,s), so it
 is useful only for development. Groq's free plan allows about ten fresh
 model decisions per minute, which limits how much load a canary step can
-apply. And the reasons for v1's and v2's random picks are generic, so a
+apply, and it occasionally rejects an answer in which the model did not
+call the required tool; the agent then falls back. And the reasons for
+v1's and v2's random picks are generic, so a
 shopper can tell a random pick from an AI pick by its wording, even though
 the API cannot.
 
@@ -554,7 +571,8 @@ contributions, e.g.\ presentation, report sections, testing}
 \item \textbf{Nofil Siddiqui:} local Docker stack; Azure foundation (budget,
 Bicep, Container Apps, Cosmos DB); the v2 agent and its tests; GitHub
 Actions; canary tooling, criteria, measurements and dashboard; cost report;
-recommendation API version 2. \todo{confirm wording}
+recommendation API version 2; end-to-end code review and fixes.
+\todo{confirm wording}
 \item \textbf{Rahil Shah:} \todo{role and technical contributions}
 \end{itemize}
 
