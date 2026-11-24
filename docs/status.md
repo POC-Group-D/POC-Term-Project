@@ -154,9 +154,13 @@ after-class checklist.
 5. **Source package** `D4-project-GroupD.zip` (without `.venv` folders or
    `infra/local/.env`).
 6. **After grading:** tear down the Azure resources (`infra/azure/teardown.sh`).
-7. Optional: re-run the full canary (`./canary.sh run`, about 35 minutes of
-   shop time) so `canary-results.md` reflects API version 2. The recorded
-   runs predate it; the 50% step after the change passed.
+7. **Mustafa: run the full canary on the final code** (`./canary.sh run`,
+   about 35 minutes of shop time, plus `./canary.sh deploy faulty` for a
+   rollback run). The report already credits him with it, so it must happen
+   before submission. Then update `canary-results.md` and the report's
+   results table with his numbers. The Azure resources are in Nofil's
+   subscription, so Nofil runs it with him or grants him access to
+   `rg-poc-group-d`.
 
 Unknown: the exact D4 date (Week 12 Thursday) and how the remaining work is
 split among the team.
