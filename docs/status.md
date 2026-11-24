@@ -83,17 +83,16 @@ From `Project_Description-Fall2026_Updated.pdf`.
   `v2` = `recommendationservice--v2-1123-1840` (Groq). The split is v1 100%,
   v2 0%. Older revisions have 0% and scale to zero, so they cost nothing.
 - **Images:** `ghcr.io/poc-group-d/{recommendationservice-v2,
-  recommendationservice-v1, productcatalogservice-200, frontend}`. The live
-  ones use the tag `nofil-azure-v2-groq`.
+  recommendationservice-v1, productcatalogservice-200, frontend}`. CI tags
+  each build `sha-<commit>`, and builds from `main` also `latest`.
 
 ## Code and branch state
 
 - All of the work above is on **`main`** (pull request #4 merged on
-  2026-11-23, commit `f32206e`). New work goes on a fresh `nofil-...` branch
-  from `main`.
-- CI publishes the `latest` images from `main`, so a plain
-  `./canary.sh deploy` uses the current v2. The README's
-  `IMAGE_TAG=nofil-azure-v2-groq` commands still work (same code).
+  2026-11-23). The merged branches were deleted; `main` is the only branch.
+  New work goes on a fresh `nofil-...` branch from `main`.
+- CI publishes the `latest` images from `main`, and the scripts deploy
+  `latest` by default (`./canary.sh deploy`).
 - **Tests:** 33 unit tests for the agent (`agent-service/tests`), run in the
   image build; the local smoke test runs 6 checks.
 

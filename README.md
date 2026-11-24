@@ -250,7 +250,7 @@ All pass: go to the next step. Any fails: all traffic goes back to v1.
    Deploy a **faulty v2**: its Groq key is wrong, so it can never reach the AI:
 
    ```bash
-   IMAGE_TAG=nofil-azure-v2-groq ./canary.sh deploy faulty
+   ./canary.sh deploy faulty
    ```
 
    **You should see:** `Traffic: v1 100%, v2 0%`. Then start the canary with 2-minute steps:
@@ -298,7 +298,7 @@ In `infra/azure`:
 1. Put the good v2 back (at 0% traffic, about 1 minute):
 
    ```bash
-   IMAGE_TAG=nofil-azure-v2-groq ./canary.sh deploy
+   ./canary.sh deploy
    ```
 
 2. **Turn the cloud shop off** (no compute cost while off):
@@ -313,8 +313,8 @@ In `infra/azure`:
    ./cloud.sh status
    ```
 
-> `IMAGE_TAG=nofil-azure-v2-groq` picks the v2 image with the Groq settings.
-> Once pull request #4 is merged into `main`, plain `./canary.sh deploy` works too.
+> `./canary.sh deploy` uses the `latest` images, which CI builds from `main`.
+> To deploy another build, set `IMAGE_TAG` (for example `IMAGE_TAG=sha-<commit>`).
 
 ---
 
@@ -356,7 +356,7 @@ Then `./shop.sh watch` in a second window, open Mug, and `./shop.sh stop` when d
 | `az: command not found` | Close and reopen Git Bash |
 | `Not logged in to Azure` | Run `az login` and sign in with your Concordia account |
 | Demo 4 still shows random products | Run `./canary.sh status`: v2 must have the share you set. Look for `FALLBACK` in `./canary.sh watch` |
-| `No v2 revision yet` | Run `IMAGE_TAG=nofil-azure-v2-groq ./canary.sh deploy` |
+| `No v2 revision yet` | Run `./canary.sh deploy` |
 | Demo 5 fails with `no v2 requests` | Too little traffic reached v2 in 2 minutes. Run `./canary.sh rollback`, then `./canary.sh run` again without `MEASURE_MINUTES=2` |
 | The dashboard is empty | Data arrives 2-5 minutes late; refresh, and check the time range |
 
